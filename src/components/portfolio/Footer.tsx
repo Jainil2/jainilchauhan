@@ -1,17 +1,18 @@
-import { Github, Linkedin, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
+import { BrandIcon } from "@/components/brand/BrandIcon";
 
 export function Footer() {
   return (
     <footer className="mt-16 border-t border-border">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6">
-        <p className="font-mono text-xs text-muted-foreground">
-          © 2026 Jainil Chauhan — built with care.
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-10 sm:flex-row sm:px-6">
+        <p className="text-sm text-muted-foreground">
+          © 2026 Jainil Chauhan. Built with care.
         </p>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <a
             href="mailto:jainil.chauhan@example.com"
             aria-label="Email"
-            className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-terminal"
+            className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
           >
             <Mail className="size-4" />
           </a>
@@ -20,18 +21,18 @@ export function Footer() {
             target="_blank"
             rel="noreferrer"
             aria-label="LinkedIn"
-            className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-terminal"
+            className="rounded-md p-2 transition-colors hover:bg-secondary"
           >
-            <Linkedin className="size-4" />
+            <BrandIcon name="LinkedIn" size={16} />
           </a>
           <a
             href="https://github.com/jainil-chauhan"
             target="_blank"
             rel="noreferrer"
             aria-label="GitHub"
-            className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-terminal"
+            className="rounded-md p-2 transition-colors hover:bg-secondary"
           >
-            <Github className="size-4" />
+            <BrandIcon name="GitHub" size={16} />
           </a>
         </div>
       </div>
