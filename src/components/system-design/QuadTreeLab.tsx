@@ -157,7 +157,7 @@ export function QuadTreeLab() {
   }
 
   function addRandom() {
-     const newPoints = [];
+     const newPoints: { x: number; y: number }[] = [];
      for(let i=0; i<10; i++) {
         newPoints.push({ x: Math.random() * width, y: Math.random() * height });
      }

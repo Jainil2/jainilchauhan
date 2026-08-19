@@ -107,7 +107,7 @@ export function AVLTreeLab() {
         </div>
       </div>
       <p className="font-mono text-xs text-muted-foreground">
-        AVL keeps every node balance factor in {(-1, 0, 1)}; rotations restore height.
+        AVL keeps every node balance factor in {"{-1, 0, 1}"}; rotations restore height.
       </p>
     </div>
   );

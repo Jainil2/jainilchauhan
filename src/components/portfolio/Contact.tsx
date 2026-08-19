@@ -6,7 +6,7 @@ import { Github, Linkedin, Mail, Download, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { SectionHeading } from "./SectionHeading";
-import { sendContactMessage } from "@/server/contact";
+import { sendContactMessage } from "@/lib/contact.functions";
 import { useTokenBucket } from "@/hooks/useTokenBucket";
 import { TokenBucket } from "@/components/system-design/TokenBucket";
 
