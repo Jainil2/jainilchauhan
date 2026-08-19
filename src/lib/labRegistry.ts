@@ -131,6 +131,12 @@ export interface LabEntry {
   realWorld?: string[];
   pitfalls?: string[];
   references?: { label: string; href: string }[];
+  /**
+   * Named companies/products that run on this concept, shown as chips in the
+   * "Used in production" section. `href` points at a public source (engineering
+   * blog, paper, docs); entries without one render as "commonly used in".
+   */
+  usedBy?: { company: string; product: string; usage: string; href?: string }[];
 }
 
 export const labRegistry: LabEntry[] = [
@@ -161,6 +167,53 @@ export const labRegistry: LabEntry[] = [
       "Middle insertions are expensive because data must shift.",
       "Sparse data wastes memory when represented as a dense array.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Fixed-size array: index math, not traversal.
+const frames = new Float64Array(8); // contiguous, 8 bytes per slot
+frames[3] = 16.7; // address = base + 3 * 8  -> O(1)
+
+// Sliding window over contiguous samples (cache-friendly scan).
+function maxWindow(xs: Float64Array, w: number): number[] {
+  const out: number[] = [];
+  let sum = 0;
+  for (let i = 0; i < xs.length; i++) {
+    sum += xs[i];
+    if (i >= w) sum -= xs[i - w];
+    if (i >= w - 1) out.push(sum / w);
+  }
+  return out;
+}`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "Chrome / V8 engine",
+        usage:
+          'JavaScript arrays start life as contiguous "packed elements" backing stores so index access is pointer arithmetic; V8 deoptimises to a dictionary only when you create holes.',
+        href: "https://v8.dev/blog/elements-kinds",
+      },
+      {
+        company: "Meta",
+        product: "React reconciler",
+        usage:
+          "Fiber children and hook state are kept in ordered arrays, which is why hooks must be called in the same order every render.",
+        href: "https://react.dev/reference/rules/rules-of-hooks",
+      },
+      {
+        company: "Netflix",
+        product: "Playback telemetry",
+        usage:
+          "Ring/array buffers hold the last N bitrate and buffer-health samples so the ABR algorithm can scan a fixed window without allocating.",
+      },
+    ],
+    references: [
+      { label: "V8 — Elements kinds in V8", href: "https://v8.dev/blog/elements-kinds" },
+      {
+        label: "MDN — JavaScript typed arrays",
+        href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Typed_arrays",
+      },
+    ],
   },
   {
     slug: "dynamic-array",
@@ -185,6 +238,57 @@ export const labRegistry: LabEntry[] = [
       "Holding references into a backing array can break after resize in low-level languages.",
       "Over-allocation trades memory for append performance.",
       "Repeated front insertion is a poor fit; use a deque.",
+    ],
+    codeSnippet: {
+      language: "go",
+      code: `// Go slices are the canonical dynamic array: len + cap over a backing array.
+s := make([]int, 0, 4)
+for i := 0; i < 9; i++ {
+    s = append(s, i) // grows by ~2x when len == cap
+    fmt.Println(len(s), cap(s)) // 1/4 2/4 3/4 4/4 5/8 ... 9/16
+}
+
+// The reallocation is why you must reassign: append may return a new array.
+func push(dst []int, v int) []int {
+    if len(dst) == cap(dst) {
+        grown := make([]int, len(dst), max(1, 2*cap(dst)))
+        copy(grown, dst)
+        dst = grown
+    }
+    return append(dst, v)
+}`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "Go standard library",
+        usage:
+          "Every `append` on a slice is amortised doubling; the growth rule is documented in the Go slice internals post.",
+        href: "https://go.dev/blog/slices-intro",
+      },
+      {
+        company: "Python Software Foundation",
+        product: "CPython list",
+        usage:
+          "`list.append` over-allocates on a documented growth pattern so appends stay amortised O(1).",
+        href: "https://docs.python.org/3/faq/design.html#how-are-lists-implemented-in-cpython",
+      },
+      {
+        company: "Elastic",
+        product: "Elasticsearch bulk indexing",
+        usage:
+          "Bulk request buffers grow geometrically until a flush threshold, trading memory headroom for fewer copies.",
+      },
+    ],
+    references: [
+      {
+        label: "Go blog — Arrays, slices and the mechanics of append",
+        href: "https://go.dev/blog/slices-intro",
+      },
+      {
+        label: "CPython — how are lists implemented?",
+        href: "https://docs.python.org/3/faq/design.html#how-are-lists-implemented-in-cpython",
+      },
     ],
   },
   {
@@ -213,6 +317,55 @@ export const labRegistry: LabEntry[] = [
       "Poor cache locality can make lists slower than arrays despite better big-O for insertion.",
       "Deleting a node usually requires knowing its predecessor in a singly linked list.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Doubly linked list node — O(1) unlink/relink, the core of an LRU chain.
+interface Node<T> { value: T; prev?: Node<T>; next?: Node<T> }
+
+function unlink<T>(n: Node<T>) {
+  if (n.prev) n.prev.next = n.next;
+  if (n.next) n.next.prev = n.prev;
+  n.prev = n.next = undefined;
+}
+
+function pushFront<T>(head: Node<T> | undefined, n: Node<T>): Node<T> {
+  n.next = head;
+  if (head) head.prev = n;
+  return n; // new head
+}`,
+    },
+    usedBy: [
+      {
+        company: "Redis",
+        product: "Redis lists / LPUSH-RPUSH",
+        usage:
+          "Lists are stored as a quicklist — a linked list of compact listpack nodes — so pushes and pops at both ends stay O(1).",
+        href: "https://redis.io/docs/latest/develop/data-types/lists/",
+      },
+      {
+        company: "Linux kernel",
+        product: "list_head intrusive lists",
+        usage:
+          "Task, timer and driver structures embed `struct list_head`, giving O(1) insert/remove with no allocation.",
+        href: "https://www.kernel.org/doc/html/latest/core-api/kernel-api.html#list-management-functions",
+      },
+      {
+        company: "Memcached",
+        product: "Slab LRU chain",
+        usage:
+          "Each slab class keeps a doubly linked recency list so a hit only relinks pointers instead of shifting data.",
+      },
+    ],
+    references: [
+      {
+        label: "Redis docs — Lists (quicklist encoding)",
+        href: "https://redis.io/docs/latest/develop/data-types/lists/",
+      },
+      {
+        label: "Linux kernel — list management API",
+        href: "https://www.kernel.org/doc/html/latest/core-api/kernel-api.html#list-management-functions",
+      },
+    ],
   },
   {
     slug: "stack",
@@ -239,6 +392,51 @@ export const labRegistry: LabEntry[] = [
       "Popping from an empty stack must be handled explicitly.",
       "A stack reverses order; this is useful but easy to misuse.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Bracket matching: the classic LIFO check behind every parser.
+const PAIRS: Record<string, string> = { ")": "(", "]": "[", "}": "{" };
+
+export function balanced(src: string): boolean {
+  const stack: string[] = [];
+  for (const ch of src) {
+    if (ch === "(" || ch === "[" || ch === "{") stack.push(ch);
+    else if (ch in PAIRS) {
+      if (stack.pop() !== PAIRS[ch]) return false; // wrong closer
+    }
+  }
+  return stack.length === 0; // nothing left unclosed
+}`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "V8 call stack / Error.stack",
+        usage:
+          "Each JS call pushes a frame; the stack trace you read in DevTools is that stack unwound, and deep recursion pops out as RangeError.",
+        href: "https://v8.dev/docs/stack-trace-api",
+      },
+      {
+        company: "Mozilla",
+        product: "WebAssembly value stack",
+        usage:
+          "Wasm is a stack machine: instructions push and pop operands, and validation checks the stack shape ahead of time.",
+        href: "https://developer.mozilla.org/en-US/docs/WebAssembly/Guides/Understanding_the_text_format",
+      },
+      {
+        company: "Figma",
+        product: "Undo / redo history",
+        usage:
+          "Editing tools keep an undo stack of inverse operations, popping the most recent edit first.",
+      },
+    ],
+    references: [
+      { label: "V8 — Stack trace API", href: "https://v8.dev/docs/stack-trace-api" },
+      {
+        label: "MDN — Call stack",
+        href: "https://developer.mozilla.org/en-US/docs/Glossary/Call_stack",
+      },
+    ],
   },
   {
     slug: "queue",
@@ -264,6 +462,59 @@ export const labRegistry: LabEntry[] = [
       "Unbounded queues hide overload as growing latency.",
       "Array-backed queues must avoid O(n) front shifts; use head/tail indexes.",
       "Distributed queues need idempotent consumers because retries happen.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// O(1) FIFO with head/tail indexes — no O(n) shift() on every dequeue.
+export class Queue<T> {
+  private items: (T | undefined)[] = [];
+  private head = 0;
+
+  enqueue(v: T) { this.items.push(v); }
+
+  dequeue(): T | undefined {
+    if (this.head >= this.items.length) return undefined;
+    const v = this.items[this.head];
+    this.items[this.head++] = undefined; // release reference
+    if (this.head > 32 && this.head * 2 >= this.items.length) {
+      this.items = this.items.slice(this.head); // compact rarely
+      this.head = 0;
+    }
+    return v;
+  }
+}`,
+    },
+    usedBy: [
+      {
+        company: "Amazon",
+        product: "AWS SQS",
+        usage:
+          "Standard queues buffer work between producers and consumers with visibility timeouts and dead-letter queues for poison messages.",
+        href: "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-basic-architecture.html",
+      },
+      {
+        company: "Shopify",
+        product: "Sidekiq background jobs",
+        usage:
+          "Checkout side-effects (emails, webhooks, inventory sync) are enqueued so the request path stays fast and retries are automatic.",
+      },
+      {
+        company: "Google",
+        product: "Chrome task queues",
+        usage:
+          "The event loop drains macrotask and microtask queues in arrival order, which is why a long task delays every queued callback.",
+        href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Execution_model",
+      },
+    ],
+    references: [
+      {
+        label: "AWS — SQS basic architecture",
+        href: "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-basic-architecture.html",
+      },
+      {
+        label: "MDN — JavaScript execution model (task queues)",
+        href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Execution_model",
+      },
     ],
   },
   {
@@ -292,6 +543,56 @@ export const labRegistry: LabEntry[] = [
       "Concurrency at both ends requires careful locking or lock-free design.",
       "A deque is not a priority queue; it preserves end order, not priority.",
     ],
+    codeSnippet: {
+      language: "py",
+      code: `from collections import deque
+
+# Sliding-window maximum in O(n): the deque holds indexes of
+# candidates in decreasing value order.
+def window_max(xs, w):
+    dq, out = deque(), []
+    for i, x in enumerate(xs):
+        while dq and xs[dq[-1]] <= x:
+            dq.pop()            # dominated candidates leave the back
+        dq.append(i)
+        if dq[0] <= i - w:
+            dq.popleft()        # window moved past the front
+        if i >= w - 1:
+            out.append(xs[dq[0]])
+    return out`,
+    },
+    usedBy: [
+      {
+        company: "Python Software Foundation",
+        product: "collections.deque",
+        usage:
+          "A doubly linked list of fixed-size blocks giving O(1) appends and pops at both ends, plus bounded `maxlen` ring behaviour.",
+        href: "https://docs.python.org/3/library/collections.html#collections.deque",
+      },
+      {
+        company: "Oracle",
+        product: "Java ForkJoinPool work stealing",
+        usage:
+          "Each worker owns a deque: it pushes/pops its own tasks at one end while idle threads steal from the other end.",
+        href: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ForkJoinPool.html",
+      },
+      {
+        company: "Datadog",
+        product: "Agent metric buffers",
+        usage:
+          "Bounded deques keep the newest N samples per metric and drop the oldest when the flush interval slips.",
+      },
+    ],
+    references: [
+      {
+        label: "Python docs — collections.deque",
+        href: "https://docs.python.org/3/library/collections.html#collections.deque",
+      },
+      {
+        label: "Java — ForkJoinPool (work-stealing deques)",
+        href: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ForkJoinPool.html",
+      },
+    ],
   },
   {
     slug: "circular-buffer",
@@ -317,6 +618,63 @@ export const labRegistry: LabEntry[] = [
       "Full and empty states can look identical if only head and tail are tracked.",
       "Overwrite policy must be explicit.",
       "Multi-producer/multi-consumer rings require memory-ordering discipline.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Fixed-memory ring with an explicit overwrite policy.
+export class RingBuffer<T> {
+  private buf: (T | undefined)[];
+  private head = 0; // read cursor
+  private size = 0;
+  constructor(readonly capacity: number) {
+    this.buf = new Array(capacity);
+  }
+  write(v: T) {
+    const tail = (this.head + this.size) % this.capacity;
+    this.buf[tail] = v;
+    if (this.size === this.capacity) this.head = (this.head + 1) % this.capacity; // drop oldest
+    else this.size++;
+  }
+  read(): T | undefined {
+    if (this.size === 0) return undefined; // size disambiguates full vs empty
+    const v = this.buf[this.head];
+    this.head = (this.head + 1) % this.capacity;
+    this.size--;
+    return v;
+  }
+}`,
+    },
+    usedBy: [
+      {
+        company: "LMAX",
+        product: "Disruptor exchange core",
+        usage:
+          "A pre-allocated ring buffer with sequence counters lets the trading engine pass millions of events per second between threads without locks.",
+        href: "https://lmax-exchange.github.io/disruptor/disruptor.html",
+      },
+      {
+        company: "Linux kernel",
+        product: "dmesg / printk log buffer",
+        usage:
+          "Kernel messages land in a fixed ring, so old lines are overwritten instead of exhausting memory.",
+        href: "https://www.kernel.org/doc/html/latest/core-api/printk-basics.html",
+      },
+      {
+        company: "Spotify",
+        product: "Audio playback pipeline",
+        usage:
+          "Decoded PCM frames sit in a ring between the decoder and the audio device so jitter never blocks the decoder.",
+      },
+    ],
+    references: [
+      {
+        label: "LMAX Disruptor — technical paper",
+        href: "https://lmax-exchange.github.io/disruptor/disruptor.html",
+      },
+      {
+        label: "Linux — printk ring buffer basics",
+        href: "https://www.kernel.org/doc/html/latest/core-api/printk-basics.html",
+      },
     ],
   },
   {
@@ -344,6 +702,69 @@ export const labRegistry: LabEntry[] = [
       "Resizing can create latency spikes.",
       "Iteration order should not be relied on unless the implementation guarantees it.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Separate chaining with load-factor driven resize.
+export class HashMap<V> {
+  private buckets: [string, V][][] = Array.from({ length: 8 }, () => []);
+  private count = 0;
+
+  private idx(key: string, m = this.buckets.length) {
+    let h = 2166136261; // FNV-1a
+    for (let i = 0; i < key.length; i++) {
+      h = (h ^ key.charCodeAt(i)) * 16777619;
+    }
+    return (h >>> 0) % m;
+  }
+
+  set(key: string, value: V) {
+    const b = this.buckets[this.idx(key)];
+    const hit = b.find((e) => e[0] === key);
+    if (hit) { hit[1] = value; return; }
+    b.push([key, value]);
+    if (++this.count / this.buckets.length > 0.75) this.resize();
+  }
+
+  private resize() {
+    const next: [string, V][][] = Array.from({ length: this.buckets.length * 2 }, () => []);
+    for (const b of this.buckets) for (const e of b) next[this.idx(e[0], next.length)].push(e);
+    this.buckets = next;
+  }
+}`,
+    },
+    usedBy: [
+      {
+        company: "Redis",
+        product: "Keyspace / HSET",
+        usage:
+          "The main keyspace is a hash table that rehashes incrementally into a second table so a resize never stalls the single-threaded event loop.",
+        href: "https://redis.io/docs/latest/develop/data-types/hashes/",
+      },
+      {
+        company: "Cloudflare",
+        product: "Edge routing tables",
+        usage:
+          "Hash maps resolve host/zone lookups per request; hash-collision (HashDoS) hardening uses randomised seeds.",
+        href: "https://blog.cloudflare.com/why-i-started-contributing-to-swiss-tables/",
+      },
+      {
+        company: "Google",
+        product: "Abseil Swiss Tables",
+        usage:
+          "SIMD-scanned open-addressed control bytes make flat_hash_map lookups faster than node-based maps across Google's C++ code.",
+        href: "https://abseil.io/about/design/swisstables",
+      },
+    ],
+    references: [
+      {
+        label: "Abseil — Swiss Tables design notes",
+        href: "https://abseil.io/about/design/swisstables",
+      },
+      {
+        label: "Redis docs — Hashes",
+        href: "https://redis.io/docs/latest/develop/data-types/hashes/",
+      },
+    ],
   },
   {
     slug: "bitset",
@@ -369,6 +790,57 @@ export const labRegistry: LabEntry[] = [
       "Requires a stable mapping from item to bit position.",
       "Sparse large universes may waste memory.",
       "Bit arithmetic is compact but can reduce readability if not wrapped well.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// One bit per id: 1M feature flags in 125 KB.
+export class Bitset {
+  private words: Uint32Array;
+  constructor(bits: number) { this.words = new Uint32Array(Math.ceil(bits / 32)); }
+  set(i: number) { this.words[i >>> 5] |= 1 << (i & 31); }
+  has(i: number) { return (this.words[i >>> 5] & (1 << (i & 31))) !== 0; }
+  // Intersect two cohorts with word-at-a-time AND.
+  and(other: Bitset) {
+    const out = new Bitset(this.words.length * 32);
+    for (let w = 0; w < this.words.length; w++) out.words[w] = this.words[w] & other.words[w];
+    return out;
+  }
+  popcount() {
+    let n = 0;
+    for (let w of this.words) { w = w - ((w >>> 1) & 0x55555555); w = (w & 0x33333333) + ((w >>> 2) & 0x33333333); n += (((w + (w >>> 4)) & 0x0f0f0f0f) * 0x01010101) >>> 24; }
+    return n;
+  }
+}`,
+    },
+    usedBy: [
+      {
+        company: "Elastic",
+        product: "Elasticsearch / Lucene filters",
+        usage:
+          "Filter clauses are cached as bitsets per segment so combining filters is a word-wise AND rather than a re-scan.",
+        href: "https://www.elastic.co/blog/frame-of-reference-and-roaring-bitmaps",
+      },
+      {
+        company: "Druid / Apache",
+        product: "Roaring bitmap indexes",
+        usage:
+          "Compressed bitmaps store which rows match each dimension value, making high-cardinality filtering cheap.",
+        href: "https://roaringbitmap.org/",
+      },
+      {
+        company: "Redis",
+        product: "Bitmaps (SETBIT) for DAU tracking",
+        usage:
+          "One bit per user id per day gives daily-active-user counts and retention set operations in a few hundred KB.",
+        href: "https://redis.io/docs/latest/develop/data-types/bitmaps/",
+      },
+    ],
+    references: [
+      { label: "Roaring Bitmaps — compressed bitset format", href: "https://roaringbitmap.org/" },
+      {
+        label: "Redis docs — Bitmaps",
+        href: "https://redis.io/docs/latest/develop/data-types/bitmaps/",
+      },
     ],
   },
   {
@@ -397,6 +869,54 @@ export const labRegistry: LabEntry[] = [
       "Wrong sparse format makes operations expensive.",
       "When density grows, dense arrays can become faster and simpler.",
     ],
+    codeSnippet: {
+      language: "py",
+      code: `import numpy as np
+from scipy.sparse import csr_matrix
+
+# 3 users x 4 items, only 4 ratings stored instead of 12 cells.
+rows = [0, 0, 1, 2]
+cols = [1, 3, 0, 2]
+vals = [5.0, 3.0, 4.0, 2.0]
+R = csr_matrix((vals, (rows, cols)), shape=(3, 4))
+
+R.data          # non-zero values, row-major
+R.indices       # column index of each value
+R.indptr        # where each row starts -> O(nnz per row) scans
+
+similar = R @ R.T   # cosine-style neighbourhood, touches only non-zeros`,
+    },
+    usedBy: [
+      {
+        company: "Netflix",
+        product: "Recommendation matrix factorisation",
+        usage:
+          "The user x title rating matrix is over 99% empty, so latent-factor models iterate only over observed cells.",
+        href: "https://netflixtechblog.com/netflix-recommendations-beyond-the-5-stars-part-1-55838468f429",
+      },
+      {
+        company: "Google",
+        product: "PageRank web graph",
+        usage:
+          "The web link matrix is stored as sparse adjacency: each page links to a handful of pages, not billions.",
+        href: "http://infolab.stanford.edu/~backrub/google.html",
+      },
+      {
+        company: "Spotify",
+        product: "Implicit-feedback collaborative filtering",
+        usage: "Play counts form a sparse user x track matrix consumed by ALS-style factorisation.",
+      },
+    ],
+    references: [
+      {
+        label: "SciPy — compressed sparse row (CSR) format",
+        href: "https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html",
+      },
+      {
+        label: "Netflix Tech Blog — recommendations beyond the 5 stars",
+        href: "https://netflixtechblog.com/netflix-recommendations-beyond-the-5-stars-part-1-55838468f429",
+      },
+    ],
   },
   {
     slug: "binary-tree",
@@ -423,6 +943,63 @@ export const labRegistry: LabEntry[] = [
       "Recursive traversal can overflow on deep trees.",
       "Tree height controls performance for many derived structures.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `interface TreeNode { value: string; left?: TreeNode; right?: TreeNode }
+
+// Depth-first: the shape of the tree drives the order.
+function inorder(n: TreeNode | undefined, out: string[] = []) {
+  if (!n) return out;
+  inorder(n.left, out);
+  out.push(n.value);
+  inorder(n.right, out);
+  return out;
+}
+
+// Breadth-first: level by level, the traversal UIs use for expand-all.
+function levels(root: TreeNode) {
+  const q = [root], out: string[][] = [];
+  while (q.length) {
+    const level = q.splice(0, q.length);
+    out.push(level.map((n) => n.value));
+    for (const n of level) { if (n.left) q.push(n.left); if (n.right) q.push(n.right); }
+  }
+  return out;
+}`,
+    },
+    usedBy: [
+      {
+        company: "Meta",
+        product: "React fiber tree",
+        usage:
+          "The UI is a tree of fiber nodes walked depth-first during render and commit; sibling/child pointers make the walk interruptible.",
+        href: "https://react.dev/learn/preserving-and-resetting-state",
+      },
+      {
+        company: "Google",
+        product: "Chrome DOM & render tree",
+        usage:
+          "HTML parses into a DOM tree, which is walked to build the render tree and layout boxes on every frame.",
+        href: "https://developer.chrome.com/docs/devtools/dom",
+      },
+      {
+        company: "Git / Linux Foundation",
+        product: "Git tree objects",
+        usage:
+          "A commit points at a tree object whose children are subtrees and blobs, so unchanged directories are shared between commits.",
+        href: "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects",
+      },
+    ],
+    references: [
+      {
+        label: "Git internals — tree objects",
+        href: "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects",
+      },
+      {
+        label: "MDN — Introduction to the DOM",
+        href: "https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction",
+      },
+    ],
   },
   {
     slug: "binary-search-tree",
@@ -448,6 +1025,58 @@ export const labRegistry: LabEntry[] = [
       "Sorted inserts can degrade to a chain.",
       "Delete cases are easy to implement incorrectly.",
       "Duplicate-key policy must be explicit.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `interface BST { key: number; left?: BST; right?: BST }
+
+function insert(node: BST | undefined, key: number): BST {
+  if (!node) return { key };
+  if (key < node.key) node.left = insert(node.left, key);
+  else if (key > node.key) node.right = insert(node.right, key);
+  return node;
+}
+
+// Ordered range scan: the property a hash map cannot give you.
+function range(node: BST | undefined, lo: number, hi: number, out: number[] = []) {
+  if (!node) return out;
+  if (node.key > lo) range(node.left, lo, hi, out);
+  if (node.key >= lo && node.key <= hi) out.push(node.key);
+  if (node.key < hi) range(node.right, lo, hi, out);
+  return out;
+}`,
+    },
+    usedBy: [
+      {
+        company: "Oracle",
+        product: "Java TreeMap / TreeSet",
+        usage:
+          "Sorted map APIs (headMap, tailMap, ceilingKey) are backed by a balanced search tree, giving ordered iteration a HashMap can't.",
+        href: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/TreeMap.html",
+      },
+      {
+        company: "Google",
+        product: "Abseil btree_map",
+        usage:
+          "Google replaced node-per-key trees with B-tree-shaped ordered containers for better cache behaviour at the same ordered-API surface.",
+        href: "https://abseil.io/docs/cpp/guides/container",
+      },
+      {
+        company: "SQLite",
+        product: "In-memory ephemeral tables",
+        usage:
+          "Ordered lookups and range constraints inside query execution rely on search-tree structures rather than hashing.",
+      },
+    ],
+    references: [
+      {
+        label: "Java — TreeMap (sorted map contract)",
+        href: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/TreeMap.html",
+      },
+      {
+        label: "Abseil — ordered container guide",
+        href: "https://abseil.io/docs/cpp/guides/container",
+      },
     ],
   },
   {
@@ -476,6 +1105,64 @@ export const labRegistry: LabEntry[] = [
       "More rotations than red-black trees under frequent writes.",
       "Recursive implementations must handle height updates carefully.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// AVL keeps |height(left) - height(right)| <= 1 via rotations.
+interface AVL { key: number; h: number; left?: AVL; right?: AVL }
+const h = (n?: AVL) => n?.h ?? 0;
+const fix = (n: AVL) => { n.h = 1 + Math.max(h(n.left), h(n.right)); return n; };
+
+function rotateRight(y: AVL): AVL {
+  const x = y.left!;
+  y.left = x.right;
+  x.right = fix(y);
+  return fix(x);
+}
+
+function rebalance(n: AVL): AVL {
+  const bf = h(n.left) - h(n.right);
+  if (bf > 1) {
+    if (h(n.left!.left) < h(n.left!.right)) n.left = rotateLeft(n.left!); // left-right case
+    return rotateRight(n);
+  }
+  if (bf < -1) {
+    if (h(n.right!.right) < h(n.right!.left)) n.right = rotateRight(n.right!);
+    return rotateLeft(n);
+  }
+  return fix(n);
+}`,
+    },
+    usedBy: [
+      {
+        company: "Oracle",
+        product: "MySQL / InnoDB adaptive structures",
+        usage:
+          "Strictly height-balanced trees are chosen where reads dominate writes, because the tighter bound means fewer comparisons per lookup.",
+      },
+      {
+        company: "Ethereum Foundation",
+        product: "AVL+ trees in Merkle-authenticated stores",
+        usage:
+          "Authenticated dictionaries use AVL-style rebalancing so proof paths stay logarithmic and deterministic.",
+        href: "https://eprint.iacr.org/2016/994",
+      },
+      {
+        company: "Redis",
+        product: "RedisAI / module indexes",
+        usage:
+          "Read-heavy in-memory indexes favour strict balancing so lookup latency has a tight upper bound.",
+      },
+    ],
+    references: [
+      {
+        label: "Adelson-Velsky & Landis — original balancing paper (overview)",
+        href: "https://en.wikipedia.org/wiki/AVL_tree",
+      },
+      {
+        label: "Improving authenticated dynamic dictionaries (AVL+)",
+        href: "https://eprint.iacr.org/2016/994",
+      },
+    ],
   },
   {
     slug: "red-black-tree",
@@ -499,6 +1186,59 @@ export const labRegistry: LabEntry[] = [
       "Color invariants are subtle to preserve.",
       "Implementation complexity is higher than AVL or treap.",
       "Not optimal for cache locality compared with B-trees.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Red-black invariants (relaxed balance -> fewer rotations than AVL):
+// 1. every node is red or black; the root is black
+// 2. a red node cannot have a red child
+// 3. every root-to-leaf path has the same number of black nodes
+// => longest path <= 2x shortest path, so height is O(log n)
+
+type Color = "R" | "B";
+interface RB { key: number; color: Color; left?: RB; right?: RB }
+
+function insertFixup(n: RB, parent: RB, grandparent: RB, uncle?: RB): void {
+  if (uncle?.color === "R") {
+    parent.color = uncle.color = "B"; // recolor, push the problem up
+    grandparent.color = "R";
+    return;
+  }
+  // black/absent uncle -> single or double rotation at the grandparent
+}`,
+    },
+    usedBy: [
+      {
+        company: "Linux kernel",
+        product: "CFS scheduler & VMA lookup",
+        usage:
+          "Runnable tasks and virtual memory areas live in red-black trees; the leftmost node is the next task to run.",
+        href: "https://www.kernel.org/doc/html/latest/core-api/rbtree.html",
+      },
+      {
+        company: "Oracle",
+        product: "Java TreeMap / HashMap treeified bins",
+        usage:
+          "TreeMap is a red-black tree, and HashMap converts a long collision chain into one when a bucket exceeds 8 entries.",
+        href: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html",
+      },
+      {
+        company: "GNU / C++ standard library",
+        product: "std::map, std::set",
+        usage:
+          "Ordered associative containers are specified with logarithmic bounds that implementations meet with red-black trees.",
+        href: "https://en.cppreference.com/w/cpp/container/map",
+      },
+    ],
+    references: [
+      {
+        label: "Linux kernel — Red-black trees (rbtree)",
+        href: "https://www.kernel.org/doc/html/latest/core-api/rbtree.html",
+      },
+      {
+        label: "cppreference — std::map complexity guarantees",
+        href: "https://en.cppreference.com/w/cpp/container/map",
+      },
     ],
   },
   {
@@ -524,6 +1264,71 @@ export const labRegistry: LabEntry[] = [
       "A heap is not globally sorted.",
       "Removing arbitrary items needs extra indexing.",
       "Priority ties require deterministic tie-breaking when order matters.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Array-backed binary min-heap: parent (i-1)>>1, children 2i+1 / 2i+2.
+export class MinHeap<T> {
+  private a: { p: number; v: T }[] = [];
+  push(p: number, v: T) {
+    this.a.push({ p, v });
+    let i = this.a.length - 1;
+    while (i > 0) {
+      const par = (i - 1) >> 1;
+      if (this.a[par].p <= this.a[i].p) break;
+      [this.a[par], this.a[i]] = [this.a[i], this.a[par]];
+      i = par;
+    }
+  }
+  pop(): T | undefined {
+    const top = this.a[0];
+    const last = this.a.pop();
+    if (this.a.length && last) {
+      this.a[0] = last;
+      for (let i = 0; ; ) {
+        const l = 2 * i + 1, r = l + 1;
+        let m = i;
+        if (l < this.a.length && this.a[l].p < this.a[m].p) m = l;
+        if (r < this.a.length && this.a[r].p < this.a[m].p) m = r;
+        if (m === i) break;
+        [this.a[m], this.a[i]] = [this.a[i], this.a[m]];
+        i = m;
+      }
+    }
+    return top?.v;
+  }
+}`,
+    },
+    usedBy: [
+      {
+        company: "Linux kernel",
+        product: "Timer wheels & I/O deadlines",
+        usage:
+          "Earliest-deadline-first structures pop the next expiring timer in O(log n) instead of scanning every pending timer.",
+      },
+      {
+        company: "Kubernetes / CNCF",
+        product: "kube-scheduler priority queue",
+        usage:
+          "Pending pods sit in an active priority queue ordered by pod priority and timestamp, so the highest-priority pod is scheduled next.",
+        href: "https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/",
+      },
+      {
+        company: "Uber",
+        product: "Dispatch & ETA search",
+        usage:
+          "Route search over the road graph pops the lowest-cost frontier node from a heap on every Dijkstra/A* expansion.",
+      },
+    ],
+    references: [
+      {
+        label: "Kubernetes — pod priority and preemption",
+        href: "https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/",
+      },
+      {
+        label: "Python docs — heapq (binary heap API)",
+        href: "https://docs.python.org/3/library/heapq.html",
+      },
     ],
   },
   {
@@ -552,6 +1357,64 @@ export const labRegistry: LabEntry[] = [
       "Lazy propagation bugs are common.",
       "The merge function must be associative.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Range sum with point update in O(log n) using an iterative segment tree.
+export class SegmentTree {
+  private t: number[];
+  constructor(private xs: number[]) {
+    const n = xs.length;
+    this.t = new Array(2 * n).fill(0);
+    for (let i = 0; i < n; i++) this.t[n + i] = xs[i];
+    for (let i = n - 1; i > 0; i--) this.t[i] = this.t[2 * i] + this.t[2 * i + 1];
+  }
+  update(i: number, value: number) {
+    const n = this.xs.length;
+    for (this.t[(i += n)] = value; i > 1; i >>= 1) this.t[i >> 1] = this.t[i] + this.t[i ^ 1];
+  }
+  query(lo: number, hi: number) { // [lo, hi)
+    const n = this.xs.length;
+    let sum = 0;
+    for (lo += n, hi += n; lo < hi; lo >>= 1, hi >>= 1) {
+      if (lo & 1) sum += this.t[lo++];
+      if (hi & 1) sum += this.t[--hi];
+    }
+    return sum;
+  }
+}`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "Monarch / time-series range rollups",
+        usage:
+          'Hierarchical range-aggregation trees answer "sum over this window" without rescanning every raw sample.',
+        href: "https://research.google/pubs/pub50652/",
+      },
+      {
+        company: "Figma",
+        product: "Multiplayer text CRDT ranges",
+        usage:
+          "Interval/segment trees map document offsets to formatting spans so an edit updates ranges in logarithmic time.",
+        href: "https://www.figma.com/blog/how-figmas-multiplayer-technology-works/",
+      },
+      {
+        company: "Codeforces / ICPC",
+        product: "Competitive programming toolbox",
+        usage:
+          "The default structure for mixed range-query + point-update workloads, including lazy-propagated range updates.",
+      },
+    ],
+    references: [
+      {
+        label: "CP-Algorithms — Segment tree",
+        href: "https://cp-algorithms.com/data_structures/segment_tree.html",
+      },
+      {
+        label: "Google — Monarch: planet-scale in-memory time series",
+        href: "https://research.google/pubs/pub50652/",
+      },
+    ],
   },
   {
     slug: "fenwick-tree",
@@ -579,6 +1442,54 @@ export const labRegistry: LabEntry[] = [
       "Less flexible than segment trees for arbitrary range operations.",
       "Requires invertible operations for easy range query conversion.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Binary Indexed Tree: prefix sums in O(log n) with one array and i & -i.
+export class Fenwick {
+  private t: number[];
+  constructor(n: number) { this.t = new Array(n + 1).fill(0); }
+  add(i: number, delta: number) {          // 1-based index
+    for (; i < this.t.length; i += i & -i) this.t[i] += delta;
+  }
+  prefix(i: number) {
+    let s = 0;
+    for (; i > 0; i -= i & -i) s += this.t[i];
+    return s;
+  }
+  range(lo: number, hi: number) { return this.prefix(hi) - this.prefix(lo - 1); }
+}`,
+    },
+    usedBy: [
+      {
+        company: "Riot Games",
+        product: "Leaderboard rank queries",
+        usage:
+          '"How many players scored above X" is a prefix-count over score buckets, updated as matches finish.',
+      },
+      {
+        company: "Cloudflare",
+        product: "Rolling analytics counters",
+        usage:
+          "Per-interval counters with cumulative queries let dashboards report windowed totals without scanning raw events.",
+      },
+      {
+        company: "Codeforces / ICPC",
+        product: "Inversion counting & order statistics",
+        usage:
+          "Counting inversions during a merge or answering k-th order statistics is the canonical Fenwick exercise.",
+        href: "https://cp-algorithms.com/data_structures/fenwick.html",
+      },
+    ],
+    references: [
+      {
+        label: "CP-Algorithms — Fenwick tree",
+        href: "https://cp-algorithms.com/data_structures/fenwick.html",
+      },
+      {
+        label: "Fenwick (1994) — A new data structure for cumulative frequency tables",
+        href: "https://doi.org/10.1002/spe.4380240306",
+      },
+    ],
   },
   {
     slug: "disjoint-set-union",
@@ -605,6 +1516,64 @@ export const labRegistry: LabEntry[] = [
       "Path compression mutates parent pointers during reads.",
       "DSU handles merges well but not arbitrary edge deletions.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Union-Find with path compression + union by size: near O(1) amortised.
+export class DSU {
+  private parent: number[];
+  private size: number[];
+  constructor(n: number) {
+    this.parent = Array.from({ length: n }, (_, i) => i);
+    this.size = new Array(n).fill(1);
+  }
+  find(x: number): number {
+    while (this.parent[x] !== x) {
+      this.parent[x] = this.parent[this.parent[x]]; // halve the path
+      x = this.parent[x];
+    }
+    return x;
+  }
+  union(a: number, b: number): boolean {
+    let ra = this.find(a), rb = this.find(b);
+    if (ra === rb) return false; // already connected -> would create a cycle
+    if (this.size[ra] < this.size[rb]) [ra, rb] = [rb, ra];
+    this.parent[rb] = ra;
+    this.size[ra] += this.size[rb];
+    return true;
+  }
+}`,
+    },
+    usedBy: [
+      {
+        company: "Meta",
+        product: "Friend / entity clustering",
+        usage:
+          "Merging duplicate entities and connected social components is a union-find over billions of pair decisions.",
+      },
+      {
+        company: "Google",
+        product: "Kruskal-based network planning",
+        usage:
+          "Minimum spanning tree construction uses union-find to reject edges that would close a cycle.",
+        href: "https://cp-algorithms.com/data_structures/disjoint_set_union.html",
+      },
+      {
+        company: "Percona / MySQL ecosystem",
+        product: "Deduplication pipelines",
+        usage:
+          "Record-linkage jobs union candidate pairs into clusters and then pick a survivor per cluster.",
+      },
+    ],
+    references: [
+      {
+        label: "CP-Algorithms — Disjoint set union",
+        href: "https://cp-algorithms.com/data_structures/disjoint_set_union.html",
+      },
+      {
+        label: "Tarjan — Efficiency of a good but not linear set union algorithm",
+        href: "https://dl.acm.org/doi/10.1145/321879.321884",
+      },
+    ],
   },
   {
     slug: "b-plus-tree",
@@ -628,6 +1597,57 @@ export const labRegistry: LabEntry[] = [
       "Page splits and merges must preserve balance.",
       "Random inserts fragment pages more than sequential keys.",
       "Concurrency requires latching or optimistic page protocols.",
+    ],
+    codeSnippet: {
+      language: "sql",
+      code: `-- A B+tree index only helps if the query can use a prefix of its key order.
+CREATE INDEX idx_orders_customer_created
+  ON orders (customer_id, created_at DESC);
+
+-- Index range scan: seek to (42, max) then walk leaf pages backwards.
+EXPLAIN ANALYZE
+SELECT id, total
+FROM orders
+WHERE customer_id = 42
+  AND created_at >= now() - interval '30 days'
+ORDER BY created_at DESC
+LIMIT 20;
+
+-- Covering index: leaves carry \`total\`, so the heap is never touched.
+CREATE INDEX idx_orders_covering
+  ON orders (customer_id, created_at DESC) INCLUDE (total);`,
+    },
+    usedBy: [
+      {
+        company: "PostgreSQL",
+        product: "Default btree indexes",
+        usage:
+          "Postgres implements Lehman & Yao high-concurrency B+trees; leaf pages are linked so range scans walk sideways.",
+        href: "https://www.postgresql.org/docs/current/btree-implementation.html",
+      },
+      {
+        company: "Oracle / MySQL",
+        product: "InnoDB clustered index",
+        usage:
+          "Table rows are stored in the leaves of the primary-key B+tree, so secondary indexes store PKs and require a second lookup.",
+        href: "https://dev.mysql.com/doc/refman/8.0/en/innodb-index-types.html",
+      },
+      {
+        company: "MongoDB",
+        product: "WiredTiger row-store indexes",
+        usage: "Index B+trees with page-level compression back equality, range and sort pushdown.",
+        href: "https://www.mongodb.com/docs/manual/indexes/",
+      },
+    ],
+    references: [
+      {
+        label: "PostgreSQL — btree implementation notes",
+        href: "https://www.postgresql.org/docs/current/btree-implementation.html",
+      },
+      {
+        label: "MySQL — InnoDB index types (clustered vs secondary)",
+        href: "https://dev.mysql.com/doc/refman/8.0/en/innodb-index-types.html",
+      },
     ],
   },
   {
@@ -693,6 +1713,36 @@ export const labRegistry: LabEntry[] = [
         href: "https://cassandra.apache.org/doc/latest/cassandra/architecture/storage_engine.html",
       },
     ],
+    usedBy: [
+      {
+        company: "Google",
+        product: "Chrome Safe Browsing",
+        usage:
+          "The browser checks URLs against a local probabilistic filter of known-bad hosts and only calls the API on a possible hit.",
+        href: "https://developers.google.com/safe-browsing/v4/update-api",
+      },
+      {
+        company: "Apache Cassandra",
+        product: "SSTable read path",
+        usage:
+          "Each SSTable carries a Bloom filter so a read can skip files that definitely do not contain the partition key.",
+        href: "https://cassandra.apache.org/doc/latest/cassandra/managing/operating/bloomfilters.html",
+      },
+      {
+        company: "Medium",
+        product: '"Already read" article feed',
+        usage:
+          "Bloom filters cheaply exclude posts a reader has already seen before ranking recommendations.",
+        href: "https://medium.com/the-story/what-are-bloom-filters-1ec2a50c68ff",
+      },
+      {
+        company: "Bitcoin Core",
+        product: "BIP-37 SPV wallet filters",
+        usage:
+          "Light clients ask peers for transactions matching a Bloom filter of their addresses instead of downloading every block in full.",
+        href: "https://github.com/bitcoin/bips/blob/master/bip-0037.mediawiki",
+      },
+    ],
   },
   {
     slug: "graph-representations",
@@ -720,6 +1770,56 @@ export const labRegistry: LabEntry[] = [
       "A list makes edge-existence checks O(degree) unless indexed.",
       "Directed vs undirected edge insertion must be explicit.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Adjacency list: O(V + E) memory, iterate neighbours fast.
+const list = new Map<string, string[]>([
+  ["api", ["auth", "db"]],
+  ["auth", ["db"]],
+  ["db", []],
+]);
+for (const dep of list.get("api") ?? []) console.log(dep);
+
+// Adjacency matrix: O(V^2) memory, O(1) "is there an edge?"
+const nodes = ["api", "auth", "db"];
+const idx = new Map(nodes.map((n, i) => [n, i]));
+const matrix = nodes.map(() => new Uint8Array(nodes.length));
+matrix[idx.get("api")!][idx.get("db")!] = 1;
+const connected = matrix[idx.get("api")!][idx.get("db")!] === 1;`,
+    },
+    usedBy: [
+      {
+        company: "Meta",
+        product: "TAO social graph",
+        usage:
+          "Friend and interest edges are stored as adjacency lists behind a cache tier because the social graph is extremely sparse.",
+        href: "https://engineering.fb.com/2013/06/25/core-infra/tao-the-power-of-the-graph/",
+      },
+      {
+        company: "Google",
+        product: "Web link graph / PageRank",
+        usage:
+          "Billions of pages with a handful of outlinks each are only tractable as sparse adjacency, never as a matrix.",
+        href: "http://infolab.stanford.edu/~backrub/google.html",
+      },
+      {
+        company: "Neo4j",
+        product: "Native graph storage",
+        usage:
+          'Records store direct pointers to relationship chains ("index-free adjacency") so traversal cost is independent of total graph size.',
+        href: "https://neo4j.com/docs/getting-started/get-started-with-neo4j/graph-database/",
+      },
+    ],
+    references: [
+      {
+        label: "Meta Engineering — TAO: the power of the graph",
+        href: "https://engineering.fb.com/2013/06/25/core-infra/tao-the-power-of-the-graph/",
+      },
+      {
+        label: "Neo4j — index-free adjacency",
+        href: "https://neo4j.com/docs/getting-started/get-started-with-neo4j/graph-database/",
+      },
+    ],
   },
   {
     slug: "connected-components",
@@ -745,6 +1845,55 @@ export const labRegistry: LabEntry[] = [
       "Directed graphs need weak or strong component definitions.",
       "For huge graphs, recursion can overflow; use iterative traversal.",
       "Disconnected isolated nodes are components of size one.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Label every vertex with its component id via BFS flood fill.
+function components(adj: Map<string, string[]>): Map<string, number> {
+  const label = new Map<string, number>();
+  let id = 0;
+  for (const start of adj.keys()) {
+    if (label.has(start)) continue;
+    const q = [start];
+    label.set(start, id);
+    while (q.length) {
+      const v = q.shift()!;
+      for (const n of adj.get(v) ?? []) {
+        if (!label.has(n)) { label.set(n, id); q.push(n); }
+      }
+    }
+    id++;
+  }
+  return label; // id count = number of isolated islands
+}`,
+    },
+    usedBy: [
+      {
+        company: "Meta",
+        product: "Duplicate account / entity resolution",
+        usage:
+          "Match signals form a graph; each connected component becomes one merged identity cluster.",
+      },
+      {
+        company: "Stripe",
+        product: "Radar fraud rings",
+        usage:
+          "Shared cards, devices and IPs link accounts into components, and a whole ring can be actioned together.",
+        href: "https://stripe.com/radar",
+      },
+      {
+        company: "Google",
+        product: "Photos face clustering",
+        usage:
+          "Similarity edges above a threshold are grouped into components so each cluster becomes one suggested person.",
+      },
+    ],
+    references: [
+      {
+        label: "CP-Algorithms — Search for connected components",
+        href: "https://cp-algorithms.com/graph/search-for-connected-components.html",
+      },
+      { label: "Stripe Radar — network-level fraud signals", href: "https://stripe.com/radar" },
     ],
   },
   {
@@ -772,6 +1921,62 @@ export const labRegistry: LabEntry[] = [
       "A visited node is not always a cycle in directed DFS; it must be in the current recursion stack.",
       "Self-loops and parallel edges need explicit handling.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Directed cycle detection with white/grey/black colouring.
+type Color = 0 | 1 | 2; // 0 unvisited, 1 in-stack, 2 done
+
+function hasCycle(adj: Map<string, string[]>): string[] | null {
+  const color = new Map<string, Color>();
+  const stack: string[] = [];
+  const dfs = (v: string): string[] | null => {
+    color.set(v, 1);
+    stack.push(v);
+    for (const n of adj.get(v) ?? []) {
+      if (color.get(n) === 1) return [...stack.slice(stack.indexOf(n)), n]; // back edge
+      if (!color.get(n)) { const c = dfs(n); if (c) return c; }
+    }
+    color.set(v, 2);
+    stack.pop();
+    return null;
+  };
+  for (const v of adj.keys()) if (!color.get(v)) { const c = dfs(v); if (c) return c; }
+  return null;
+}`,
+    },
+    usedBy: [
+      {
+        company: "npm / GitHub",
+        product: "Dependency resolution",
+        usage:
+          "Package managers and bundlers detect circular imports and cyclic peer requirements before install or build.",
+        href: "https://docs.npmjs.com/cli/v10/configuring-npm/package-json",
+      },
+      {
+        company: "Apache Airflow",
+        product: "DAG validation",
+        usage:
+          "A pipeline must be acyclic; the scheduler rejects a DAG whose task dependencies close a loop.",
+        href: "https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/dags.html",
+      },
+      {
+        company: "Oracle",
+        product: "MySQL / InnoDB deadlock detector",
+        usage:
+          "The lock wait-for graph is scanned for cycles; the cheapest transaction in the cycle is rolled back.",
+        href: "https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlock-detection.html",
+      },
+    ],
+    references: [
+      {
+        label: "Airflow — DAGs must be acyclic",
+        href: "https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/dags.html",
+      },
+      {
+        label: "MySQL — InnoDB deadlock detection",
+        href: "https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlock-detection.html",
+      },
+    ],
   },
   {
     slug: "strongly-connected-components",
@@ -798,6 +2003,61 @@ export const labRegistry: LabEntry[] = [
       "SCCs apply to directed graphs; undirected components are simpler.",
       "Recursive Tarjan can overflow on very deep graphs.",
     ],
+    codeSnippet: {
+      language: "py",
+      code: `# Tarjan's SCC: one DFS, low-link values, an explicit stack.
+def tarjan(adj):
+    index, low, on_stack, stack, out = {}, {}, set(), [], []
+    counter = [0]
+
+    def dfs(v):
+        index[v] = low[v] = counter[0]; counter[0] += 1
+        stack.append(v); on_stack.add(v)
+        for w in adj.get(v, ()):
+            if w not in index:
+                dfs(w); low[v] = min(low[v], low[w])
+            elif w in on_stack:
+                low[v] = min(low[v], index[w])
+        if low[v] == index[v]:               # v is an SCC root
+            comp = []
+            while True:
+                w = stack.pop(); on_stack.discard(w); comp.append(w)
+                if w == v: break
+            out.append(comp)
+
+    for v in list(adj):
+        if v not in index: dfs(v)
+    return out`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "Web spam / link-farm detection",
+        usage:
+          "Tightly interlinked page groups surface as strongly connected components in the link graph.",
+        href: "http://infolab.stanford.edu/~backrub/google.html",
+      },
+      {
+        company: "Uber",
+        product: "Service dependency analysis",
+        usage:
+          "Cyclic call chains between microservices show up as SCCs and are the first thing to break when untangling a monolith.",
+      },
+      {
+        company: "LLVM / Apple",
+        product: "Compiler call-graph SCCs",
+        usage:
+          "The pass manager processes the call graph bottom-up by SCC so mutually recursive functions are optimised together.",
+        href: "https://llvm.org/docs/Passes.html",
+      },
+    ],
+    references: [
+      {
+        label: "CP-Algorithms — Strongly connected components",
+        href: "https://cp-algorithms.com/graph/strongly-connected-components.html",
+      },
+      { label: "LLVM — CallGraph SCC passes", href: "https://llvm.org/docs/Passes.html" },
+    ],
   },
   {
     slug: "bipartite-check",
@@ -820,6 +2080,58 @@ export const labRegistry: LabEntry[] = [
       "Disconnected graphs require starting BFS from every uncolored node.",
       "Self-loops immediately violate bipartiteness.",
       "Odd cycles are the reason two-coloring fails.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Two-colour the graph; a conflict proves an odd cycle exists.
+function isBipartite(adj: Map<string, string[]>): boolean {
+  const side = new Map<string, 0 | 1>();
+  for (const start of adj.keys()) {
+    if (side.has(start)) continue;
+    side.set(start, 0);
+    const q = [start];
+    while (q.length) {
+      const v = q.shift()!;
+      for (const n of adj.get(v) ?? []) {
+        if (!side.has(n)) { side.set(n, side.get(v)! === 0 ? 1 : 0); q.push(n); }
+        else if (side.get(n) === side.get(v)) return false; // same side -> odd cycle
+      }
+    }
+  }
+  return true;
+}`,
+    },
+    usedBy: [
+      {
+        company: "Uber",
+        product: "Rider ↔ driver matching graph",
+        usage:
+          "Supply and demand are two disjoint sides; feasible pairings are edges, and dispatch is a matching over that bipartite graph.",
+        href: "https://www.uber.com/blog/engineering/",
+      },
+      {
+        company: "Amazon",
+        product: "Order ↔ fulfilment centre assignment",
+        usage:
+          "Shipments and warehouses form a bipartite graph where edges encode cost and availability.",
+      },
+      {
+        company: "Google",
+        product: "Ad impression ↔ advertiser allocation",
+        usage:
+          "Online bipartite matching underpins allocating incoming impressions to budgeted advertisers.",
+        href: "https://research.google/pubs/pub37409/",
+      },
+    ],
+    references: [
+      {
+        label: "CP-Algorithms — Bipartite graph check",
+        href: "https://cp-algorithms.com/graph/bipartite-check.html",
+      },
+      {
+        label: "Google Research — AdWords and generalized online matching",
+        href: "https://research.google/pubs/pub37409/",
+      },
     ],
   },
   {
@@ -846,6 +2158,57 @@ export const labRegistry: LabEntry[] = [
       "Does not support arbitrary deletions cleanly.",
       "Works for undirected connectivity, not directed reachability.",
       "Without path compression/rank, trees can become tall.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Connectivity queries under a stream of merges — no re-traversal.
+const parent = new Map<string, string>();
+const find = (x: string): string => {
+  const p = parent.get(x) ?? x;
+  if (p === x) return x;
+  const root = find(p);
+  parent.set(x, root); // path compression
+  return root;
+};
+const union = (a: string, b: string) => {
+  const ra = find(a), rb = find(b);
+  if (ra !== rb) parent.set(rb, ra);
+};
+
+union("user:1", "device:a");
+union("device:a", "user:2");
+find("user:1") === find("user:2"); // true -> same cluster`,
+    },
+    usedBy: [
+      {
+        company: "Stripe",
+        product: "Linked-account clustering",
+        usage:
+          "Streaming signals union accounts into fraud clusters without recomputing components from scratch.",
+        href: "https://stripe.com/radar",
+      },
+      {
+        company: "Apache Spark",
+        product: "GraphX connected components",
+        usage: "Distributed union-find style label propagation groups vertices across partitions.",
+        href: "https://spark.apache.org/docs/latest/graphx-programming-guide.html",
+      },
+      {
+        company: "Google",
+        product: "Percolation / image segmentation",
+        usage:
+          "Pixel similarity merges produce segments incrementally, which is exactly incremental connectivity.",
+      },
+    ],
+    references: [
+      {
+        label: "CP-Algorithms — DSU applications",
+        href: "https://cp-algorithms.com/data_structures/disjoint_set_union.html",
+      },
+      {
+        label: "Spark GraphX — connected components",
+        href: "https://spark.apache.org/docs/latest/graphx-programming-guide.html",
+      },
     ],
   },
   {
@@ -902,6 +2265,35 @@ export const labRegistry: LabEntry[] = [
     references: [
       { label: "LeetCode 146 — LRU Cache", href: "https://leetcode.com/problems/lru-cache/" },
     ],
+    usedBy: [
+      {
+        company: "Redis",
+        product: "maxmemory eviction policies",
+        usage:
+          "Redis approximates LRU with random sampling (and offers LFU) because exact recency ordering costs memory per key.",
+        href: "https://redis.io/docs/latest/develop/reference/eviction/",
+      },
+      {
+        company: "Cloudflare",
+        product: "Edge cache tiers",
+        usage:
+          "Hot objects stay in memory/SSD at the PoP under recency-based eviction; cold objects fall through to origin.",
+        href: "https://developers.cloudflare.com/cache/concepts/default-cache-behavior/",
+      },
+      {
+        company: "Oracle / MySQL",
+        product: "InnoDB buffer pool",
+        usage:
+          "A midpoint-insertion LRU list keeps hot pages resident and protects them from a full-table scan flushing the pool.",
+        href: "https://dev.mysql.com/doc/refman/8.0/en/innodb-buffer-pool.html",
+      },
+      {
+        company: "Google",
+        product: "Chrome HTTP disk cache",
+        usage:
+          "Cached responses are evicted in recency order once the disk cache hits its size budget.",
+      },
+    ],
   },
   {
     slug: "bellman-ford",
@@ -927,6 +2319,59 @@ export const labRegistry: LabEntry[] = [
       "Negative cycles make shortest paths undefined.",
       "It is usually too slow for very large sparse graphs when weights are non-negative.",
       "Only cycles reachable from the source are detected in the standard version.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Handles negative weights and reports negative cycles. O(V*E).
+type Edge = { from: number; to: number; w: number };
+
+function bellmanFord(n: number, edges: Edge[], src: number) {
+  const dist = new Array(n).fill(Infinity);
+  dist[src] = 0;
+  for (let i = 0; i < n - 1; i++) {
+    let changed = false;
+    for (const e of edges) {
+      if (dist[e.from] + e.w < dist[e.to]) { dist[e.to] = dist[e.from] + e.w; changed = true; }
+    }
+    if (!changed) break; // early exit when distances settle
+  }
+  for (const e of edges) {
+    if (dist[e.from] + e.w < dist[e.to]) throw new Error("negative cycle reachable");
+  }
+  return dist;
+}`,
+    },
+    usedBy: [
+      {
+        company: "Cisco",
+        product: "RIP distance-vector routing",
+        usage:
+          "Routers exchange distance vectors and relax neighbour estimates — Bellman-Ford executed by the network itself.",
+        href: "https://datatracker.ietf.org/doc/html/rfc2453",
+      },
+      {
+        company: "Internet Engineering Task Force",
+        product: "BGP path selection (path-vector)",
+        usage:
+          "BGP is a path-vector descendant of distance-vector routing, carrying AS paths to avoid the count-to-infinity loop problem.",
+        href: "https://datatracker.ietf.org/doc/html/rfc4271",
+      },
+      {
+        company: "Coinbase-style exchanges",
+        product: "Currency arbitrage detection",
+        usage:
+          "Taking -log of exchange rates turns a profitable cycle into a negative cycle Bellman-Ford can flag.",
+      },
+    ],
+    references: [
+      {
+        label: "RFC 2453 — RIP version 2 (distance vector)",
+        href: "https://datatracker.ietf.org/doc/html/rfc2453",
+      },
+      {
+        label: "CP-Algorithms — Bellman-Ford",
+        href: "https://cp-algorithms.com/graph/bellman_ford.html",
+      },
     ],
   },
   {
@@ -954,6 +2399,57 @@ export const labRegistry: LabEntry[] = [
       "Negative cycles require separate detection.",
       "Path reconstruction needs a next-hop matrix, not just distances.",
     ],
+    codeSnippet: {
+      language: "py",
+      code: `# All-pairs shortest paths in O(V^3) — dense graphs, small V.
+def floyd_warshall(dist):
+    n = len(dist)
+    for k in range(n):              # allow k as an intermediate hop
+        dk = dist[k]
+        for i in range(n):
+            dik = dist[i][k]
+            if dik == float("inf"):
+                continue
+            row = dist[i]
+            for j in range(n):
+                if dik + dk[j] < row[j]:
+                    row[j] = dik + dk[j]
+    for i in range(n):
+        if dist[i][i] < 0:
+            raise ValueError("negative cycle")
+    return dist`,
+    },
+    usedBy: [
+      {
+        company: "Uber",
+        product: "Zone-to-zone travel-time matrices",
+        usage:
+          "Small aggregated region graphs are precomputed all-pairs so pricing and ETA services do table lookups, not searches.",
+      },
+      {
+        company: "Amazon",
+        product: "Warehouse network transfer costs",
+        usage:
+          "Inter-facility cost matrices are dense and modest in size — the exact case Floyd-Warshall wins.",
+      },
+      {
+        company: "Google",
+        product: "Transitive closure in static analysis",
+        usage:
+          "Reachability closure over dependency/type graphs is the boolean variant of the same triple loop.",
+        href: "https://cp-algorithms.com/graph/all-pair-shortest-path-floyd-warshall.html",
+      },
+    ],
+    references: [
+      {
+        label: "CP-Algorithms — Floyd-Warshall",
+        href: "https://cp-algorithms.com/graph/all-pair-shortest-path-floyd-warshall.html",
+      },
+      {
+        label: "Floyd (1962) — Algorithm 97: Shortest path",
+        href: "https://dl.acm.org/doi/10.1145/367766.368168",
+      },
+    ],
   },
   {
     slug: "prim-mst",
@@ -978,6 +2474,55 @@ export const labRegistry: LabEntry[] = [
       "Disconnected graphs produce a spanning forest, not one tree.",
       "MST minimizes total edge cost, not shortest paths from a source.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Grow one tree: always take the cheapest edge leaving the built set.
+function prim(n: number, adj: [number, number][][]): number {
+  const inTree = new Array(n).fill(false);
+  const best = new Array(n).fill(Infinity);
+  best[0] = 0;
+  let total = 0;
+  for (let it = 0; it < n; it++) {
+    let u = -1;
+    for (let v = 0; v < n; v++) if (!inTree[v] && (u === -1 || best[v] < best[u])) u = v;
+    inTree[u] = true;
+    total += best[u];
+    for (const [v, w] of adj[u]) if (!inTree[v] && w < best[v]) best[v] = w;
+  }
+  return total; // use a binary heap for O(E log V)
+}`,
+    },
+    usedBy: [
+      {
+        company: "AT&T / telecom operators",
+        product: "Fibre backbone planning",
+        usage:
+          "Connecting every site at minimum trench/fibre cost is the textbook minimum spanning tree problem.",
+      },
+      {
+        company: "Meta",
+        product: "Data-centre cable topology planning",
+        usage:
+          "Dense candidate-link graphs favour Prim's, which grows a single tree from a seed node.",
+      },
+      {
+        company: "Esri",
+        product: "Utility network design (GIS)",
+        usage:
+          "Water/power distribution layouts are generated as minimum-cost spanning structures over service points.",
+        href: "https://cp-algorithms.com/graph/mst_prim.html",
+      },
+    ],
+    references: [
+      {
+        label: "CP-Algorithms — Prim's MST",
+        href: "https://cp-algorithms.com/graph/mst_prim.html",
+      },
+      {
+        label: "Prim (1957) — Shortest connection networks",
+        href: "https://ieeexplore.ieee.org/document/6773228",
+      },
+    ],
   },
   {
     slug: "kruskal-mst",
@@ -1001,6 +2546,54 @@ export const labRegistry: LabEntry[] = [
       "Parallel edges are allowed; choose the cheapest useful one.",
       "Disconnected input yields a minimum spanning forest.",
       "Sorting dominates runtime for most inputs.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Sort edges, add the cheapest that doesn't close a cycle (union-find).
+function kruskal(n: number, edges: { a: number; b: number; w: number }[]) {
+  const parent = Array.from({ length: n }, (_, i) => i);
+  const find = (x: number): number => (parent[x] === x ? x : (parent[x] = find(parent[x])));
+  const tree: typeof edges = [];
+  for (const e of [...edges].sort((x, y) => x.w - y.w)) {
+    const ra = find(e.a), rb = find(e.b);
+    if (ra === rb) continue; // would create a cycle
+    parent[rb] = ra;
+    tree.push(e);
+    if (tree.length === n - 1) break;
+  }
+  return tree;
+}`,
+    },
+    usedBy: [
+      {
+        company: "Cloudflare / CDN operators",
+        product: "Backbone link selection",
+        usage:
+          "Sparse candidate-link graphs are cheaper to solve edge-first, which is exactly Kruskal's ordering.",
+      },
+      {
+        company: "Scikit-learn contributors",
+        product: "Single-linkage clustering",
+        usage:
+          "Single-linkage hierarchical clustering is an MST computation; cutting the largest edges yields clusters.",
+        href: "https://scikit-learn.org/stable/modules/clustering.html#hierarchical-clustering",
+      },
+      {
+        company: "Autodesk",
+        product: "Mesh simplification / segmentation",
+        usage:
+          "Minimum spanning forests over dual graphs drive region growing in geometry pipelines.",
+      },
+    ],
+    references: [
+      {
+        label: "CP-Algorithms — Kruskal with DSU",
+        href: "https://cp-algorithms.com/graph/mst_kruskal_with_dsu.html",
+      },
+      {
+        label: "scikit-learn — hierarchical (single linkage) clustering",
+        href: "https://scikit-learn.org/stable/modules/clustering.html#hierarchical-clustering",
+      },
     ],
   },
   {
@@ -1032,6 +2625,54 @@ export const labRegistry: LabEntry[] = [
       "Irrational capacities can prevent Ford-Fulkerson termination in theory.",
       "Residual backward edges are essential, not optional.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Residual graph: pushing flow forward creates reverse capacity to undo it.
+class FlowNetwork {
+  cap = new Map<string, number>();
+  key = (u: string, v: string) => \`\${u}->\${v}\`;
+  addEdge(u: string, v: string, c: number) {
+    this.cap.set(this.key(u, v), c);
+    this.cap.set(this.key(v, u), this.cap.get(this.key(v, u)) ?? 0);
+  }
+  push(u: string, v: string, amount: number) {
+    this.cap.set(this.key(u, v), this.cap.get(this.key(u, v))! - amount);
+    this.cap.set(this.key(v, u), this.cap.get(this.key(v, u))! + amount); // undo path
+  }
+}
+// Max-flow = repeatedly find an augmenting s->t path with residual capacity.`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "Ad allocation & budget pacing",
+        usage:
+          "Impressions to advertisers under budget caps is a flow problem with capacities on both sides.",
+        href: "https://research.google/pubs/pub37409/",
+      },
+      {
+        company: "Amazon",
+        product: "Fulfilment network routing",
+        usage:
+          "Units flow from inventory nodes through capacity-limited lanes to destinations — a min-cost flow at scale.",
+      },
+      {
+        company: "Airlines (Delta, United)",
+        product: "Crew and aircraft rotation",
+        usage:
+          "Legal pairings are modelled as network flow with capacity constraints per crew and aircraft.",
+      },
+    ],
+    references: [
+      {
+        label: "CP-Algorithms — Maximum flow (Ford-Fulkerson / Edmonds-Karp)",
+        href: "https://cp-algorithms.com/graph/edmonds_karp.html",
+      },
+      {
+        label: "Ford & Fulkerson (1956) — Maximal flow through a network",
+        href: "https://www.rand.org/pubs/papers/P605.html",
+      },
+    ],
   },
   {
     slug: "edmonds-karp",
@@ -1057,6 +2698,67 @@ export const labRegistry: LabEntry[] = [
       "Too slow for very large flow networks.",
       "Must update reverse edges after every augmentation.",
       "BFS is over residual capacity, not original capacity.",
+    ],
+    codeSnippet: {
+      language: "py",
+      code: `from collections import deque
+
+# Ford-Fulkerson with BFS augmenting paths => O(V * E^2), no bad orderings.
+def edmonds_karp(cap, s, t):
+    flow = 0
+    while True:
+        parent = {s: None}
+        q = deque([s])
+        while q and t not in parent:
+            u = q.popleft()
+            for v, c in cap[u].items():
+                if c > 0 and v not in parent:
+                    parent[v] = u
+                    q.append(v)
+        if t not in parent:
+            return flow                     # no augmenting path left
+        bottleneck, v = float("inf"), t
+        while parent[v] is not None:
+            u = parent[v]; bottleneck = min(bottleneck, cap[u][v]); v = u
+        v = t
+        while parent[v] is not None:
+            u = parent[v]
+            cap[u][v] -= bottleneck
+            cap[v][u] = cap[v].get(u, 0) + bottleneck
+            v = u
+        flow += bottleneck`,
+    },
+    usedBy: [
+      {
+        company: "Kubernetes / CNCF",
+        product: "Bin-packing & scheduling research",
+        usage:
+          "Flow formulations (e.g. Firmament-style schedulers) assign tasks to machines by solving min-cost flow.",
+        href: "https://www.usenix.org/conference/osdi16/technical-sessions/presentation/gog",
+      },
+      {
+        company: "Netflix",
+        product: "Content delivery capacity planning",
+        usage:
+          "Deciding which Open Connect appliance serves which ISP under link capacity is a flow assignment.",
+        href: "https://openconnect.netflix.com/en/",
+      },
+      {
+        company: "Sports leagues (MLB, NFL)",
+        product: "Playoff elimination proofs",
+        usage:
+          "The classic baseball-elimination problem is decided by a max-flow computation over remaining games.",
+      },
+    ],
+    references: [
+      {
+        label: "CP-Algorithms — Edmonds-Karp",
+        href: "https://cp-algorithms.com/graph/edmonds_karp.html",
+      },
+      {
+        label: "Firmament — fast, centralized cluster scheduling (OSDI '16)",
+        href: "https://www.usenix.org/conference/osdi16/technical-sessions/presentation/gog",
+      },
     ],
   },
   {
@@ -1084,6 +2786,52 @@ export const labRegistry: LabEntry[] = [
       "A visually small cut is not always the minimum-capacity cut.",
       "Min cut depends on capacities, not just edge count.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Max-flow min-cut: after saturating flow, the cut is the reachable set.
+function minCut(residual: Map<string, Map<string, number>>, s: string) {
+  const seen = new Set([s]);
+  const stack = [s];
+  while (stack.length) {
+    const u = stack.pop()!;
+    for (const [v, c] of residual.get(u) ?? []) {
+      if (c > 0 && !seen.has(v)) { seen.add(v); stack.push(v); }
+    }
+  }
+  // Edges from \`seen\` to its complement are the bottleneck set.
+  return seen;
+}`,
+    },
+    usedBy: [
+      {
+        company: "Microsoft",
+        product: "GrabCut image segmentation",
+        usage:
+          "Foreground/background separation is solved as a graph cut over pixel similarity, shipped in Office/Photos tooling.",
+        href: "https://www.microsoft.com/en-us/research/publication/grabcut-interactive-foreground-extraction-using-iterated-graph-cuts/",
+      },
+      {
+        company: "Cloudflare",
+        product: "Network resilience analysis",
+        usage:
+          "The minimum cut identifies the smallest set of links whose failure would partition a region.",
+      },
+      {
+        company: "Meta",
+        product: "Community / cluster boundaries",
+        usage: "Cut-based objectives separate weakly connected communities in large social graphs.",
+      },
+    ],
+    references: [
+      {
+        label: "GrabCut — interactive foreground extraction using graph cuts",
+        href: "https://www.microsoft.com/en-us/research/publication/grabcut-interactive-foreground-extraction-using-iterated-graph-cuts/",
+      },
+      {
+        label: "CP-Algorithms — flow and cuts",
+        href: "https://cp-algorithms.com/graph/edmonds_karp.html",
+      },
+    ],
   },
   {
     slug: "bipartite-matching",
@@ -1109,6 +2857,61 @@ export const labRegistry: LabEntry[] = [
       "Greedy matching can get stuck below optimal.",
       "Weighted matching is a different problem.",
       "The graph must be bipartite for these algorithms.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Kuhn's algorithm: try to find an augmenting path for each left vertex.
+function maxMatching(left: number, adj: number[][]) {
+  const matchRight = new Map<number, number>();
+  const tryKuhn = (u: number, seen: Set<number>): boolean => {
+    for (const v of adj[u]) {
+      if (seen.has(v)) continue;
+      seen.add(v);
+      const cur = matchRight.get(v);
+      if (cur === undefined || tryKuhn(cur, seen)) { // bump the current owner
+        matchRight.set(v, u);
+        return true;
+      }
+    }
+    return false;
+  };
+  let size = 0;
+  for (let u = 0; u < left; u++) if (tryKuhn(u, new Set())) size++;
+  return { size, matchRight };
+}`,
+    },
+    usedBy: [
+      {
+        company: "Uber",
+        product: "Batched dispatch",
+        usage:
+          "Instead of greedy first-come matching, riders and drivers are matched in batches to maximise global assignment quality.",
+        href: "https://www.uber.com/blog/engineering/",
+      },
+      {
+        company: "National Resident Matching Program",
+        product: "Medical residency match",
+        usage:
+          "Applicants and hospital programmes are matched by a stable-matching variant of bipartite assignment.",
+        href: "https://www.nrmp.org/intro-to-the-match/how-matching-algorithm-works/",
+      },
+      {
+        company: "Google",
+        product: "Online ad slot assignment",
+        usage:
+          "Impressions arrive online and must be matched to advertisers with budget — online bipartite matching theory in production.",
+        href: "https://research.google/pubs/pub37409/",
+      },
+    ],
+    references: [
+      {
+        label: "CP-Algorithms — Kuhn's algorithm for maximum matching",
+        href: "https://cp-algorithms.com/graph/kuhn_maximum_bipartite_matching.html",
+      },
+      {
+        label: "NRMP — how the matching algorithm works",
+        href: "https://www.nrmp.org/intro-to-the-match/how-matching-algorithm-works/",
+      },
     ],
   },
   {
@@ -1169,6 +2972,36 @@ func (r *Raft) run() {
       { label: "Diego Ongaro — Raft paper (2014)", href: "https://raft.github.io/raft.pdf" },
       { label: "raft.github.io — visualizations", href: "https://raft.github.io/" },
     ],
+    usedBy: [
+      {
+        company: "CNCF",
+        product: "etcd (Kubernetes control plane store)",
+        usage:
+          "Every Kubernetes cluster's state lives in etcd, whose leader election and log replication are Raft.",
+        href: "https://etcd.io/docs/latest/learning/design-learner/",
+      },
+      {
+        company: "HashiCorp",
+        product: "Consul & Nomad",
+        usage:
+          "Server clusters elect a leader via Raft; only the leader commits writes to the replicated state store.",
+        href: "https://developer.hashicorp.com/consul/docs/architecture/consensus",
+      },
+      {
+        company: "MongoDB",
+        product: "Replica set elections",
+        usage:
+          "Replica sets use a Raft-derived protocol to elect a primary and roll back uncommitted writes after failover.",
+        href: "https://www.mongodb.com/docs/manual/core/replica-set-elections/",
+      },
+      {
+        company: "CockroachDB",
+        product: "Per-range consensus groups",
+        usage:
+          "Each data range is its own Raft group, so leadership and replication are sharded across the cluster.",
+        href: "https://www.cockroachlabs.com/docs/stable/architecture/replication-layer.html",
+      },
+    ],
   },
   {
     slug: "binary-search",
@@ -1194,6 +3027,61 @@ func (r *Raft) run() {
       "Off-by-one errors in lo/hi updates.",
       "Requires sorted or monotonic data.",
       "mid = (lo + hi) / 2 can overflow in low-level languages; use lo + (hi-lo)/2.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Overflow-safe lower bound: first index whose value is >= target.
+export function lowerBound(xs: number[], target: number): number {
+  let lo = 0, hi = xs.length; // invariant: answer in [lo, hi]
+  while (lo < hi) {
+    const mid = lo + ((hi - lo) >> 1); // not (lo + hi) / 2
+    if (xs[mid] < target) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo;
+}
+
+// Binary search on the answer: smallest capacity that fits the SLA.
+function minCapacity(canServe: (c: number) => boolean, hiBound: number) {
+  let lo = 1, hi = hiBound;
+  while (lo < hi) {
+    const mid = lo + ((hi - lo) >> 1);
+    canServe(mid) ? (hi = mid) : (lo = mid + 1);
+  }
+  return lo;
+}`,
+    },
+    usedBy: [
+      {
+        company: "PostgreSQL",
+        product: "Index page search",
+        usage:
+          "Locating a key inside a btree page is a binary search over the page's item pointers before descending a level.",
+        href: "https://www.postgresql.org/docs/current/btree-implementation.html",
+      },
+      {
+        company: "Google",
+        product: "Chrome / V8 sorted lookups",
+        usage:
+          "Sorted-array lookups (source maps, ICU tables, timestamp ranges) resolve by binary search rather than linear scan.",
+        href: "https://v8.dev/blog/array-sort",
+      },
+      {
+        company: "Elastic",
+        product: "Lucene term dictionary seeks",
+        usage:
+          "Block-based term dictionaries binary-search to a block before decoding it, keeping seek cost logarithmic.",
+      },
+    ],
+    references: [
+      {
+        label: "Google Research blog — nearly all binary searches are broken (overflow)",
+        href: "https://research.google/blog/extra-extra-read-all-about-it-nearly-all-binary-searches-and-mergesorts-are-broken/",
+      },
+      {
+        label: "CP-Algorithms — Binary search",
+        href: "https://cp-algorithms.com/num_methods/binary_search.html",
+      },
     ],
   },
   {
@@ -1221,6 +3109,60 @@ func (r *Raft) run() {
       "It mutates the input unless copied.",
       "k indexing must be consistent: zero-based vs one-based.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// k-th smallest in O(n) average — partition, then recurse into one side only.
+export function quickselect(xs: number[], k: number, lo = 0, hi = xs.length - 1): number {
+  while (lo < hi) {
+    const pivot = xs[lo + Math.floor(Math.random() * (hi - lo + 1))];
+    let i = lo, j = hi;
+    while (i <= j) {
+      while (xs[i] < pivot) i++;
+      while (xs[j] > pivot) j--;
+      if (i <= j) { [xs[i], xs[j]] = [xs[j], xs[i]]; i++; j--; }
+    }
+    if (k <= j) hi = j;
+    else if (k >= i) lo = i;
+    else return xs[k];
+  }
+  return xs[k];
+}
+
+// p99 latency without a full sort:
+// quickselect(samples, Math.floor(0.99 * samples.length))`,
+    },
+    usedBy: [
+      {
+        company: "Datadog",
+        product: "Latency percentile computation",
+        usage:
+          "Exact percentiles over a batch of samples need only selection, not a full sort (sketches take over at streaming scale).",
+        href: "https://www.datadoghq.com/blog/engineering/computing-accurate-percentiles-with-ddsketch/",
+      },
+      {
+        company: "NumPy / scientific Python",
+        product: "np.partition & median",
+        usage:
+          "`np.partition` exposes introselect so medians and quantiles avoid an O(n log n) sort.",
+        href: "https://numpy.org/doc/stable/reference/generated/numpy.partition.html",
+      },
+      {
+        company: "Elastic",
+        product: "Top-k aggregation shortcuts",
+        usage:
+          '"Top N by score" only needs the boundary element, so selection beats sorting the whole candidate set.',
+      },
+    ],
+    references: [
+      {
+        label: "NumPy — np.partition (introselect)",
+        href: "https://numpy.org/doc/stable/reference/generated/numpy.partition.html",
+      },
+      {
+        label: "Datadog — computing accurate percentiles",
+        href: "https://www.datadoghq.com/blog/engineering/computing-accurate-percentiles-with-ddsketch/",
+      },
+    ],
   },
   {
     slug: "heap-sort",
@@ -1244,6 +3186,61 @@ func (r *Raft) run() {
       "Not stable.",
       "Often slower in practice than optimized quicksort/TimSort.",
       "Heap index arithmetic is prone to off-by-one errors.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// In-place, O(1) extra memory, guaranteed O(n log n) — no quicksort worst case.
+export function heapSort(a: number[]) {
+  const sift = (i: number, n: number) => {
+    while (true) {
+      const l = 2 * i + 1, r = l + 1;
+      let m = i;
+      if (l < n && a[l] > a[m]) m = l;
+      if (r < n && a[r] > a[m]) m = r;
+      if (m === i) return;
+      [a[i], a[m]] = [a[m], a[i]];
+      i = m;
+    }
+  };
+  for (let i = (a.length >> 1) - 1; i >= 0; i--) sift(i, a.length); // heapify O(n)
+  for (let n = a.length - 1; n > 0; n--) {
+    [a[0], a[n]] = [a[n], a[0]]; // max to the back
+    sift(0, n);
+  }
+  return a;
+}`,
+    },
+    usedBy: [
+      {
+        company: "LLVM / C++ standard library",
+        product: "std::sort introsort fallback",
+        usage:
+          "Introsort starts with quicksort and switches to heapsort once recursion gets too deep, bounding the worst case at O(n log n).",
+        href: "https://en.cppreference.com/w/cpp/algorithm/sort",
+      },
+      {
+        company: "Linux kernel",
+        product: "sort() in lib/sort.c",
+        usage:
+          "The kernel uses heapsort because it needs constant extra memory and no recursion on a small kernel stack.",
+        href: "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/lib/sort.c",
+      },
+      {
+        company: "Embedded / real-time vendors",
+        product: "Deterministic sorting paths",
+        usage:
+          "Predictable worst-case time and no allocation make heapsort the safe choice under hard deadlines.",
+      },
+    ],
+    references: [
+      {
+        label: "Linux kernel — lib/sort.c (heapsort)",
+        href: "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/lib/sort.c",
+      },
+      {
+        label: "cppreference — std::sort (introsort guarantees)",
+        href: "https://en.cppreference.com/w/cpp/algorithm/sort",
+      },
     ],
   },
   {
@@ -1271,6 +3268,49 @@ func (r *Raft) run() {
       "Negative keys need offset mapping.",
       "Plain count expansion is not stable unless prefix placement is used.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// O(n + k) for small integer keys, and stable if you walk input backwards.
+export function countingSort(xs: number[], k: number): number[] {
+  const counts = new Array(k + 1).fill(0);
+  for (const x of xs) counts[x]++;
+  for (let i = 1; i <= k; i++) counts[i] += counts[i - 1]; // prefix sums = end positions
+  const out = new Array(xs.length);
+  for (let i = xs.length - 1; i >= 0; i--) out[--counts[xs[i]]] = xs[i]; // stable
+  return out;
+}`,
+    },
+    usedBy: [
+      {
+        company: "Illumina / bioinformatics tooling",
+        product: "Read bucketing by quality score",
+        usage:
+          "Scores live in a tiny fixed range, so counting them beats comparison sorting billions of reads.",
+      },
+      {
+        company: "Elastic",
+        product: "Histogram aggregations",
+        usage:
+          "Bucketed value counts are computed with counting-style passes over doc values rather than sorting.",
+      },
+      {
+        company: "Apache Lucene",
+        product: "Radix sort building blocks",
+        usage:
+          "Counting sort is the stable per-digit pass inside LSD radix sorting of doc ids and terms.",
+        href: "https://lucene.apache.org/core/9_9_0/core/org/apache/lucene/util/RadixSelector.html",
+      },
+    ],
+    references: [
+      {
+        label: "CP-Algorithms — sorting by counting",
+        href: "https://cp-algorithms.com/sequences/index.html",
+      },
+      {
+        label: "Lucene — RadixSelector (counting passes)",
+        href: "https://lucene.apache.org/core/9_9_0/core/org/apache/lucene/util/RadixSelector.html",
+      },
+    ],
   },
   {
     slug: "radix-sort",
@@ -1293,6 +3333,51 @@ func (r *Raft) run() {
       "Requires stable per-digit sorting for LSD radix.",
       "Variable-length keys need padding or careful ordering.",
       "Constants can beat comparison sorts only for suitable key types.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// LSD radix sort: stable counting pass per 8-bit digit, 4 passes for 32-bit keys.
+export function radixSort(xs: Uint32Array): Uint32Array {
+  let src = xs, dst = new Uint32Array(xs.length);
+  for (let shift = 0; shift < 32; shift += 8) {
+    const counts = new Uint32Array(256);
+    for (const x of src) counts[(x >>> shift) & 255]++;
+    let sum = 0;
+    for (let i = 0; i < 256; i++) { const c = counts[i]; counts[i] = sum; sum += c; }
+    for (const x of src) dst[counts[(x >>> shift) & 255]++] = x;
+    [src, dst] = [dst, src];
+  }
+  return src;
+}`,
+    },
+    usedBy: [
+      {
+        company: "NVIDIA",
+        product: "CUB / Thrust GPU sort",
+        usage:
+          "GPU sorting primitives are radix-based because digit passes are embarrassingly parallel, unlike comparison sorts.",
+        href: "https://nvidia.github.io/cccl/cub/",
+      },
+      {
+        company: "Apache Software Foundation",
+        product: "Lucene / Spark shuffle key sorting",
+        usage:
+          "Fixed-width binary keys (doc ids, prefixes) are radix-sorted to avoid comparator overhead.",
+        href: "https://lucene.apache.org/core/9_9_0/core/org/apache/lucene/util/RadixSelector.html",
+      },
+      {
+        company: "Databricks",
+        product: "Tungsten sort-based shuffle",
+        usage:
+          "Records are sorted on packed prefix keys so most comparisons never touch the full row.",
+      },
+    ],
+    references: [
+      { label: "NVIDIA CUB — device-wide radix sort", href: "https://nvidia.github.io/cccl/cub/" },
+      {
+        label: "Lucene — radix-based selection/sorting utilities",
+        href: "https://lucene.apache.org/core/9_9_0/core/org/apache/lucene/util/RadixSelector.html",
+      },
     ],
   },
   {
@@ -1320,6 +3405,52 @@ func (r *Raft) run() {
       "Bucket boundaries must preserve global ordering.",
       "Needs a local sorting strategy inside each bucket.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Scatter into buckets by value range, sort each bucket, concatenate.
+export function bucketSort(xs: number[], bucketCount = 16): number[] {
+  if (xs.length === 0) return xs;
+  const min = Math.min(...xs), max = Math.max(...xs);
+  const span = (max - min) / bucketCount || 1;
+  const buckets: number[][] = Array.from({ length: bucketCount }, () => []);
+  for (const x of xs) {
+    const i = Math.min(bucketCount - 1, Math.floor((x - min) / span));
+    buckets[i].push(x); // skewed data -> one hot bucket -> O(n^2)
+  }
+  return buckets.flatMap((b) => b.sort((a, z) => a - z));
+}`,
+    },
+    usedBy: [
+      {
+        company: "Apache Software Foundation",
+        product: "Hadoop TeraSort range partitioner",
+        usage:
+          "Sampled key ranges assign records to reducers so each reducer sorts a bucket and output is globally ordered.",
+        href: "https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/examples/terasort/package-summary.html",
+      },
+      {
+        company: "Databricks",
+        product: "Spark range partitioning",
+        usage:
+          "`repartitionByRange` samples the key distribution to build balanced buckets before per-partition sorting.",
+        href: "https://spark.apache.org/docs/latest/sql-performance-tuning.html",
+      },
+      {
+        company: "Snowflake / analytics warehouses",
+        product: "Histogram-based data skipping",
+        usage: "Value-range buckets drive both partition pruning and parallel sort placement.",
+      },
+    ],
+    references: [
+      {
+        label: "Hadoop TeraSort — range partitioning",
+        href: "https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/examples/terasort/package-summary.html",
+      },
+      {
+        label: "Spark — performance tuning and partitioning",
+        href: "https://spark.apache.org/docs/latest/sql-performance-tuning.html",
+      },
+    ],
   },
   {
     slug: "timsort",
@@ -1345,6 +3476,57 @@ func (r *Raft) run() {
       "Implementation is complex because run invariants matter.",
       "Needs extra memory for merges.",
       "Primitive-array sorts may use different algorithms.",
+    ],
+    codeSnippet: {
+      language: "py",
+      code: `# Timsort exploits existing order: find natural runs, extend to minrun, merge.
+def find_run(a, lo):
+    hi = lo + 1
+    if hi == len(a):
+        return hi, False
+    if a[hi] < a[lo]:                  # strictly descending run
+        while hi + 1 < len(a) and a[hi + 1] < a[hi]:
+            hi += 1
+        return hi + 1, True            # reverse it in place -> stable ascending run
+    while hi + 1 < len(a) and a[hi + 1] >= a[hi]:
+        hi += 1
+    return hi + 1, False
+
+# Already-sorted or reverse-sorted input costs O(n); merges obey stack invariants
+# so run lengths stay balanced.`,
+    },
+    usedBy: [
+      {
+        company: "Python Software Foundation",
+        product: "list.sort() / sorted()",
+        usage:
+          "Timsort was written for CPython and is the reason sorting near-ordered real-world data is close to linear.",
+        href: "https://github.com/python/cpython/blob/main/Objects/listsort.txt",
+      },
+      {
+        company: "Oracle / Android",
+        product: "java.util.Arrays.sort for objects",
+        usage:
+          "Java uses Timsort for reference arrays because stability is required by the spec; Android inherits it.",
+        href: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Arrays.html",
+      },
+      {
+        company: "Google",
+        product: "V8 Array.prototype.sort",
+        usage:
+          "V8 replaced its old sort with TimSort in 2018, making JavaScript sorting stable across engines.",
+        href: "https://v8.dev/blog/array-sort",
+      },
+    ],
+    references: [
+      {
+        label: "CPython — listsort.txt (Timsort design notes)",
+        href: "https://github.com/python/cpython/blob/main/Objects/listsort.txt",
+      },
+      {
+        label: "V8 — getting things sorted (TimSort in V8)",
+        href: "https://v8.dev/blog/array-sort",
+      },
     ],
   },
   {
@@ -1372,6 +3554,64 @@ func (r *Raft) run() {
       "Too many merge passes increase disk reads/writes.",
       "Temporary storage must be sized for run files.",
     ],
+    codeSnippet: {
+      language: "py",
+      code: `import heapq, tempfile
+
+# Phase 1: sort chunks that fit in RAM, spill each to disk.
+def spill_sorted_runs(rows, chunk=1_000_000):
+    runs, buf = [], []
+    for row in rows:
+        buf.append(row)
+        if len(buf) >= chunk:
+            runs.append(_write(sorted(buf))); buf = []
+    if buf:
+        runs.append(_write(sorted(buf)))
+    return runs
+
+# Phase 2: k-way merge the runs with a heap — one buffered read per run.
+def merge_runs(runs):
+    files = [open(r) for r in runs]
+    yield from heapq.merge(*files)
+
+def _write(sorted_rows):
+    f = tempfile.NamedTemporaryFile("w", delete=False)
+    f.writelines(sorted_rows); f.close()
+    return f.name`,
+    },
+    usedBy: [
+      {
+        company: "PostgreSQL",
+        product: "Disk-based sorts (work_mem spill)",
+        usage:
+          'When a sort exceeds work_mem, Postgres writes sorted runs to temp files and merges them — visible as "external merge" in EXPLAIN.',
+        href: "https://www.postgresql.org/docs/current/runtime-config-resource.html",
+      },
+      {
+        company: "Databricks",
+        product: "Spark spill-to-disk shuffles",
+        usage:
+          "Sort-based shuffle spills sorted partitions and merges them, which is why shuffle disk IO dominates big jobs.",
+        href: "https://spark.apache.org/docs/latest/tuning.html",
+      },
+      {
+        company: "Google",
+        product: "MapReduce sort phase",
+        usage:
+          "The shuffle stage merges sorted spill files per reducer — external merge sort at cluster scale.",
+        href: "https://research.google/pubs/pub62/",
+      },
+    ],
+    references: [
+      {
+        label: "PostgreSQL — work_mem and external sorts",
+        href: "https://www.postgresql.org/docs/current/runtime-config-resource.html",
+      },
+      {
+        label: "MapReduce — simplified data processing on large clusters",
+        href: "https://research.google/pubs/pub62/",
+      },
+    ],
   },
   {
     slug: "sorting-race",
@@ -1396,6 +3636,54 @@ func (r *Raft) run() {
       "C++ STL — introsort (quicksort + heapsort fallback).",
       "Java primitive arrays — dual-pivot quicksort.",
       "PostgreSQL — external mergesort for ORDER BY that exceeds work_mem.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Why engines pick different algorithms for the same call:
+//   n < 22            -> insertion sort   (tiny, cache-resident, low overhead)
+//   objects / stable  -> TimSort          (stability is required by the spec)
+//   primitives        -> quicksort family (in-place, great constants)
+//   adversarial depth -> heapsort         (introsort's O(n log n) safety net)
+
+const byPrice = [...items].sort((a, b) => a.price - b.price); // stable since ES2019
+// Comparator contract: consistent, transitive, returns 0 only for true ties.
+// A comparator that returns a boolean (a > b) is the #1 real-world sorting bug.`,
+    },
+    pitfalls: [
+      "Comparator bugs beat algorithm choice: `(a, b) => a > b` returns a boolean, not -1/0/1, and silently produces wrong order.",
+      "Big-O hides constants — insertion sort wins below ~20 elements, which is why every real sort has a small-array cutoff.",
+      "Quicksort's worst case is O(n^2) on adversarial input; production sorts randomise the pivot or fall back to heapsort.",
+      "Stability matters when sorting by a second key; unstable sorts silently scramble previously applied ordering.",
+    ],
+    usedBy: [
+      {
+        company: "Google",
+        product: "V8 Array.prototype.sort",
+        usage:
+          "V8 uses TimSort with an insertion-sort cutoff for small runs, and JavaScript sorting is now stable by specification.",
+        href: "https://v8.dev/blog/array-sort",
+      },
+      {
+        company: "Rust project",
+        product: "slice::sort vs sort_unstable",
+        usage:
+          "Rust exposes the tradeoff directly: a stable merge-based sort with allocation, or an in-place pattern-defeating quicksort.",
+        href: "https://doc.rust-lang.org/std/primitive.slice.html#method.sort_unstable",
+      },
+      {
+        company: "Oracle",
+        product: "Java dual-pivot quicksort for primitives",
+        usage:
+          "Primitives use dual-pivot quicksort (no stability requirement); objects use TimSort because stability is contractual.",
+        href: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Arrays.html",
+      },
+    ],
+    references: [
+      { label: "V8 — getting things sorted", href: "https://v8.dev/blog/array-sort" },
+      {
+        label: "Rust — sort vs sort_unstable tradeoffs",
+        href: "https://doc.rust-lang.org/std/primitive.slice.html#method.sort_unstable",
+      },
     ],
   },
   {
@@ -1423,6 +3711,59 @@ func (r *Raft) run() {
       "Memoization can trade too much memory for speed.",
       "Cycles in recurrence need detection.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Memoization turns an exponential recursion tree into a linear walk.
+const memo = new Map<number, number>();
+function fib(n: number): number {
+  if (n < 2) return n;
+  const hit = memo.get(n);
+  if (hit !== undefined) return hit; // overlapping subproblem, computed once
+  const v = fib(n - 1) + fib(n - 2);
+  memo.set(n, v);
+  return v;
+}
+
+// The same shape as a request-level cache: pure function + stable key + store.
+function memoize<A extends unknown[], R>(fn: (...a: A) => R, key: (...a: A) => string) {
+  const cache = new Map<string, R>();
+  return (...args: A): R => {
+    const k = key(...args);
+    if (!cache.has(k)) cache.set(k, fn(...args));
+    return cache.get(k)!;
+  };
+}`,
+    },
+    usedBy: [
+      {
+        company: "Meta",
+        product: "React useMemo / cache()",
+        usage:
+          "Component memoization skips recomputation when inputs are unchanged — the same overlapping-subproblem argument at UI scale.",
+        href: "https://react.dev/reference/react/useMemo",
+      },
+      {
+        company: "Vercel",
+        product: "Next.js request-level deduplication",
+        usage:
+          "Identical fetches in one render pass are deduped from a per-request cache instead of hitting the origin repeatedly.",
+        href: "https://nextjs.org/docs/app/building-your-application/caching",
+      },
+      {
+        company: "Google",
+        product: "Bazel action cache",
+        usage:
+          "Build actions are keyed by input hashes so an already-computed subgraph is fetched, not rebuilt.",
+        href: "https://bazel.build/remote/caching",
+      },
+    ],
+    references: [
+      { label: "React — useMemo", href: "https://react.dev/reference/react/useMemo" },
+      {
+        label: "Bazel — remote caching of build actions",
+        href: "https://bazel.build/remote/caching",
+      },
+    ],
   },
   {
     slug: "knapsack",
@@ -1449,6 +3790,51 @@ func (r *Raft) run() {
       "Loop direction matters for 1D 0/1 DP.",
       "Fractional knapsack is a different greedy problem.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// 0/1 knapsack, 1-D rolling array. Iterate capacity downward so each item is used once.
+export function knapsack(items: { w: number; v: number }[], cap: number): number {
+  const dp = new Array(cap + 1).fill(0);
+  for (const it of items) {
+    for (let c = cap; c >= it.w; c--) {
+      dp[c] = Math.max(dp[c], dp[c - it.w] + it.v);
+    }
+  }
+  return dp[cap]; // pseudo-polynomial: O(n * cap), cap is a value not a size
+}`,
+    },
+    usedBy: [
+      {
+        company: "Amazon",
+        product: "Package / container loading",
+        usage:
+          "Choosing which units fill a box or truck under weight and volume caps is a multi-dimensional knapsack solved heuristically.",
+      },
+      {
+        company: "Google",
+        product: "Ad budget allocation",
+        usage:
+          "Selecting a set of candidate ads with the highest expected value under a budget cap is a knapsack formulation.",
+        href: "https://research.google/pubs/pub37409/",
+      },
+      {
+        company: "Kubernetes / CNCF",
+        product: "Pod bin-packing on nodes",
+        usage:
+          "The MostAllocated / bin-packing scoring strategy chooses placements that pack requests tightly into node capacity.",
+        href: "https://kubernetes.io/docs/reference/scheduling/config/",
+      },
+    ],
+    references: [
+      {
+        label: "Kubernetes — scheduler scoring & bin packing config",
+        href: "https://kubernetes.io/docs/reference/scheduling/config/",
+      },
+      {
+        label: "CP-Algorithms — knapsack style DP",
+        href: "https://cp-algorithms.com/dynamic_programming/knapsack.html",
+      },
+    ],
   },
   {
     slug: "coin-change",
@@ -1469,6 +3855,53 @@ func (r *Raft) run() {
       "Unreachable amounts need Infinity/sentinel handling.",
       "Combination vs permutation loop order is easy to mix up.",
       "Greedy only works for some coin systems.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Minimum coins for an amount — unbounded knapsack, ascending loop.
+export function minCoins(coins: number[], amount: number): number {
+  const dp = new Array(amount + 1).fill(Infinity);
+  dp[0] = 0;
+  for (const c of coins) {
+    for (let a = c; a <= amount; a++) {
+      dp[a] = Math.min(dp[a], dp[a - c] + 1); // ascending -> coin reusable
+    }
+  }
+  return dp[amount] === Infinity ? -1 : dp[amount];
+}
+// Greedy works for {1,5,10,25} but fails for e.g. {1,3,4} at amount 6.`,
+    },
+    usedBy: [
+      {
+        company: "NCR / vending & POS vendors",
+        product: "Cash change dispensing",
+        usage:
+          "Dispensers minimise coin count subject to hopper stock, which greedy alone cannot guarantee.",
+      },
+      {
+        company: "Stripe",
+        product: "Payout batching & denomination splits",
+        usage:
+          "Splitting an amount across balances, rails or fee tiers is the same make-the-target-from-parts DP.",
+        href: "https://docs.stripe.com/payouts",
+      },
+      {
+        company: "Bitcoin Core",
+        product: "UTXO coin selection",
+        usage:
+          "Wallets pick a subset of unspent outputs to cover a payment with minimal change and fees — branch-and-bound over the same problem.",
+        href: "https://github.com/bitcoin/bitcoin/blob/master/src/wallet/coinselection.cpp",
+      },
+    ],
+    references: [
+      {
+        label: "Bitcoin Core — coin selection implementation",
+        href: "https://github.com/bitcoin/bitcoin/blob/master/src/wallet/coinselection.cpp",
+      },
+      {
+        label: "CP-Algorithms — DP over coins",
+        href: "https://cp-algorithms.com/dynamic_programming/knapsack.html",
+      },
     ],
   },
   {
@@ -1492,6 +3925,54 @@ func (r *Raft) run() {
       "Subsequence is not substring.",
       "Strict vs non-decreasing comparison changes answer.",
       "The O(n log n) tails array does not directly store the sequence without parent links.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// O(n log n): tails[i] = smallest possible tail of an increasing run of length i+1.
+export function lisLength(xs: number[]): number {
+  const tails: number[] = [];
+  for (const x of xs) {
+    let lo = 0, hi = tails.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      tails[mid] < x ? (lo = mid + 1) : (hi = mid);
+    }
+    tails[lo] = x; // extend or tighten
+  }
+  return tails.length; // tails is NOT the subsequence itself
+}`,
+    },
+    usedBy: [
+      {
+        company: "Git / Linux Foundation",
+        product: "Diff & patience diff",
+        usage:
+          "Patience diff computes a longest increasing subsequence over unique matching lines to anchor a readable diff.",
+        href: "https://bramcohen.livejournal.com/73318.html",
+      },
+      {
+        company: "Vue.js core team",
+        product: "Keyed children DOM patching",
+        usage:
+          "The reconciler finds the longest increasing subsequence of stable indexes so only the remaining nodes are moved.",
+        href: "https://github.com/vuejs/core/blob/main/packages/runtime-core/src/renderer.ts",
+      },
+      {
+        company: "Bioinformatics tooling (BLAST-family)",
+        product: "Seed chaining in sequence alignment",
+        usage:
+          "Chaining co-linear seed matches is an increasing-subsequence problem over match coordinates.",
+      },
+    ],
+    references: [
+      {
+        label: "Patience diff — LIS over unique lines",
+        href: "https://bramcohen.livejournal.com/73318.html",
+      },
+      {
+        label: "CP-Algorithms — longest increasing subsequence",
+        href: "https://cp-algorithms.com/sequences/longest_increasing_subsequence.html",
+      },
     ],
   },
   {
@@ -1517,6 +3998,51 @@ func (r *Raft) run() {
       "Reconstructing the sequence needs backtracking or parent data.",
       "Large strings require memory optimization.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// LCS table — the core of line-based diffs.
+export function lcs(a: string[], b: string[]): number[][] {
+  const dp = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      dp[i][j] = a[i - 1] === b[j - 1]
+        ? dp[i - 1][j - 1] + 1              // matched line -> context
+        : Math.max(dp[i - 1][j], dp[i][j - 1]); // deletion or insertion
+    }
+  }
+  return dp; // backtrack from dp[a.length][b.length] to emit the patch
+}`,
+    },
+    usedBy: [
+      {
+        company: "Git / Linux Foundation",
+        product: "git diff (Myers algorithm)",
+        usage:
+          "Diff output is the complement of a longest common subsequence between the two file versions.",
+        href: "https://git-scm.com/docs/git-diff",
+      },
+      {
+        company: "GitHub",
+        product: "Pull request diff views",
+        usage:
+          "Side-by-side and unified PR diffs render the LCS-derived edit script produced by the diff engine.",
+        href: "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/about-comparing-branches-in-pull-requests",
+      },
+      {
+        company: "Google",
+        product: "diff-match-patch (Docs revision history)",
+        usage:
+          "Character-level diffing for collaborative editing and revision playback is built on the same LCS/edit-script machinery.",
+        href: "https://github.com/google/diff-match-patch",
+      },
+    ],
+    references: [
+      {
+        label: "Myers — An O(ND) difference algorithm",
+        href: "http://www.xmailserver.org/diff2.pdf",
+      },
+      { label: "Google — diff-match-patch", href: "https://github.com/google/diff-match-patch" },
+    ],
   },
   {
     slug: "matrix-chain-multiplication",
@@ -1536,6 +4062,54 @@ func (r *Raft) run() {
       "Only optimizes order, not mathematical result.",
       "Requires compatible dimensions.",
       "The split table is needed to reconstruct parentheses.",
+    ],
+    codeSnippet: {
+      language: "py",
+      code: `# Choose the parenthesisation with the fewest scalar multiplications.
+def matrix_chain(dims):                 # dims[i-1] x dims[i] for matrix i
+    n = len(dims) - 1
+    dp = [[0] * (n + 1) for _ in range(n + 1)]
+    for length in range(2, n + 1):
+        for i in range(1, n - length + 2):
+            j = i + length - 1
+            dp[i][j] = min(
+                dp[i][k] + dp[k + 1][j] + dims[i - 1] * dims[k] * dims[j]
+                for k in range(i, j)
+            )
+    return dp[1][n]                     # O(n^3) planning, huge runtime savings`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "TensorFlow / XLA operator fusion",
+        usage:
+          "Compilers reorder and fuse tensor contractions; the multiplication order changes FLOP count by orders of magnitude.",
+        href: "https://openxla.org/xla",
+      },
+      {
+        company: "PostgreSQL",
+        product: "Join order optimisation",
+        usage:
+          "Join ordering is the same interval DP — cost depends on the shape of the tree, not just the set of operands.",
+        href: "https://www.postgresql.org/docs/current/planner-optimizer.html",
+      },
+      {
+        company: "NVIDIA",
+        product: "cuBLAS / einsum contraction paths",
+        usage:
+          "Optimal contraction ordering for einsum-style expressions is solved with the same dynamic program.",
+        href: "https://numpy.org/doc/stable/reference/generated/numpy.einsum_path.html",
+      },
+    ],
+    references: [
+      {
+        label: "PostgreSQL — planner and join ordering",
+        href: "https://www.postgresql.org/docs/current/planner-optimizer.html",
+      },
+      {
+        label: "NumPy — einsum_path (contraction ordering)",
+        href: "https://numpy.org/doc/stable/reference/generated/numpy.einsum_path.html",
+      },
     ],
   },
   {
@@ -1563,6 +4137,53 @@ func (r *Raft) run() {
       "Movement cycles break simple row-order DP.",
       "Boundary initialization controls correctness.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Min-cost path on a grid: each cell depends only on up/left.
+export function minPathCost(grid: number[][]): number {
+  const rows = grid.length, cols = grid[0].length;
+  const dp = new Array(cols).fill(Infinity);
+  dp[0] = 0;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const fromLeft = c > 0 ? dp[c - 1] : Infinity;
+      dp[c] = (r === 0 && c === 0 ? 0 : Math.min(dp[c], fromLeft)) + grid[r][c];
+    }
+  }
+  return dp[cols - 1]; // O(rows*cols) time, O(cols) memory
+}`,
+    },
+    usedBy: [
+      {
+        company: "Adobe",
+        product: "Content-aware resizing (seam carving)",
+        usage:
+          "Seam carving finds a minimum-energy path down an image grid with exactly this recurrence.",
+        href: "https://dl.acm.org/doi/10.1145/1275808.1276390",
+      },
+      {
+        company: "Blizzard / game studios",
+        product: "Tile-based pathfinding costs",
+        usage:
+          "Terrain-cost grids are pre-solved with DP for flow fields when hundreds of units share a destination.",
+      },
+      {
+        company: "Google",
+        product: "Dynamic time warping in speech",
+        usage:
+          "Aligning two time series is a grid DP over an alignment matrix with the same up/left/diagonal transitions.",
+      },
+    ],
+    references: [
+      {
+        label: "Avidan & Shamir — Seam carving for content-aware image resizing",
+        href: "https://dl.acm.org/doi/10.1145/1275808.1276390",
+      },
+      {
+        label: "CP-Algorithms — dynamic programming basics",
+        href: "https://cp-algorithms.com/dynamic_programming/intro-to-dp.html",
+      },
+    ],
   },
   {
     slug: "tree-dp",
@@ -1585,6 +4206,55 @@ func (r *Raft) run() {
       "Root choice can matter for directed/parented states.",
       "Rerooting DP is needed when every node may be root.",
       "Recursive depth can overflow on skewed trees.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Post-order DP: combine children results into the parent's answer.
+interface Node { id: string; children: Node[]; weight: number }
+
+// Maximum-weight independent set on a tree ("no manager with their report").
+function solve(n: Node): { take: number; skip: number } {
+  let take = n.weight, skip = 0;
+  for (const c of n.children) {
+    const r = solve(c);
+    take += r.skip;                 // taking n forbids taking a child
+    skip += Math.max(r.take, r.skip);
+  }
+  return { take, skip };
+}
+const best = (root: Node) => Math.max(...Object.values(solve(root)));`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "Bazel build graph analysis",
+        usage:
+          "Aggregating cost, staleness and cache hits bottom-up over a dependency tree is post-order DP.",
+        href: "https://bazel.build/remote/caching",
+      },
+      {
+        company: "Meta",
+        product: "React render cost aggregation",
+        usage:
+          "Profiler timings roll up child subtree costs into parent components in a post-order pass.",
+        href: "https://react.dev/reference/react/Profiler",
+      },
+      {
+        company: "Amazon",
+        product: "Org / category hierarchy rollups",
+        usage:
+          "Catalog and org trees compute aggregates (inventory, spend, permissions) once per node instead of re-walking subtrees.",
+      },
+    ],
+    references: [
+      {
+        label: "CP-Algorithms — DP on trees",
+        href: "https://cp-algorithms.com/graph/rerooting.html",
+      },
+      {
+        label: "React — Profiler (subtree cost aggregation)",
+        href: "https://react.dev/reference/react/Profiler",
+      },
     ],
   },
   {
@@ -1631,6 +4301,39 @@ func (r *Raft) run() {
       "Negative edge weights break it — use Bellman-Ford instead.",
       "Re-using a stale (distance, node) entry in the priority queue is the classic off-by-one bug — check if popped distance matches current best.",
     ],
+    usedBy: [
+      {
+        company: "Google",
+        product: "Maps routing",
+        usage:
+          "Production routing starts from Dijkstra/A* over the road graph and layers contraction hierarchies for continent-scale queries.",
+        href: "https://research.google/pubs/pub41336/",
+      },
+      {
+        company: "Uber",
+        product: "ETA & dispatch routing",
+        usage:
+          "Shortest-path search over a live, traffic-weighted road graph drives both ETA and driver assignment.",
+        href: "https://www.uber.com/blog/engineering/",
+      },
+      {
+        company: "Internet Engineering Task Force",
+        product: "OSPF link-state routing",
+        usage:
+          "Every OSPF router runs Dijkstra over the flooded link-state database to build its forwarding table.",
+        href: "https://datatracker.ietf.org/doc/html/rfc2328",
+      },
+    ],
+    references: [
+      {
+        label: "RFC 2328 — OSPF v2 (SPF calculation)",
+        href: "https://datatracker.ietf.org/doc/html/rfc2328",
+      },
+      {
+        label: "CP-Algorithms — Dijkstra with priority queue",
+        href: "https://cp-algorithms.com/graph/dijkstra_sparse.html",
+      },
+    ],
   },
   {
     slug: "interval-scheduling",
@@ -1653,6 +4356,52 @@ func (r *Raft) run() {
       "Sorting by start time or shortest duration is not generally optimal.",
       "Weighted intervals need DP, not this greedy rule.",
       "Boundary rules for touching intervals must be defined.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Maximum non-overlapping intervals: sort by END time, then take greedily.
+type Interval = { start: number; end: number; id: string };
+
+export function schedule(intervals: Interval[]): Interval[] {
+  const byEnd = [...intervals].sort((a, b) => a.end - b.end);
+  const picked: Interval[] = [];
+  let freeAt = -Infinity;
+  for (const iv of byEnd) {
+    if (iv.start >= freeAt) { picked.push(iv); freeAt = iv.end; }
+  }
+  return picked; // sorting by start or by duration is provably worse
+}`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "Calendar room booking",
+        usage:
+          "Fitting the most meetings into a room, and detecting conflicts, is interval scheduling over booking requests.",
+        href: "https://developers.google.com/workspace/calendar/api/guides/free-busy",
+      },
+      {
+        company: "AWS",
+        product: "EC2 / spot capacity reservation windows",
+        usage:
+          "Non-overlapping reservation windows are packed to maximise utilised capacity per host.",
+      },
+      {
+        company: "Netflix",
+        product: "Encoding job slotting",
+        usage:
+          "Transcoding tasks with fixed durations are packed onto workers by earliest-finish-first ordering.",
+      },
+    ],
+    references: [
+      {
+        label: "Google Calendar API — free/busy and conflict detection",
+        href: "https://developers.google.com/workspace/calendar/api/guides/free-busy",
+      },
+      {
+        label: "Kleinberg & Tardos — interval scheduling (greedy stays ahead)",
+        href: "https://www.cs.princeton.edu/~wayne/kleinberg-tardos/pdf/04GreedyAlgorithmsI.pdf",
+      },
     ],
   },
   {
@@ -1680,6 +4429,51 @@ func (r *Raft) run() {
       "Requires known start/end times.",
       "Overlapping definition affects compatibility.",
     ],
+    codeSnippet: {
+      language: "py",
+      code: `# Greedy "earliest finishing first" with an exchange-argument proof:
+# any optimal solution can swap its first activity for ours without getting worse.
+def select(activities):
+    chosen, last_end = [], float("-inf")
+    for a in sorted(activities, key=lambda a: a["end"]):
+        if a["start"] >= last_end:
+            chosen.append(a)
+            last_end = a["end"]
+    return chosen
+
+# Weighted variant breaks the greedy proof -> needs DP with binary search.`,
+    },
+    usedBy: [
+      {
+        company: "Microsoft",
+        product: "Outlook scheduling assistant",
+        usage:
+          "Suggested meeting slots are generated by scanning free/busy intervals and packing compatible ones.",
+        href: "https://learn.microsoft.com/en-us/graph/api/user-findmeetingtimes",
+      },
+      {
+        company: "Delta / airline operations",
+        product: "Gate and runway slot assignment",
+        usage:
+          "Aircraft turns are assigned to gates by earliest-free ordering under fixed occupancy windows.",
+      },
+      {
+        company: "Databricks",
+        product: "Cluster job window packing",
+        usage:
+          "Scheduled jobs with known runtimes are packed into cluster uptime windows to reduce idle spin-up cost.",
+      },
+    ],
+    references: [
+      {
+        label: "Microsoft Graph — findMeetingTimes",
+        href: "https://learn.microsoft.com/en-us/graph/api/user-findmeetingtimes",
+      },
+      {
+        label: "Greedy algorithms — exchange argument notes",
+        href: "https://www.cs.princeton.edu/~wayne/kleinberg-tardos/pdf/04GreedyAlgorithmsI.pdf",
+      },
+    ],
   },
   {
     slug: "huffman-coding",
@@ -1704,6 +4498,61 @@ func (r *Raft) run() {
       "Not adaptive unless rebuilt or updated.",
       "Arithmetic coding can compress closer to entropy.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Build the optimal prefix code: repeatedly merge the two rarest symbols.
+type Node = { freq: number; sym?: string; left?: Node; right?: Node };
+
+export function huffman(freqs: Record<string, number>): Map<string, string> {
+  const heap: Node[] = Object.entries(freqs).map(([sym, freq]) => ({ sym, freq }));
+  while (heap.length > 1) {
+    heap.sort((a, b) => a.freq - b.freq); // a real impl uses a min-heap
+    const [l, r] = heap.splice(0, 2);
+    heap.push({ freq: l.freq + r.freq, left: l, right: r });
+  }
+  const codes = new Map<string, string>();
+  const walk = (n: Node, path: string) => {
+    if (n.sym !== undefined) return codes.set(n.sym, path || "0");
+    walk(n.left!, path + "0");
+    walk(n.right!, path + "1"); // prefix-free: symbols only live at leaves
+  };
+  if (heap[0]) walk(heap[0], "");
+  return codes;
+}`,
+    },
+    usedBy: [
+      {
+        company: "IETF / all major browsers",
+        product: "HTTP/2 HPACK header compression",
+        usage:
+          "HPACK ships a static Huffman table for header strings, cutting request header bytes on every HTTP/2 request.",
+        href: "https://datatracker.ietf.org/doc/html/rfc7541#appendix-B",
+      },
+      {
+        company: "PNG / zlib (DEFLATE)",
+        product: "gzip, PNG, ZIP",
+        usage:
+          "DEFLATE = LZ77 matching followed by Huffman coding of literals and lengths — the backbone of web compression.",
+        href: "https://datatracker.ietf.org/doc/html/rfc1951",
+      },
+      {
+        company: "Joint Photographic Experts Group",
+        product: "JPEG entropy coding",
+        usage:
+          "Quantised DCT coefficients are entropy-coded with Huffman tables stored in the file header.",
+        href: "https://www.w3.org/Graphics/JPEG/itu-t81.pdf",
+      },
+    ],
+    references: [
+      {
+        label: "RFC 7541 — HPACK Huffman code table",
+        href: "https://datatracker.ietf.org/doc/html/rfc7541#appendix-B",
+      },
+      {
+        label: "RFC 1951 — DEFLATE compressed data format",
+        href: "https://datatracker.ietf.org/doc/html/rfc1951",
+      },
+    ],
   },
   {
     slug: "n-queens",
@@ -1724,6 +4573,54 @@ func (r *Raft) run() {
       "Naive board scanning is slower than column/diagonal sets.",
       "Symmetric solutions can duplicate work.",
       "Backtracking still has exponential worst-case growth.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Backtracking with O(1) conflict checks via column/diagonal bitmasks.
+export function countSolutions(n: number): number {
+  const full = (1 << n) - 1;
+  let count = 0;
+  const place = (cols: number, d1: number, d2: number) => {
+    if (cols === full) { count++; return; }
+    let free = ~(cols | d1 | d2) & full; // candidate squares in this row
+    while (free) {
+      const bit = free & -free; // lowest set bit
+      free ^= bit;
+      place(cols | bit, ((d1 | bit) << 1) & full, (d2 | bit) >> 1);
+    }
+  };
+  place(0, 0, 0);
+  return count; // prune early: never explore a partially invalid board
+}`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "OR-Tools CP-SAT",
+        usage:
+          "N-Queens is the shipped teaching model for constraint propagation plus backtracking search in OR-Tools.",
+        href: "https://developers.google.com/optimization/cp/queens",
+      },
+      {
+        company: "Microsoft",
+        product: "Z3 / SAT-style solvers",
+        usage:
+          "Conflict-driven search with backjumping generalises exactly this prune-on-conflict pattern.",
+        href: "https://github.com/Z3Prover/z3",
+      },
+      {
+        company: "IBM",
+        product: "CPLEX CP optimizer benchmarks",
+        usage:
+          "Placement-under-constraints problems (VLSI, seating, timetabling) use the same feasibility search.",
+      },
+    ],
+    references: [
+      {
+        label: "Google OR-Tools — the N-queens problem",
+        href: "https://developers.google.com/optimization/cp/queens",
+      },
+      { label: "Z3 theorem prover", href: "https://github.com/Z3Prover/z3" },
     ],
   },
   {
@@ -1750,6 +4647,59 @@ func (r *Raft) run() {
       "Output grows explosively.",
       "Duplicate input values need deduping rules.",
       "Mutable path arrays must be copied at output time.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Subsets via bitmask enumeration — 2^n combinations.
+function subsets<T>(xs: T[]): T[][] {
+  const out: T[][] = [];
+  for (let mask = 0; mask < 1 << xs.length; mask++) {
+    out.push(xs.filter((_, i) => mask & (1 << i)));
+  }
+  return out;
+}
+
+// Permutations via backtracking with an in-place swap.
+function permute<T>(xs: T[], k = 0, out: T[][] = []): T[][] {
+  if (k === xs.length) return (out.push([...xs]), out);
+  for (let i = k; i < xs.length; i++) {
+    [xs[k], xs[i]] = [xs[i], xs[k]];
+    permute(xs, k + 1, out);
+    [xs[k], xs[i]] = [xs[i], xs[k]]; // undo
+  }
+  return out;
+}`,
+    },
+    usedBy: [
+      {
+        company: "Optimizely / experimentation platforms",
+        product: "Feature-flag combination testing",
+        usage:
+          "Multivariate experiments enumerate the subset/permutation space of variants before pruning to a testable set.",
+      },
+      {
+        company: "Netflix",
+        product: "Chaos experiment matrices",
+        usage:
+          "Failure-injection suites enumerate combinations of failing dependencies to find the ones that break the request path.",
+        href: "https://netflixtechblog.com/tagged/chaos-engineering",
+      },
+      {
+        company: "Meta",
+        product: "Property-based / fuzz input generation",
+        usage:
+          "Systematic enumeration of small input combinations catches ordering bugs random testing misses.",
+      },
+    ],
+    references: [
+      {
+        label: "Netflix Tech Blog — chaos engineering",
+        href: "https://netflixtechblog.com/tagged/chaos-engineering",
+      },
+      {
+        label: "CP-Algorithms — submask enumeration",
+        href: "https://cp-algorithms.com/algebra/all-submasks.html",
+      },
     ],
   },
   {
@@ -1781,6 +4731,59 @@ func (r *Raft) run() {
       "Weak bounds do little work reduction.",
       "Priority frontier can grow large.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Explore the search tree, but prune any branch whose optimistic bound
+// cannot beat the best solution found so far.
+function branchAndBound(root: State, bound: (s: State) => number, value: (s: State) => number) {
+  let best = -Infinity, bestState: State | null = null;
+  const stack = [root];
+  while (stack.length) {
+    const s = stack.pop()!;
+    if (bound(s) <= best) continue; // optimistic estimate is still worse -> prune
+    if (s.isComplete) {
+      const v = value(s);
+      if (v > best) { best = v; bestState = s; }
+      continue;
+    }
+    stack.push(...s.children());
+  }
+  return { best, bestState }; // bound quality decides whether this is fast or exponential
+}`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "OR-Tools routing & MIP solvers",
+        usage:
+          "Vehicle routing and mixed-integer models are solved by branch-and-bound over LP relaxations.",
+        href: "https://developers.google.com/optimization/routing",
+      },
+      {
+        company: "Gurobi / IBM CPLEX",
+        product: "Commercial MIP solvers",
+        usage:
+          "Branch-and-cut (bound + cutting planes) is the industry-standard exact method for supply-chain and scheduling models.",
+        href: "https://www.gurobi.com/resources/mixed-integer-programming-mip-a-primer-on-the-basics/",
+      },
+      {
+        company: "Bitcoin Core",
+        product: "Coin selection",
+        usage:
+          "The wallet runs a bounded branch-and-bound search for an exact-match input set before falling back to random selection.",
+        href: "https://github.com/bitcoin/bitcoin/blob/master/src/wallet/coinselection.cpp",
+      },
+    ],
+    references: [
+      {
+        label: "Gurobi — MIP basics (branch and bound)",
+        href: "https://www.gurobi.com/resources/mixed-integer-programming-mip-a-primer-on-the-basics/",
+      },
+      {
+        label: "Google OR-Tools — routing solver",
+        href: "https://developers.google.com/optimization/routing",
+      },
+    ],
   },
   {
     slug: "merge-sort-recursion",
@@ -1806,6 +4809,55 @@ func (r *Raft) run() {
       "Needs extra memory for arrays.",
       "Recursive allocation can be costly if not optimized.",
       "Small arrays are often faster with insertion sort.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Divide and conquer: T(n) = 2T(n/2) + O(n) => O(n log n), stable.
+export function mergeSort(xs: number[]): number[] {
+  if (xs.length <= 1) return xs;
+  const mid = xs.length >> 1;
+  const left = mergeSort(xs.slice(0, mid));
+  const right = mergeSort(xs.slice(mid));
+  const out: number[] = [];
+  let i = 0, j = 0;
+  while (i < left.length && j < right.length) {
+    out.push(left[i] <= right[j] ? left[i++] : right[j++]); // <= keeps it stable
+  }
+  return out.concat(left.slice(i), right.slice(j));
+}`,
+    },
+    usedBy: [
+      {
+        company: "Python Software Foundation",
+        product: "Timsort merge phase",
+        usage:
+          "Timsort is an adaptive merge sort: natural runs are merged with galloping mode instead of blind halving.",
+        href: "https://github.com/python/cpython/blob/main/Objects/listsort.txt",
+      },
+      {
+        company: "Google",
+        product: "MapReduce / BigQuery shuffle merges",
+        usage:
+          "Distributed sorts merge sorted partitions across machines — merge sort where each half lives on a different node.",
+        href: "https://research.google/pubs/pub62/",
+      },
+      {
+        company: "Elastic",
+        product: "Lucene segment merges",
+        usage:
+          "Sorted postings from multiple segments are merged into a larger sorted segment during background merges.",
+        href: "https://lucene.apache.org/core/9_9_0/core/org/apache/lucene/index/MergePolicy.html",
+      },
+    ],
+    references: [
+      {
+        label: "CPython — listsort.txt (adaptive merging)",
+        href: "https://github.com/python/cpython/blob/main/Objects/listsort.txt",
+      },
+      {
+        label: "Lucene — MergePolicy",
+        href: "https://lucene.apache.org/core/9_9_0/core/org/apache/lucene/index/MergePolicy.html",
+      },
     ],
   },
   {
@@ -1840,6 +4892,64 @@ func (r *Raft) run() {
         href: "https://openid.net/specs/openid-connect-core-1_0.html",
       },
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Authorization Code + PKCE — the only browser-safe OAuth flow today.
+const verifier = base64url(crypto.getRandomValues(new Uint8Array(32)));
+const challenge = base64url(await crypto.subtle.digest("SHA-256", enc(verifier)));
+sessionStorage.setItem("pkce_verifier", verifier);
+
+location.href = \`\${issuer}/authorize?\` + new URLSearchParams({
+  response_type: "code",
+  client_id: clientId,
+  redirect_uri: redirectUri,
+  scope: "openid profile email",
+  state: crypto.randomUUID(),        // CSRF binding, verify on return
+  nonce: crypto.randomUUID(),        // replay binding, must match the id_token
+  code_challenge: challenge,
+  code_challenge_method: "S256",
+});
+
+// On the callback: exchange the one-time code for tokens with the verifier.
+await fetch(\`\${issuer}/token\`, {
+  method: "POST",
+  body: new URLSearchParams({
+    grant_type: "authorization_code",
+    code, redirect_uri: redirectUri, client_id: clientId,
+    code_verifier: sessionStorage.getItem("pkce_verifier")!,
+  }),
+});`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "Sign in with Google",
+        usage:
+          "Google's identity platform is an OIDC provider; the id_token is a signed JWT verified against its published JWKS.",
+        href: "https://developers.google.com/identity/openid-connect/openid-connect",
+      },
+      {
+        company: "Okta / Auth0",
+        product: "Enterprise SSO",
+        usage:
+          "Auth0 and Okta ship Authorization Code + PKCE as the default for SPAs and native apps, with the implicit flow deprecated.",
+        href: "https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-pkce",
+      },
+      {
+        company: "Microsoft",
+        product: "Entra ID (Azure AD)",
+        usage:
+          "Microsoft 365 sign-in issues OIDC id_tokens plus scoped access tokens for Graph API calls.",
+        href: "https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc",
+      },
+      {
+        company: "GitHub",
+        product: "Actions OIDC to cloud providers",
+        usage:
+          "Workflows exchange a short-lived OIDC token for cloud credentials, removing long-lived secrets from CI.",
+        href: "https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect",
+      },
+    ],
   },
   {
     slug: "message-queue",
@@ -1864,6 +4974,62 @@ func (r *Raft) run() {
       "Hot partitions from skewed keys — monitor per-partition byte rate.",
       "Auto-commit can lose messages if a consumer crashes mid-batch — prefer manual commit after side effects succeed.",
       "Re-partitioning is painful (Kafka doesn't move data) — over-partition early.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Consumer contract that survives redelivery: idempotency + explicit ack.
+async function handle(msg: { id: string; body: unknown; attempt: number }) {
+  const claimed = await store.claimOnce(msg.id); // dedupe key, e.g. UNIQUE(message_id)
+  if (!claimed) return ack(msg);                 // already processed -> at-least-once is fine
+  try {
+    await doWork(msg.body);
+    await ack(msg);
+  } catch (err) {
+    await store.releaseClaim(msg.id);
+    if (msg.attempt >= 5) return deadLetter(msg, err); // stop poisoning the queue
+    await nack(msg, { backoffMs: 2 ** msg.attempt * 250 });
+  }
+}`,
+    },
+    usedBy: [
+      {
+        company: "Amazon",
+        product: "AWS SQS / SNS",
+        usage:
+          "Standard queues are at-least-once with visibility timeouts and dead-letter queues; FIFO queues add ordering and dedupe ids.",
+        href: "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-basic-architecture.html",
+      },
+      {
+        company: "LinkedIn",
+        product: "Apache Kafka",
+        usage:
+          "Kafka was built at LinkedIn as a partitioned commit log: consumers track offsets, so replay and fan-out are cheap.",
+        href: "https://kafka.apache.org/documentation/#design",
+      },
+      {
+        company: "Stripe",
+        product: "Webhook delivery",
+        usage:
+          "Events are queued and retried with exponential backoff, and consumers are told to key on the event id because delivery is at-least-once.",
+        href: "https://docs.stripe.com/webhooks",
+      },
+      {
+        company: "Uber",
+        product: "Cadence / Temporal workflows",
+        usage:
+          "Task queues plus durable timers turn multi-step business flows into retryable, replayable state machines.",
+        href: "https://www.uber.com/blog/cadence-multi-tenant-workflow-sys/",
+      },
+    ],
+    references: [
+      {
+        label: "Kafka — design (log, offsets, delivery semantics)",
+        href: "https://kafka.apache.org/documentation/#design",
+      },
+      {
+        label: "Stripe — webhook retries and idempotency",
+        href: "https://docs.stripe.com/webhooks",
+      },
     ],
   },
   {
@@ -1894,6 +5060,65 @@ func (r *Raft) run() {
       {
         label: "Ralph Merkle — original 1979 paper",
         href: "https://www.merkle.com/papers/Thesis1979.pdf",
+      },
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Hash pairs upward; the root commits to every leaf.
+import { createHash } from "node:crypto";
+const h = (s: string) => createHash("sha256").update(s).digest("hex");
+
+export function merkleRoot(leaves: string[]): string {
+  let level = leaves.map(h);
+  while (level.length > 1) {
+    const next: string[] = [];
+    for (let i = 0; i < level.length; i += 2) {
+      next.push(h(level[i] + (level[i + 1] ?? level[i]))); // duplicate odd tail
+    }
+    level = next;
+  }
+  return level[0] ?? h("");
+}
+
+// A proof is the sibling hash per level: O(log n) data verifies one leaf.
+export function verify(leaf: string, proof: { hash: string; right: boolean }[], root: string) {
+  return proof.reduce((acc, p) => h(p.right ? acc + p.hash : p.hash + acc), h(leaf)) === root;
+}`,
+    },
+    pitfalls: [
+      "Duplicating an odd trailing leaf (the Bitcoin CVE-2012-2459 pattern) can let two different leaf sets produce the same root — domain-separate leaf and internal hashes.",
+      "A root only proves inclusion, never absence; you need a sorted/sparse Merkle variant for non-membership proofs.",
+      "Verifying a proof without pinning the expected root against a trusted source proves nothing.",
+      "Rebuilding the whole tree on every write is O(n); production stores keep incremental subtree hashes.",
+    ],
+    usedBy: [
+      {
+        company: "Git / Linux Foundation",
+        product: "Commit & tree objects",
+        usage:
+          "Every commit hash covers the whole tree of contents, which is why a rewritten history changes every downstream hash.",
+        href: "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects",
+      },
+      {
+        company: "Apache Cassandra / Amazon DynamoDB",
+        product: "Anti-entropy repair",
+        usage:
+          "Replicas exchange Merkle trees to find the few diverging ranges instead of streaming entire partitions.",
+        href: "https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf",
+      },
+      {
+        company: "Google",
+        product: "Certificate Transparency logs",
+        usage:
+          "Append-only Merkle logs let anyone verify a certificate was logged and that the log was never rewritten.",
+        href: "https://certificate.transparency.dev/howctworks/",
+      },
+      {
+        company: "Bitcoin / Ethereum",
+        product: "Block transaction roots",
+        usage:
+          "Light clients verify a transaction is in a block with a logarithmic proof instead of downloading the block.",
+        href: "https://developer.bitcoin.org/reference/block_chain.html",
       },
     ],
   },
@@ -1958,6 +5183,36 @@ func (r *Raft) run() {
         href: "https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf",
       },
     ],
+    usedBy: [
+      {
+        company: "Amazon",
+        product: "DynamoDB / Dynamo partitioning",
+        usage:
+          "The original Dynamo paper introduced virtual nodes on a hash ring so adding a node moves only its share of keys.",
+        href: "https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf",
+      },
+      {
+        company: "Discord",
+        product: "Gateway / guild sharding",
+        usage:
+          "Consistent hashing routes each guild to a node so a deploy or scale-up doesn't reshuffle every live connection.",
+        href: "https://discord.com/blog/how-discord-scaled-elixir-to-5-000-000-concurrent-users",
+      },
+      {
+        company: "Cloudflare",
+        product: "Load balancing to origins & cache tiers",
+        usage:
+          "Ring hashing keeps a given cache key pinned to the same edge server so hit rates survive membership changes.",
+        href: "https://blog.cloudflare.com/improving-origin-performance-for-everyone-with-orpheus-and-tiered-cache/",
+      },
+      {
+        company: "Apache Cassandra",
+        product: "Token ring placement",
+        usage:
+          "Each node owns token ranges on a ring; replicas are the next N nodes clockwise from the key's token.",
+        href: "https://cassandra.apache.org/doc/latest/cassandra/architecture/dynamo.html",
+      },
+    ],
   },
   {
     slug: "rate-limiter",
@@ -2005,6 +5260,50 @@ func (r *Raft) run() {
       "Distributed rate limiting on Redis without Lua scripts can race — use atomic INCRBY + TTL.",
       "Per-IP limits can be defeated by NAT/CGNAT — combine with per-account where possible.",
     ],
+    usedBy: [
+      {
+        company: "Stripe",
+        product: "API rate limiting",
+        usage:
+          "Stripe runs multiple limiter types (request-rate, concurrency, fleet-usage load shedders) built on token buckets in Redis.",
+        href: "https://stripe.com/blog/rate-limiters",
+      },
+      {
+        company: "GitHub",
+        product: "REST & GraphQL API quotas",
+        usage:
+          "Primary and secondary limits are exposed via x-ratelimit headers so clients can back off before being blocked.",
+        href: "https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api",
+      },
+      {
+        company: "Cloudflare",
+        product: "Rate limiting rules at the edge",
+        usage:
+          "Counters are evaluated per-colo at the edge so abusive traffic is dropped before it reaches the origin.",
+        href: "https://developers.cloudflare.com/waf/rate-limiting-rules/",
+      },
+      {
+        company: "Google",
+        product: "Cloud APIs quota & Envoy token buckets",
+        usage:
+          "Service meshes enforce per-client token buckets so one noisy tenant cannot exhaust shared capacity.",
+        href: "https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/local_rate_limit_filter",
+      },
+    ],
+    references: [
+      {
+        label: "Stripe — scaling your API with rate limiters",
+        href: "https://stripe.com/blog/rate-limiters",
+      },
+      {
+        label: "GitHub — REST API rate limits",
+        href: "https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api",
+      },
+      {
+        label: "RFC 6585 — 429 Too Many Requests",
+        href: "https://datatracker.ietf.org/doc/html/rfc6585#section-4",
+      },
+    ],
   },
   {
     slug: "btree-index",
@@ -2049,6 +5348,43 @@ SELECT * FROM users WHERE email = 'jainil@example.com';
       "Composite index (a, b, c) helps WHERE a=… and WHERE a=… AND b=… but NOT WHERE b=… alone.",
       "Index bloat from updates — VACUUM or REINDEX periodically on Postgres.",
       "High-cardinality indexes work great; low-cardinality (boolean) often don't help vs full scan.",
+    ],
+    usedBy: [
+      {
+        company: "PostgreSQL",
+        product: "btree / covering indexes",
+        usage:
+          "Default indexes are Lehman-Yao B+trees; INCLUDE columns enable index-only scans that never touch the heap.",
+        href: "https://www.postgresql.org/docs/current/indexes-index-only-scans.html",
+      },
+      {
+        company: "Oracle / MySQL",
+        product: "InnoDB clustered + secondary indexes",
+        usage:
+          "Rows live in the primary-key tree, so a secondary index lookup costs an extra primary-key traversal.",
+        href: "https://dev.mysql.com/doc/refman/8.0/en/innodb-index-types.html",
+      },
+      {
+        company: "MongoDB",
+        product: "Compound index prefix rules",
+        usage:
+          "A compound index serves queries that use a left prefix of its keys — the same ordering constraint as SQL engines.",
+        href: "https://www.mongodb.com/docs/manual/core/indexes/index-types/index-compound/",
+      },
+      {
+        company: "SQLite",
+        product: "Query planner index selection",
+        usage:
+          "SQLite's documented planner rules show exactly when a B-tree index can satisfy WHERE plus ORDER BY.",
+        href: "https://www.sqlite.org/queryplanner.html",
+      },
+    ],
+    references: [
+      {
+        label: "PostgreSQL — index-only scans and covering indexes",
+        href: "https://www.postgresql.org/docs/current/indexes-index-only-scans.html",
+      },
+      { label: "SQLite — the query planner", href: "https://www.sqlite.org/queryplanner.html" },
     ],
   },
   {
@@ -2103,6 +5439,39 @@ function dfs(start: string, adj: Map<string, string[]>) {
       "DFS recursion blows the stack on deep graphs — convert to iterative DFS with explicit stack.",
       "Never forget to mark visited at enqueue time (BFS), not dequeue — otherwise a node can be enqueued many times.",
     ],
+    usedBy: [
+      {
+        company: "Meta",
+        product: "Friends-of-friends / degrees of separation",
+        usage:
+          'BFS over the social graph with early termination powers mutual-friend counts and "people you may know" candidate generation.',
+        href: "https://engineering.fb.com/2013/06/25/core-infra/tao-the-power-of-the-graph/",
+      },
+      {
+        company: "LinkedIn",
+        product: "1st / 2nd / 3rd degree connection badges",
+        usage:
+          "Every profile view runs a bounded breadth-first distance query against the connection graph.",
+        href: "https://engineering.linkedin.com/blog",
+      },
+      {
+        company: "Google",
+        product: "Crawler frontier",
+        usage:
+          "Web crawling is a prioritised breadth-first walk over discovered links with dedupe on visited URLs.",
+        href: "http://infolab.stanford.edu/~backrub/google.html",
+      },
+    ],
+    references: [
+      {
+        label: "Meta Engineering — TAO graph store",
+        href: "https://engineering.fb.com/2013/06/25/core-infra/tao-the-power-of-the-graph/",
+      },
+      {
+        label: "CP-Algorithms — BFS and DFS",
+        href: "https://cp-algorithms.com/graph/breadth-first-search.html",
+      },
+    ],
   },
   {
     slug: "cap-theorem",
@@ -2131,6 +5500,52 @@ function dfs(start: string, adj: Map<string, string[]>) {
       {
         label: "Eric Brewer — CAP Theorem (2000 keynote, 2012 retrospective)",
         href: "https://www.infoq.com/articles/cap-twelve-years-later-how-the-rules-have-changed/",
+      },
+    ],
+    codeSnippet: {
+      language: "sql",
+      code: `-- CAP is a per-operation choice, not a per-database label.
+-- Cassandra: pick your side of the tradeoff per query.
+
+-- CP-leaning: refuse to answer unless a quorum agrees.
+CONSISTENCY QUORUM;
+SELECT balance FROM accounts WHERE id = 42;
+
+-- AP-leaning: answer from whatever replica is reachable.
+CONSISTENCY ONE;
+SELECT last_seen FROM presence WHERE user_id = 42;
+
+-- Read + write quorums overlap when R + W > RF, which is how
+-- an AP-capable store gives you strong reads when you need them.`,
+    },
+    usedBy: [
+      {
+        company: "Amazon",
+        product: "DynamoDB eventual vs strongly consistent reads",
+        usage:
+          "The API exposes the tradeoff directly: strongly consistent reads cost more and are unavailable during some partitions.",
+        href: "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html",
+      },
+      {
+        company: "Google",
+        product: "Spanner (CP with TrueTime)",
+        usage:
+          "Spanner chooses consistency and uses synchronised clocks to keep availability high in practice, not by escaping CAP.",
+        href: "https://research.google/pubs/pub39966/",
+      },
+      {
+        company: "CNCF",
+        product: "etcd / Kubernetes control plane",
+        usage:
+          "etcd is CP: on a partition the minority side stops accepting writes rather than serving stale cluster state.",
+        href: "https://etcd.io/docs/latest/learning/api_guarantees/",
+      },
+      {
+        company: "Apache Cassandra",
+        product: "Tunable consistency levels",
+        usage:
+          "ONE / QUORUM / ALL per statement is CAP as a runtime dial rather than a design-time decision.",
+        href: "https://cassandra.apache.org/doc/latest/cassandra/architecture/dynamo.html",
       },
     ],
   },
@@ -2162,6 +5577,52 @@ function dfs(start: string, adj: Map<string, string[]>) {
       {
         label: "Coffman et al. — System Deadlocks (1971)",
         href: "https://dl.acm.org/doi/10.1145/356586.356588",
+      },
+    ],
+    codeSnippet: {
+      language: "sql",
+      code: `-- Classic deadlock: two transactions lock the same rows in opposite order.
+-- tx A                                  -- tx B
+BEGIN;                                    BEGIN;
+UPDATE accounts SET bal = bal - 10        UPDATE accounts SET bal = bal - 5
+  WHERE id = 1;                             WHERE id = 2;
+UPDATE accounts SET bal = bal + 10        UPDATE accounts SET bal = bal + 5
+  WHERE id = 2;  -- waits for B             WHERE id = 1;  -- waits for A  => cycle
+
+-- Fixes, in order of preference:
+--   1. always lock rows in a deterministic order (e.g. ORDER BY id)
+--   2. keep transactions short and touch fewer rows
+--   3. set a lock timeout and retry the victim transaction
+SET lock_timeout = '2s';`,
+    },
+    usedBy: [
+      {
+        company: "Oracle",
+        product: "MySQL InnoDB deadlock detector",
+        usage:
+          "InnoDB maintains a wait-for graph, detects cycles, and rolls back the transaction with the fewest changes.",
+        href: "https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlock-detection.html",
+      },
+      {
+        company: "PostgreSQL",
+        product: "deadlock_timeout detection",
+        usage:
+          "Postgres waits deadlock_timeout, then checks the lock graph and aborts one transaction with a detailed error.",
+        href: "https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-DEADLOCKS",
+      },
+      {
+        company: "Microsoft",
+        product: "SQL Server deadlock graphs",
+        usage:
+          "Extended Events capture the deadlock graph so teams can see which statements locked resources in conflicting order.",
+        href: "https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-deadlocks-guide",
+      },
+      {
+        company: "Go project",
+        product: 'Runtime "all goroutines are asleep" detector',
+        usage:
+          "Go panics on total deadlock, surfacing circular channel waits that would otherwise hang silently.",
+        href: "https://go.dev/ref/mem",
       },
     ],
   },
@@ -2199,6 +5660,59 @@ function dfs(start: string, adj: Map<string, string[]>) {
         href: "https://www.cs.cornell.edu/projects/Quicksilver/public_pdfs/SWIM.pdf",
       },
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Each node periodically pushes its view to a few random peers.
+// Information spreads in O(log N) rounds without any coordinator.
+setInterval(() => {
+  const peers = pickRandom(members, 3); // fanout
+  for (const peer of peers) {
+    send(peer, { heartbeats: myView, incarnation: myIncarnation });
+  }
+}, 1000);
+
+function onGossip(msg: { heartbeats: Map<string, number> }) {
+  for (const [node, counter] of msg.heartbeats) {
+    if (counter > (myView.get(node) ?? -1)) {
+      myView.set(node, counter);       // take the fresher heartbeat
+      lastSeen.set(node, Date.now());
+    }
+  }
+  for (const [node, at] of lastSeen) {
+    if (Date.now() - at > suspectTimeout) markSuspect(node); // SWIM-style suspicion
+  }
+}`,
+    },
+    usedBy: [
+      {
+        company: "HashiCorp",
+        product: "Consul / Serf (SWIM gossip)",
+        usage:
+          "Membership, failure detection and event broadcast run over a SWIM-based gossip layer instead of a central registry.",
+        href: "https://www.serf.io/docs/internals/gossip.html",
+      },
+      {
+        company: "Apache Cassandra",
+        product: "Cluster membership & schema propagation",
+        usage:
+          "Nodes gossip state once per second so topology and schema changes converge without a master.",
+        href: "https://cassandra.apache.org/doc/latest/cassandra/architecture/dynamo.html",
+      },
+      {
+        company: "Amazon",
+        product: "Dynamo-style ring membership",
+        usage:
+          "The Dynamo paper uses gossip for membership and failure detection to avoid a single coordination point.",
+        href: "https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf",
+      },
+      {
+        company: "Redis",
+        product: "Redis Cluster bus",
+        usage:
+          "The cluster bus gossips node health and slot ownership; failover starts when enough nodes mark a master as failing.",
+        href: "https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/",
+      },
+    ],
   },
   {
     slug: "distributed-tx",
@@ -2227,6 +5741,74 @@ function dfs(start: string, adj: Map<string, string[]>) {
       "Saga steps must be idempotent because undos/retries will happen.",
       "2PC scales poorly beyond a few nodes due to the blocking 'prepare' phase.",
       "Lack of isolation in Sagas means you need 'semantic locks' or careful business logic to handle concurrent updates.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Saga: local transactions + compensations instead of a global lock.
+const steps = [
+  { do: reserveInventory, undo: releaseInventory },
+  { do: chargeCard,       undo: refundCard },
+  { do: createShipment,   undo: cancelShipment },
+];
+
+async function runSaga(order: Order) {
+  const done: typeof steps = [];
+  try {
+    for (const step of steps) {
+      await step.do(order); // each step commits locally and is idempotent
+      done.push(step);
+    }
+  } catch (err) {
+    for (const step of done.reverse()) await step.undo(order); // compensate backwards
+    throw err;
+  }
+}
+// 2PC gives atomicity but blocks on coordinator failure; sagas stay available
+// and pay for it with temporary, visible inconsistency.`,
+    },
+    usedBy: [
+      {
+        company: "Uber",
+        product: "Cadence / Temporal workflows",
+        usage:
+          "Long-running business transactions are expressed as durable workflows with explicit compensation activities.",
+        href: "https://www.uber.com/blog/cadence-multi-tenant-workflow-sys/",
+      },
+      {
+        company: "Amazon",
+        product: "AWS Step Functions saga pattern",
+        usage:
+          "AWS documents the saga pattern with Step Functions for order/booking flows spanning multiple services.",
+        href: "https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga-orchestration.html",
+      },
+      {
+        company: "Stripe",
+        product: "Idempotent payment operations",
+        usage:
+          "Idempotency keys make each step in a payment flow safely retryable, which is what makes compensation-based flows workable.",
+        href: "https://docs.stripe.com/api/idempotent_requests",
+      },
+      {
+        company: "Google",
+        product: "Spanner distributed commits",
+        usage:
+          "Spanner does run two-phase commit across Paxos groups — with TrueTime bounding the uncertainty window.",
+        href: "https://research.google/pubs/pub39966/",
+      },
+    ],
+    references: [
+      {
+        label: "Gray & Lamport — Consensus on transaction commit (Paxos Commit)",
+        href: "https://www.microsoft.com/en-us/research/publication/consensus-on-transaction-commit/",
+      },
+      {
+        label: "Temporal — durable execution as an alternative to 2PC",
+        href: "https://docs.temporal.io/temporal",
+      },
+      {
+        label: "Microsoft — Saga distributed transactions pattern",
+        href: "https://learn.microsoft.com/en-us/azure/architecture/patterns/saga",
+      },
     ],
   },
   {
@@ -2260,6 +5842,56 @@ function dfs(start: string, adj: Map<string, string[]>) {
       {
         label: "Twitter Snowflake original source",
         href: "https://github.com/twitter-archive/snowflake/tree/snowflake-2010",
+      },
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// 64-bit id: 1 unused | 41 bits ms since epoch | 10 bits node | 12 bits sequence
+const EPOCH = 1_609_459_200_000n; // 2021-01-01
+let lastMs = 0n, seq = 0n;
+
+export function nextId(nodeId: bigint): bigint {
+  let now = BigInt(Date.now());
+  if (now === lastMs) {
+    seq = (seq + 1n) & 0xfffn;      // 4096 ids per node per ms
+    if (seq === 0n) while ((now = BigInt(Date.now())) <= lastMs) {} // spin to next ms
+  } else if (now < lastMs) {
+    throw new Error("clock moved backwards"); // never mint duplicates
+  } else {
+    seq = 0n;
+  }
+  lastMs = now;
+  return ((now - EPOCH) << 22n) | (nodeId << 12n) | seq; // k-sorted by time
+}`,
+    },
+    usedBy: [
+      {
+        company: "Twitter / X",
+        product: "Snowflake tweet ids",
+        usage:
+          "Twitter created the format so ids are unique across shards and roughly time-ordered without a central sequence server.",
+        href: "https://blog.twitter.com/engineering/en_us/a/2010/announcing-snowflake",
+      },
+      {
+        company: "Discord",
+        product: "Snowflake ids in the public API",
+        usage:
+          "Every message, channel and user id is a snowflake; clients extract the creation timestamp from the id itself.",
+        href: "https://discord.com/developers/docs/reference#snowflakes",
+      },
+      {
+        company: "Instagram / Meta",
+        product: "Sharded id generation",
+        usage:
+          "Instagram generates 64-bit ids in Postgres with a time prefix, shard id and per-shard sequence.",
+        href: "https://instagram-engineering.com/sharding-ids-at-instagram-1cf5a71e5a5c",
+      },
+      {
+        company: "Sony",
+        product: "Sonyflake",
+        usage:
+          "A Snowflake variant trading id-per-ms rate for a longer lifetime, showing how the bit budget is a design dial.",
+        href: "https://github.com/sony/sonyflake",
       },
     ],
   },
@@ -2299,6 +5931,61 @@ function dfs(start: string, adj: Map<string, string[]>) {
         href: "https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf",
       },
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `type Clock = Record<string, number>; // node -> counter
+
+const onLocalEvent = (c: Clock, self: string): Clock => ({ ...c, [self]: (c[self] ?? 0) + 1 });
+
+const onReceive = (mine: Clock, theirs: Clock, self: string): Clock => {
+  const merged: Clock = { ...mine };
+  for (const [node, n] of Object.entries(theirs)) merged[node] = Math.max(merged[node] ?? 0, n);
+  merged[self] = (merged[self] ?? 0) + 1;
+  return merged;
+};
+
+// a happened-before b iff every entry of a <= b and at least one is strictly <.
+function compare(a: Clock, b: Clock): "before" | "after" | "concurrent" {
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  let lt = false, gt = false;
+  for (const k of keys) {
+    const x = a[k] ?? 0, y = b[k] ?? 0;
+    if (x < y) lt = true;
+    if (x > y) gt = true;
+  }
+  return lt && gt ? "concurrent" : lt ? "before" : "after"; // concurrent -> conflict to resolve
+}`,
+    },
+    usedBy: [
+      {
+        company: "Amazon",
+        product: "Dynamo shopping cart",
+        usage:
+          "Dynamo used vector clocks to detect concurrent cart writes and surfaced siblings to the application to merge.",
+        href: "https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf",
+      },
+      {
+        company: "Riak / Basho",
+        product: "Dotted version vectors",
+        usage:
+          "Riak refined vector clocks into dotted version vectors to keep causality metadata from growing without bound.",
+        href: "https://docs.riak.com/riak/kv/latest/learn/concepts/causal-context/index.html",
+      },
+      {
+        company: "Figma",
+        product: "Multiplayer conflict resolution",
+        usage:
+          "Concurrent edits are detected by causal metadata and resolved by documented merge rules rather than last-write-wins guesses.",
+        href: "https://www.figma.com/blog/how-figmas-multiplayer-technology-works/",
+      },
+      {
+        company: "Apache Cassandra",
+        product: "Timestamp-based LWW (the contrast)",
+        usage:
+          "Cassandra deliberately chose wall-clock last-write-wins, which is why clock skew can silently drop a concurrent write.",
+        href: "https://cassandra.apache.org/doc/latest/cassandra/architecture/dynamo.html",
+      },
+    ],
   },
   {
     slug: "lsm-tree",
@@ -2331,6 +6018,59 @@ function dfs(start: string, adj: Map<string, string[]>) {
       {
         label: "The Log-Structured Merge-Tree (LSM-Tree) — O'Neil et al.",
         href: "https://www.cs.umb.edu/~poneil/lsmtree.pdf",
+      },
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Write path: WAL -> memtable -> immutable SSTable; reads check newest first.
+class LSM {
+  private memtable = new Map<string, string>(); // sorted structure in real engines
+  private sstables: Map<string, string>[] = []; // newest first
+  put(k: string, v: string) {
+    appendToWAL(k, v);              // durability before acknowledging
+    this.memtable.set(k, v);        // sequential write, no in-place update
+    if (this.memtable.size > 10_000) this.flush();
+  }
+  private flush() {
+    this.sstables.unshift(new Map(this.memtable)); // immutable on disk
+    this.memtable.clear();
+    // background compaction merges SSTables and drops shadowed/tombstoned keys
+  }
+  get(k: string): string | undefined {
+    if (this.memtable.has(k)) return this.memtable.get(k);
+    for (const t of this.sstables) if (t.has(k)) return t.get(k); // Bloom filter per table
+    return undefined;
+  }
+}`,
+    },
+    usedBy: [
+      {
+        company: "Meta",
+        product: "RocksDB",
+        usage:
+          "RocksDB is the LSM engine behind MySQL/MyRocks, Kafka Streams state stores, CockroachDB (historically) and countless services.",
+        href: "https://github.com/facebook/rocksdb/wiki/RocksDB-Overview",
+      },
+      {
+        company: "Google",
+        product: "Bigtable / LevelDB",
+        usage:
+          "The memtable + SSTable + compaction design comes from Bigtable and was open-sourced as LevelDB.",
+        href: "https://research.google/pubs/pub27898/",
+      },
+      {
+        company: "Apache Cassandra",
+        product: "Write path & compaction strategies",
+        usage:
+          "Cassandra's commit log, memtable and size-tiered/leveled compaction are a direct LSM implementation.",
+        href: "https://cassandra.apache.org/doc/latest/cassandra/architecture/storage_engine.html",
+      },
+      {
+        company: "ScyllaDB / CockroachDB",
+        product: "Pebble & Scylla storage engines",
+        usage:
+          "Modern distributed SQL/NoSQL engines keep LSM storage because write amplification beats random-write B-trees on SSDs.",
+        href: "https://github.com/cockroachdb/pebble",
       },
     ],
   },
@@ -2366,6 +6106,58 @@ function dfs(start: string, adj: Map<string, string[]>) {
         href: "http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf",
       },
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Cardinality from leading-zero statistics: ~1.6 KB for ~0.8% error.
+const P = 12, M = 1 << P; // 4096 registers
+const registers = new Uint8Array(M);
+
+export function add(hash: number) {
+  const idx = hash >>> (32 - P);              // which register
+  const rest = (hash << P) | (1 << (P - 1));  // remaining bits
+  const rank = Math.clz32(rest) + 1;          // position of first 1-bit
+  registers[idx] = Math.max(registers[idx], rank);
+}
+
+export function estimate() {
+  let sum = 0, zeros = 0;
+  for (const r of registers) { sum += 2 ** -r; if (r === 0) zeros++; }
+  const alpha = 0.7213 / (1 + 1.079 / M);
+  const raw = (alpha * M * M) / sum;
+  return zeros > 0 && raw < 2.5 * M ? M * Math.log(M / zeros) : raw; // small-range correction
+}
+// Registers merge with max() -> unions across shards are exact, no re-scan.`,
+    },
+    usedBy: [
+      {
+        company: "Redis",
+        product: "PFADD / PFCOUNT",
+        usage:
+          "Redis HyperLogLog counts unique visitors in ~12 KB per key with 0.81% standard error, and PFMERGE unions them.",
+        href: "https://redis.io/docs/latest/develop/data-types/probabilistic/hyperloglogs/",
+      },
+      {
+        company: "Google",
+        product: "BigQuery APPROX_COUNT_DISTINCT / HLL++",
+        usage:
+          "Google published HyperLogLog++ and exposes sketches as a SQL type so distinct counts merge across partitions.",
+        href: "https://research.google/pubs/pub40671/",
+      },
+      {
+        company: "Reddit",
+        product: "Unique pageview counters",
+        usage:
+          "Per-post unique view counts are tracked with HLL because exact sets per post would be prohibitively large.",
+        href: "https://www.redditinc.com/blog/view-counting-at-reddit",
+      },
+      {
+        company: "Elastic",
+        product: "cardinality aggregation",
+        usage:
+          "Elasticsearch's cardinality agg is HLL++-based with a tunable precision threshold trading memory for accuracy.",
+        href: "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-cardinality-aggregation.html",
+      },
+    ],
   },
   {
     slug: "quadtree",
@@ -2393,6 +6185,68 @@ function dfs(start: string, adj: Map<string, string[]>) {
       "Degenerate cases: if many points are at the exact same coordinate, the tree can become extremely deep. Most implementations set a 'Max Depth'.",
       "Dynamic objects: if objects move constantly, re-inserting them into the QuadTree every frame can be expensive.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Recursively split space into 4 quadrants; leaves hold at most \`cap\` points.
+interface Box { x: number; y: number; w: number; h: number }
+class QuadTree {
+  points: { x: number; y: number }[] = [];
+  kids: QuadTree[] = [];
+  constructor(private box: Box, private cap = 4) {}
+  insert(p: { x: number; y: number }): boolean {
+    if (!contains(this.box, p)) return false;
+    if (this.kids.length === 0 && this.points.length < this.cap) {
+      this.points.push(p);
+      return true;
+    }
+    if (this.kids.length === 0) this.split();
+    return this.kids.some((k) => k.insert(p));
+  }
+  private split() {
+    const { x, y, w, h } = this.box;
+    const [hw, hh] = [w / 2, h / 2];
+    this.kids = [
+      new QuadTree({ x, y, w: hw, h: hh }, this.cap),
+      new QuadTree({ x: x + hw, y, w: hw, h: hh }, this.cap),
+      new QuadTree({ x, y: y + hh, w: hw, h: hh }, this.cap),
+      new QuadTree({ x: x + hw, y: y + hh, w: hw, h: hh }, this.cap),
+    ];
+    this.points.splice(0).forEach((p) => this.insert(p));
+  }
+}
+const contains = (b: Box, p: { x: number; y: number }) =>
+  p.x >= b.x && p.x < b.x + b.w && p.y >= b.y && p.y < b.y + b.h;`,
+    },
+    usedBy: [
+      {
+        company: "Uber",
+        product: "H3 spatial index (hex grid)",
+        usage:
+          'Uber indexes the world with a hierarchical cell system so "drivers near me" is a cell lookup, not a distance scan over everyone.',
+        href: "https://www.uber.com/blog/h3/",
+      },
+      {
+        company: "Google",
+        product: "S2 geometry / Maps tiling",
+        usage:
+          "S2 recursively subdivides the sphere into cells, the same hierarchical-space idea used for map tiles and region queries.",
+        href: "http://s2geometry.io/",
+      },
+      {
+        company: "PostgreSQL / PostGIS",
+        product: "Spatial indexes",
+        usage:
+          "R-tree/GiST spatial indexes prune bounding boxes so range and nearest-neighbour queries touch few rows.",
+        href: "https://postgis.net/workshops/postgis-intro/indexing.html",
+      },
+    ],
+    references: [
+      {
+        label: "Uber Engineering — H3 hexagonal hierarchical spatial index",
+        href: "https://www.uber.com/blog/h3/",
+      },
+      { label: "S2 Geometry — hierarchical cell decomposition", href: "http://s2geometry.io/" },
+    ],
   },
   {
     slug: "skip-list",
@@ -2419,6 +6273,58 @@ function dfs(start: string, adj: Map<string, string[]>) {
     pitfalls: [
       "Worst-case performance is O(N) if the coin flips are extremely unlucky (all nodes height 1), though the probability is infinitesimally small.",
       "Pointer overhead: the multiple levels of pointers consume more memory than a compact array-based structure.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Probabilistic layered linked list: expected O(log n) search, no rotations.
+function randomLevel(maxLevel = 16, p = 0.5) {
+  let lvl = 1;
+  while (Math.random() < p && lvl < maxLevel) lvl++;
+  return lvl; // coin flips replace rebalancing logic
+}
+
+interface SkipNode { key: number; next: (SkipNode | undefined)[] }
+
+function search(head: SkipNode, key: number): SkipNode | undefined {
+  let node: SkipNode | undefined = head;
+  for (let lvl = head.next.length - 1; lvl >= 0; lvl--) {
+    while (node?.next[lvl] && node.next[lvl]!.key < key) node = node.next[lvl];
+  }
+  const cand = node?.next[0];
+  return cand?.key === key ? cand : undefined;
+}`,
+    },
+    usedBy: [
+      {
+        company: "Redis",
+        product: "Sorted sets (ZSET / ZRANGEBYSCORE)",
+        usage:
+          "Redis backs sorted sets with a skip list plus a hash map, giving ranked leaderboards with O(log n) rank queries.",
+        href: "https://redis.io/docs/latest/develop/data-types/sorted-sets/",
+      },
+      {
+        company: "Apache Software Foundation",
+        product: "HBase / Cassandra memtables",
+        usage:
+          "Concurrent skip lists keep in-memory writes sorted before flushing them to immutable SSTables.",
+        href: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ConcurrentSkipListMap.html",
+      },
+      {
+        company: "MongoDB / WiredTiger",
+        product: "In-memory update lists",
+        usage:
+          "Skip lists provide lock-friendly ordered inserts for concurrent writers without tree rotations.",
+      },
+    ],
+    references: [
+      {
+        label: "Redis docs — Sorted sets (skiplist encoding)",
+        href: "https://redis.io/docs/latest/develop/data-types/sorted-sets/",
+      },
+      {
+        label: "Pugh (1990) — Skip lists: a probabilistic alternative to balanced trees",
+        href: "https://dl.acm.org/doi/10.1145/78973.78977",
+      },
     ],
   },
   {
@@ -2448,6 +6354,62 @@ function dfs(start: string, adj: Map<string, string[]>) {
     pitfalls: [
       "High Memory: for large datasets with little prefix overlap, a Trie can use much more memory than a sorted list or hash set. Use a **Radix Tree** (compressed Trie) to solve this.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Prefix tree: lookup cost depends on key length, not dictionary size.
+class TrieNode {
+  children = new Map<string, TrieNode>();
+  terminal = false;
+  top: string[] = []; // cached best completions for this prefix
+}
+
+function insert(root: TrieNode, word: string) {
+  let node = root;
+  for (const ch of word) {
+    if (!node.children.has(ch)) node.children.set(ch, new TrieNode());
+    node = node.children.get(ch)!;
+  }
+  node.terminal = true;
+}
+
+function complete(root: TrieNode, prefix: string): string[] {
+  let node: TrieNode | undefined = root;
+  for (const ch of prefix) node = node?.children.get(ch);
+  return node?.top ?? []; // precomputed top-k keeps typeahead O(len(prefix))
+}`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "Search autocomplete",
+        usage:
+          "Prefix structures with precomputed top completions are how a suggestion list returns within a keystroke budget.",
+        href: "https://blog.google/products/search/how-google-autocomplete-works-search/",
+      },
+      {
+        company: "Elastic",
+        product: "Elasticsearch completion suggester (FST)",
+        usage:
+          "Lucene stores the term dictionary as a finite state transducer — a compressed trie — for prefix and fuzzy lookups.",
+        href: "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html",
+      },
+      {
+        company: "Cloudflare / router vendors",
+        product: "IP routing tables (radix trie)",
+        usage: "Longest-prefix-match forwarding uses a compressed radix trie over address bits.",
+        href: "https://datatracker.ietf.org/doc/html/rfc1519",
+      },
+    ],
+    references: [
+      {
+        label: "Elasticsearch — suggesters (FST-backed completion)",
+        href: "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html",
+      },
+      {
+        label: "Google — how autocomplete works",
+        href: "https://blog.google/products/search/how-google-autocomplete-works-search/",
+      },
+    ],
   },
   {
     slug: "astar-search",
@@ -2471,6 +6433,63 @@ function dfs(start: string, adj: Map<string, string[]>) {
     pitfalls: [
       "Bad Heuristics: if your heuristic is not admissible, A* might find a sub-optimal path. If it's not consistent, it might be slower than Dijkstra.",
       "Memory: Like Dijkstra, A* keeps all visited nodes in memory, which can be an issue for massive graphs.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// A* = Dijkstra + heuristic. f(n) = g(n) + h(n).
+// h must be admissible (never overestimate) or the path may be suboptimal.
+function astar(start: string, goal: string, neighbors: (n: string) => [string, number][], h: (n: string) => number) {
+  const open = new Map<string, number>([[start, h(start)]]); // node -> f
+  const g = new Map([[start, 0]]);
+  const cameFrom = new Map<string, string>();
+  while (open.size) {
+    const [node] = [...open.entries()].sort((a, b) => a[1] - b[1])[0]; // use a heap
+    if (node === goal) return reconstruct(cameFrom, node);
+    open.delete(node);
+    for (const [next, w] of neighbors(node)) {
+      const tentative = g.get(node)! + w;
+      if (tentative < (g.get(next) ?? Infinity)) {
+        g.set(next, tentative);
+        cameFrom.set(next, node);
+        open.set(next, tentative + h(next));
+      }
+    }
+  }
+  return null;
+}`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "Maps route planning",
+        usage:
+          "Goal-directed search with geographic heuristics (plus contraction hierarchies) makes continent-scale routing interactive.",
+        href: "https://research.google/pubs/pub41336/",
+      },
+      {
+        company: "Blizzard / Unity",
+        product: "Game NPC pathfinding",
+        usage:
+          "A* over navmeshes or tile grids is the default pathfinder in game engines and middleware.",
+        href: "https://docs.unity3d.com/Manual/nav-InnerWorkings.html",
+      },
+      {
+        company: "Amazon Robotics",
+        product: "Warehouse robot routing",
+        usage:
+          "Floor robots plan collision-aware paths with heuristic search under time-window constraints.",
+      },
+    ],
+    references: [
+      {
+        label:
+          "Hart, Nilsson & Raphael (1968) — A formal basis for heuristic determination of minimum cost paths",
+        href: "https://ieeexplore.ieee.org/document/4082128",
+      },
+      {
+        label: "Unity — navigation and pathfinding internals",
+        href: "https://docs.unity3d.com/Manual/nav-InnerWorkings.html",
+      },
     ],
   },
   {
@@ -2506,6 +6525,46 @@ function dfs(start: string, adj: Map<string, string[]>) {
         href: "http://infolab.stanford.edu/~backrub/google.html",
       },
     ],
+    codeSnippet: {
+      language: "py",
+      code: `# Power iteration with a damping factor: rank flows along links.
+def pagerank(out_links, d=0.85, iters=30):
+    nodes = list(out_links)
+    n = len(nodes)
+    rank = {v: 1 / n for v in nodes}
+    for _ in range(iters):
+        nxt = {v: (1 - d) / n for v in nodes}          # teleport term
+        dangling = sum(rank[v] for v in nodes if not out_links[v])
+        for v in nodes:
+            share = d * rank[v] / len(out_links[v]) if out_links[v] else 0
+            for w in out_links[v]:
+                nxt[w] += share
+            nxt[v] += d * dangling / n                 # redistribute sinks
+        rank = nxt
+    return rank`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "Search ranking (original algorithm)",
+        usage:
+          "PageRank scored pages by the random-surfer probability of landing on them; it remains one signal among many today.",
+        href: "http://infolab.stanford.edu/~backrub/google.html",
+      },
+      {
+        company: "Twitter / X",
+        product: 'WTF "Who to Follow" (personalised PageRank)',
+        usage: "Personalised random walks over the follow graph generate account recommendations.",
+        href: "https://dl.acm.org/doi/10.1145/2488388.2488433",
+      },
+      {
+        company: "Neo4j",
+        product: "Graph Data Science library",
+        usage:
+          "PageRank ships as a built-in centrality algorithm for influence and importance scoring in enterprise graphs.",
+        href: "https://neo4j.com/docs/graph-data-science/current/algorithms/page-rank/",
+      },
+    ],
   },
   {
     slug: "levenshtein",
@@ -2533,6 +6592,58 @@ function dfs(start: string, adj: Map<string, string[]>) {
     pitfalls: [
       "Performance: O(M*N) is too slow for very long strings (e.g., full books). Use the **Wagner–Fischer** algorithm optimization or bit-parallelism for better performance.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Edit distance with a rolling row: O(n*m) time, O(min(n,m)) memory.
+export function levenshtein(a: string, b: string): number {
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(
+        prev[j] + 1,          // deletion
+        cur[j - 1] + 1,       // insertion
+        prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1), // substitution
+      );
+    }
+    prev = cur;
+  }
+  return prev[b.length];
+}`,
+    },
+    usedBy: [
+      {
+        company: "Elastic",
+        product: "Elasticsearch fuzzy queries",
+        usage:
+          "`fuzziness: AUTO` matches terms within a Levenshtein distance using a Levenshtein automaton over the term dictionary.",
+        href: "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html",
+      },
+      {
+        company: "Google",
+        product: '"Did you mean" spelling correction',
+        usage:
+          "Candidate corrections are generated within a small edit distance and then re-ranked by language models and click data.",
+        href: "https://blog.google/products/search/how-google-autocomplete-works-search/",
+      },
+      {
+        company: "Git / Linux Foundation",
+        product: "Command suggestions",
+        usage:
+          "`git: 'comit' is not a git command` suggestions come from edit distance against the known command list.",
+        href: "https://git-scm.com/docs/git-config#Documentation/git-config.txt-helpautoCorrect",
+      },
+    ],
+    references: [
+      {
+        label: "Elasticsearch — fuzzy query (edit distance)",
+        href: "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html",
+      },
+      {
+        label: "Schulz & Mihov — fast string correction with Levenshtein automata",
+        href: "https://link.springer.com/article/10.1007/s10032-002-0082-8",
+      },
+    ],
   },
   {
     slug: "rabin-karp",
@@ -2559,6 +6670,63 @@ function dfs(start: string, adj: Map<string, string[]>) {
     pitfalls: [
       "Hash Collisions: a bad hash function can lead to many 'spurious hits' where hashes match but strings don't, degrading performance to O(N*M).",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Rolling hash: slide the window in O(1) per step, verify only on hash hits.
+export function rabinKarp(text: string, pattern: string): number[] {
+  const B = 256n, M = 1_000_000_007n;
+  const m = pattern.length;
+  if (m === 0 || m > text.length) return [];
+  let power = 1n;
+  for (let i = 1; i < m; i++) power = (power * B) % M;
+  const hash = (s: string, from: number) => {
+    let h = 0n;
+    for (let i = from; i < from + m; i++) h = (h * B + BigInt(s.charCodeAt(i))) % M;
+    return h;
+  };
+  const target = hash(pattern, 0);
+  let rolling = hash(text, 0);
+  const hits: number[] = [];
+  for (let i = 0; ; i++) {
+    if (rolling === target && text.startsWith(pattern, i)) hits.push(i); // verify
+    if (i + m >= text.length) break;
+    rolling = ((rolling - BigInt(text.charCodeAt(i)) * power % M + M) % M * B + BigInt(text.charCodeAt(i + m))) % M;
+  }
+  return hits;
+}`,
+    },
+    usedBy: [
+      {
+        company: "Dropbox",
+        product: "Delta sync / block deduplication",
+        usage:
+          "Content-defined chunking with rolling hashes finds shifted duplicate blocks so only changed chunks upload.",
+        href: "https://dropbox.tech/infrastructure/streaming-file-synchronization",
+      },
+      {
+        company: "rsync / Samba team",
+        product: "rsync delta transfer",
+        usage:
+          "A weak rolling checksum scans the file byte-by-byte and only strong-hashes on a match — Rabin-Karp's verify pattern.",
+        href: "https://rsync.samba.org/tech_report/",
+      },
+      {
+        company: "Turnitin / plagiarism tooling",
+        product: "Document fingerprinting (winnowing)",
+        usage:
+          "Overlapping k-gram hashes fingerprint documents so near-duplicate passages surface without pairwise comparison.",
+      },
+    ],
+    references: [
+      {
+        label: "rsync — technical report (rolling checksum)",
+        href: "https://rsync.samba.org/tech_report/",
+      },
+      {
+        label: "CP-Algorithms — string hashing / Rabin-Karp",
+        href: "https://cp-algorithms.com/string/string-hashing.html",
+      },
+    ],
   },
   {
     slug: "jwt-anatomy",
@@ -2582,6 +6750,60 @@ function dfs(start: string, adj: Map<string, string[]>) {
       "Sensitive Data: NEVER put passwords or credit card numbers in a JWT payload.",
       "The 'alg: none' attack: older libraries allowed tokens with no signature; always validate the algorithm on the server.",
       "Expiration: Stateless tokens can't be easily revoked. Use short-lived JWTs with long-lived Refresh Tokens.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Verification is the whole security model — decoding is not verifying.
+import { createRemoteJWKSet, jwtVerify } from "jose";
+
+const jwks = createRemoteJWKSet(new URL(\`\${issuer}/.well-known/jwks.json\`));
+
+const { payload } = await jwtVerify(token, jwks, {
+  issuer,                       // iss must match your IdP
+  audience: clientId,           // aud must be *your* app
+  algorithms: ["RS256"],        // pin algs: never accept "none" or alg confusion
+  clockTolerance: "5s",
+});
+
+// payload.exp / nbf are checked by the library; revocation is not —
+// short TTLs plus a refresh token (or a deny-list) are how you log someone out.`,
+    },
+    usedBy: [
+      {
+        company: "Auth0 / Okta",
+        product: "Access & id tokens",
+        usage:
+          "Tokens are RS256-signed JWTs verified against a rotating JWKS endpoint rather than a shared secret.",
+        href: "https://auth0.com/docs/secure/tokens/json-web-tokens",
+      },
+      {
+        company: "Supabase / Firebase",
+        product: "Row-level security claims",
+        usage:
+          "The JWT's claims are passed into database policies, so authorization is enforced in Postgres rather than app code.",
+        href: "https://supabase.com/docs/guides/database/postgres/row-level-security",
+      },
+      {
+        company: "CNCF",
+        product: "Kubernetes service account tokens",
+        usage:
+          "Projected service-account tokens are audience-scoped, time-bound JWTs validated by the API server.",
+        href: "https://kubernetes.io/docs/concepts/security/service-accounts/",
+      },
+      {
+        company: "Stripe",
+        product: "Connect / embedded session tokens",
+        usage:
+          "Short-lived signed tokens scope a client session to specific accounts and permissions.",
+        href: "https://docs.stripe.com/connect",
+      },
+    ],
+    references: [
+      { label: "RFC 7519 — JSON Web Token", href: "https://datatracker.ietf.org/doc/html/rfc7519" },
+      {
+        label: "RFC 8725 — JWT best current practices (alg confusion, none)",
+        href: "https://datatracker.ietf.org/doc/html/rfc8725",
+      },
     ],
   },
   {
@@ -2613,6 +6835,52 @@ function dfs(start: string, adj: Map<string, string[]>) {
         href: "https://datatracker.ietf.org/doc/html/rfc8446",
       },
     ],
+    codeSnippet: {
+      language: "go",
+      code: `// TLS 1.3: one round trip. ClientHello already carries a key share.
+cfg := &tls.Config{
+    MinVersion: tls.VersionTLS13,      // no downgrade to legacy suites
+    ServerName: "api.example.com",     // SNI + certificate hostname check
+    CurvePreferences: []tls.CurveID{tls.X25519},
+}
+conn, err := tls.Dial("tcp", "api.example.com:443", cfg)
+// state.HandshakeComplete, state.CipherSuite, state.PeerCertificates[0]
+state := conn.ConnectionState()
+
+// Flow: ClientHello(key_share) -> ServerHello(key_share) + EncryptedExtensions
+//       + Certificate + CertificateVerify + Finished -> Finished.
+// Forward secrecy comes from the ephemeral ECDHE key, not the certificate.`,
+    },
+    usedBy: [
+      {
+        company: "Cloudflare",
+        product: "TLS 1.3 & Encrypted Client Hello at the edge",
+        usage:
+          "Cloudflare drove TLS 1.3 deployment and publishes measurements of handshake latency and 0-RTT tradeoffs.",
+        href: "https://blog.cloudflare.com/rfc-8446-aka-tls-1-3/",
+      },
+      {
+        company: "Google",
+        product: "Chrome / QUIC & HTTP/3",
+        usage:
+          "QUIC embeds the TLS 1.3 handshake into the transport, so connection setup and encryption complete together.",
+        href: "https://datatracker.ietf.org/doc/html/rfc9001",
+      },
+      {
+        company: "Let's Encrypt / ISRG",
+        product: "ACME certificate issuance",
+        usage:
+          "Automated 90-day certificates are what made universal HTTPS (and the certificate chain in every handshake) practical.",
+        href: "https://letsencrypt.org/how-it-works/",
+      },
+      {
+        company: "Apple",
+        product: "App Transport Security",
+        usage:
+          "iOS requires TLS with modern ciphers by default, forcing app backends onto forward-secret suites.",
+        href: "https://developer.apple.com/documentation/security/preventing-insecure-network-connections",
+      },
+    ],
   },
   {
     slug: "cors-lab",
@@ -2636,6 +6904,65 @@ function dfs(start: string, adj: Map<string, string[]>) {
       "Access-Control-Allow-Origin: *: While easy, this allows ANY site to read your API data. Never use this for authenticated endpoints.",
       "Misconfigured Credential Support: If you allow credentials (cookies), you cannot use the wildcard `*`.",
       "Opaque Errors: Browsers don't always explain why a CORS request failed for security reasons; check the Network tab carefully.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// CORS is a browser policy, not server security. It relaxes the same-origin rule.
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED.has(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin); // echo, never "*" with credentials
+    res.setHeader("Vary", "Origin");                      // or caches will poison responses
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+  }
+  if (req.method === "OPTIONS") {
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE");
+    res.setHeader("Access-Control-Allow-Headers", "content-type,authorization");
+    res.setHeader("Access-Control-Max-Age", "600");       // cache the preflight
+    return res.status(204).end();
+  }
+  next();
+});`,
+    },
+    usedBy: [
+      {
+        company: "Stripe",
+        product: "Stripe.js / browser SDKs",
+        usage:
+          "Public-key browser calls are explicitly CORS-enabled while secret-key endpoints are server-only by design.",
+        href: "https://docs.stripe.com/api",
+      },
+      {
+        company: "Amazon",
+        product: "S3 bucket CORS configuration",
+        usage:
+          "Direct browser uploads require an explicit CORS policy per bucket listing origins, methods and exposed headers.",
+        href: "https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html",
+      },
+      {
+        company: "Mozilla",
+        product: "Fetch / browser enforcement",
+        usage:
+          "The browser (not the server) blocks the response; preflights and credential rules are specified in the Fetch standard.",
+        href: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS",
+      },
+      {
+        company: "Cloudflare",
+        product: "Workers & CDN header handling",
+        usage:
+          "Edge middleware injects CORS headers and must Vary on Origin so one origin's response isn't served to another.",
+        href: "https://developers.cloudflare.com/workers/examples/cors-header-proxy/",
+      },
+    ],
+    references: [
+      {
+        label: "MDN — Cross-Origin Resource Sharing (CORS)",
+        href: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS",
+      },
+      {
+        label: "Fetch standard — CORS protocol",
+        href: "https://fetch.spec.whatwg.org/#http-cors-protocol",
+      },
     ],
   },
   {
@@ -2663,6 +6990,79 @@ function dfs(start: string, adj: Map<string, string[]>) {
     references: [
       { label: "W3C Web Authentication Working Group", href: "https://www.w3.org/TR/webauthn-2/" },
       { label: "FIDO Alliance — How it works", href: "https://fidoalliance.org/how-fido-works/" },
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Registration: the authenticator keeps the private key; the server stores a public key.
+const cred = (await navigator.credentials.create({
+  publicKey: {
+    challenge: serverChallenge,               // random, single use, server-generated
+    rp: { id: "example.com", name: "Example" }, // origin binding kills phishing
+    user: { id: userIdBytes, name: email, displayName: name },
+    pubKeyCredParams: [{ type: "public-key", alg: -7 }],   // ES256
+    authenticatorSelection: { residentKey: "preferred", userVerification: "required" },
+    usedBy: [
+      {
+        company: "Apple",
+        product: "iCloud Keychain passkeys",
+        usage: "Passkeys sync across devices and replace passwords with Face ID / Touch ID-gated WebAuthn credentials.",
+        href: "https://developer.apple.com/passkeys/",
+      },
+      {
+        company: "Google",
+        product: "Passkeys for Google Accounts",
+        usage: "Google made passkeys the default sign-in option and reports faster, phishing-resistant authentication.",
+        href: "https://blog.google/technology/safety-security/the-beginning-of-the-end-of-the-password/",
+      },
+      {
+        company: "GitHub",
+        product: "Security keys & passkeys for 2FA",
+        usage: "GitHub supports WebAuthn security keys and passkeys, including for sudo-mode reauthentication.",
+        href: "https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication",
+      },
+      {
+        company: "Cloudflare",
+        product: "Company-wide hardware keys",
+        usage: "Cloudflare credits mandatory hardware security keys with blocking a targeted phishing campaign that hit other companies.",
+        href: "https://blog.cloudflare.com/2022-07-sms-phishing-attacks/",
+      },
+    ],
+  },
+})) as PublicKeyCredential;
+
+// Login: sign the challenge; the server verifies with the stored public key
+// and checks the signature counter / origin. No shared secret ever leaves the device.
+await navigator.credentials.get({ publicKey: { challenge, rpId: "example.com" } });`,
+    },
+    usedBy: [
+      {
+        company: "Apple",
+        product: "iCloud Keychain passkeys",
+        usage:
+          "Passkeys sync across devices and replace passwords with Face ID / Touch ID-gated WebAuthn credentials.",
+        href: "https://developer.apple.com/passkeys/",
+      },
+      {
+        company: "Google",
+        product: "Passkeys for Google Accounts",
+        usage:
+          "Google made passkeys the default sign-in option and reports faster, phishing-resistant authentication.",
+        href: "https://blog.google/technology/safety-security/the-beginning-of-the-end-of-the-password/",
+      },
+      {
+        company: "GitHub",
+        product: "Security keys & passkeys for 2FA",
+        usage:
+          "GitHub supports WebAuthn security keys and passkeys, including for sudo-mode reauthentication.",
+        href: "https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication",
+      },
+      {
+        company: "Cloudflare",
+        product: "Company-wide hardware keys",
+        usage:
+          "Cloudflare credits mandatory hardware security keys with blocking a targeted phishing campaign that hit other companies.",
+        href: "https://blog.cloudflare.com/2022-07-sms-phishing-attacks/",
+      },
     ],
   },
   {
@@ -2692,6 +7092,65 @@ function dfs(start: string, adj: Map<string, string[]>) {
       "Sticky sessions simplify state but reduce balancing quality.",
       "Health checks must detect partial failure, not just process liveness.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// "Power of two choices": sample 2 backends, send to the less loaded one.
+// Near-optimal balance without global state — what Envoy/NGINX least-request does.
+function pick(backends: { id: string; inflight: number; healthy: boolean }[]) {
+  const live = backends.filter((b) => b.healthy);
+  if (live.length <= 1) return live[0];
+  const a = live[Math.floor(Math.random() * live.length)];
+  const b = live[Math.floor(Math.random() * live.length)];
+  return a.inflight <= b.inflight ? a : b;
+}
+
+// Round robin ignores request cost; least-request tracks it;
+// consistent hashing trades balance for cache affinity (session/shard stickiness).`,
+    },
+    usedBy: [
+      {
+        company: "Google / CNCF",
+        product: "Envoy least-request policy",
+        usage:
+          "Envoy implements power-of-two-choices as its default least-request load balancer for HTTP upstreams.",
+        href: "https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers",
+      },
+      {
+        company: "NGINX / F5",
+        product: "upstream least_conn & hash",
+        usage:
+          "NGINX exposes round-robin, least-connections and hash-based (sticky) balancing per upstream block.",
+        href: "https://nginx.org/en/docs/http/load_balancing.html",
+      },
+      {
+        company: "AWS",
+        product: "Application Load Balancer",
+        usage:
+          "ALB spreads requests across targets in multiple AZs with health checks and connection draining on deploys.",
+        href: "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html",
+      },
+      {
+        company: "Cloudflare",
+        product: "Anycast + PoP-level balancing",
+        usage:
+          "Traffic reaches the nearest PoP by anycast routing, then is balanced across machines inside that PoP.",
+        href: "https://blog.cloudflare.com/unimog-cloudflares-edge-load-balancer/",
+      },
+    ],
+    references: [
+      {
+        label: "Mitzenmacher — The power of two choices in randomized load balancing",
+        href: "https://www.eecs.harvard.edu/~michaelm/postscripts/handbook2001.pdf",
+      },
+      {
+        label: "Envoy — load balancing architecture overview",
+        href: "https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers",
+      },
+      {
+        label: "Cloudflare — Unimog, the edge load balancer",
+        href: "https://blog.cloudflare.com/unimog-cloudflares-edge-load-balancer/",
+      },
+    ],
   },
   {
     slug: "circuit-breaker",
@@ -2718,6 +7177,79 @@ function dfs(start: string, adj: Map<string, string[]>) {
       "A breaker without timeouts still lets calls hang.",
       "Aggressive retry plus open breakers can produce traffic bursts during recovery.",
       "Fallbacks must be intentionally degraded, not silently wrong.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// closed -> (failures exceed threshold) -> open -> (after cooldown) -> half-open
+class CircuitBreaker {
+  private state: "closed" | "open" | "half-open" = "closed";
+  private failures = 0;
+  private openedAt = 0;
+  constructor(private threshold = 5, private cooldownMs = 10_000) {}
+
+  async call<T>(fn: () => Promise<T>): Promise<T> {
+    if (this.state === "open") {
+      if (Date.now() - this.openedAt < this.cooldownMs) throw new Error("circuit open"); // fail fast
+      this.state = "half-open"; // let one probe through
+    }
+    try {
+      const out = await fn();
+      this.failures = 0;
+      this.state = "closed";
+      return out;
+    } catch (err) {
+      if (++this.failures >= this.threshold || this.state === "half-open") {
+        this.state = "open";
+        this.openedAt = Date.now();
+      }
+      throw err;
+    }
+  }
+}`,
+    },
+    usedBy: [
+      {
+        company: "Netflix",
+        product: "Hystrix / resilience tooling",
+        usage:
+          "Netflix popularised circuit breakers with Hystrix so one failing dependency degrades instead of collapsing the API.",
+        href: "https://netflixtechblog.com/introducing-hystrix-for-resilience-engineering-13531c1ab362",
+      },
+      {
+        company: "Google / CNCF",
+        product: "Envoy outlier detection",
+        usage:
+          "Envoy ejects hosts that exceed error thresholds and re-admits them gradually — a breaker per upstream host.",
+        href: "https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/outlier",
+      },
+      {
+        company: "Amazon",
+        product: "Retry, backoff and brownout guidance",
+        usage:
+          "The Builders' Library documents fail-fast and load-shedding patterns to prevent retry storms during partial failure.",
+        href: "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/",
+      },
+      {
+        company: "Shopify",
+        product: "Semian resiliency library",
+        usage:
+          "Shopify open-sourced circuit breakers plus bulkheads for MySQL/Redis/HTTP calls in the storefront path.",
+        href: "https://github.com/Shopify/semian",
+      },
+    ],
+    references: [
+      {
+        label: "Martin Fowler — CircuitBreaker",
+        href: "https://martinfowler.com/bliki/CircuitBreaker.html",
+      },
+      {
+        label: "AWS Builders' Library — Timeouts, retries and backoff with jitter",
+        href: "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/",
+      },
+      {
+        label: "Envoy — outlier detection",
+        href: "https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/outlier",
+      },
     ],
   },
   {
@@ -2746,6 +7278,73 @@ function dfs(start: string, adj: Map<string, string[]>) {
       "Not every invariant can be preserved without coordination.",
       "Deletes require more complex CRDTs such as OR-Sets or tombstones.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// PN-Counter: two grow-only maps, merge with per-node max -> commutative,
+// associative, idempotent. Replicas converge regardless of message order.
+type GCounter = Record<string, number>;
+interface PNCounter { inc: GCounter; dec: GCounter }
+
+const increment = (c: PNCounter, node: string, by = 1): PNCounter =>
+  ({ ...c, inc: { ...c.inc, [node]: (c.inc[node] ?? 0) + by } });
+
+const mergeG = (a: GCounter, b: GCounter): GCounter => {
+  const out = { ...a };
+  for (const [k, v] of Object.entries(b)) out[k] = Math.max(out[k] ?? 0, v);
+  return out;
+};
+
+const merge = (a: PNCounter, b: PNCounter): PNCounter =>
+  ({ inc: mergeG(a.inc, b.inc), dec: mergeG(a.dec, b.dec) });
+
+const value = (c: PNCounter) =>
+  Object.values(c.inc).reduce((s, n) => s + n, 0) - Object.values(c.dec).reduce((s, n) => s + n, 0);`,
+    },
+    usedBy: [
+      {
+        company: "Figma",
+        product: "Multiplayer document state",
+        usage:
+          "Figma's realtime engine uses CRDT-inspired merge rules so concurrent edits converge without a locking server.",
+        href: "https://www.figma.com/blog/how-figmas-multiplayer-technology-works/",
+      },
+      {
+        company: "Apple",
+        product: "Notes sync across devices",
+        usage:
+          "Apple has described using CRDTs so edits made offline on different devices merge without conflict dialogs.",
+        href: "https://archive.org/details/crdts-in-production-apple-notes",
+      },
+      {
+        company: "Redis",
+        product: "Active-Active geo-replication (CRDBs)",
+        usage:
+          "Redis Enterprise databases replicate multi-master using CRDT semantics for counters, sets and maps.",
+        href: "https://redis.io/docs/latest/operate/rs/databases/active-active/",
+      },
+      {
+        company: "Automerge / Yjs ecosystem",
+        product: "Local-first collaborative apps",
+        usage:
+          "Open-source CRDT libraries power offline-first editors where every peer can write and later sync.",
+        href: "https://automerge.org/",
+      },
+    ],
+    references: [
+      {
+        label:
+          "Shapiro et al. — A comprehensive study of Convergent and Commutative Replicated Data Types",
+        href: "https://inria.hal.science/inria-00555588/document",
+      },
+      {
+        label: "Redis — Active-Active geo-replication (CRDBs)",
+        href: "https://redis.io/docs/latest/operate/rs/databases/active-active/",
+      },
+      {
+        label: "Automerge — CRDT library documentation",
+        href: "https://automerge.org/docs/hello/",
+      },
+    ],
   },
   {
     slug: "sharding-replication",
@@ -2773,6 +7372,69 @@ function dfs(start: string, adj: Map<string, string[]>) {
       "Cross-shard joins and transactions are expensive.",
       "Resharding needs careful dual-write, backfill, and cutover plans.",
     ],
+    codeSnippet: {
+      language: "sql",
+      code: `-- Shard key choice decides whether you scale or build a hotspot.
+-- Bad: monotonically increasing key -> every write lands on the newest shard.
+-- Better: hash a high-cardinality, query-aligned key.
+
+CREATE TABLE events (
+  tenant_id  bigint      NOT NULL,
+  event_id   bigint      NOT NULL,
+  created_at timestamptz NOT NULL,
+  payload    jsonb       NOT NULL,
+  PRIMARY KEY (tenant_id, event_id)
+) PARTITION BY HASH (tenant_id);
+
+-- Cross-shard queries lose single-shard transactions and need scatter-gather:
+SELECT tenant_id, count(*) FROM events
+WHERE created_at > now() - interval '1 day'
+GROUP BY tenant_id;  -- fans out to every shard, then merges`,
+    },
+    usedBy: [
+      {
+        company: "YouTube / PlanetScale",
+        product: "Vitess",
+        usage:
+          "Vitess was built to shard YouTube's MySQL fleet transparently, and now backs PlanetScale and Slack's MySQL.",
+        href: "https://vitess.io/docs/",
+      },
+      {
+        company: "Instagram / Meta",
+        product: "Logical shards in Postgres",
+        usage:
+          "Thousands of logical shards are mapped onto fewer physical machines so rebalancing does not require re-sharding data.",
+        href: "https://instagram-engineering.com/sharding-ids-at-instagram-1cf5a71e5a5c",
+      },
+      {
+        company: "MongoDB",
+        product: "Sharded clusters",
+        usage:
+          "Shard key selection, chunk balancing and scatter-gather query costs are documented as first-class design concerns.",
+        href: "https://www.mongodb.com/docs/manual/sharding/",
+      },
+      {
+        company: "Discord",
+        product: "Cassandra → ScyllaDB message store",
+        usage:
+          "Messages are partitioned by channel and bucketed by time to keep partitions bounded and reads local.",
+        href: "https://discord.com/blog/how-discord-stores-trillions-of-messages",
+      },
+    ],
+    references: [
+      {
+        label: "Vitess — sharding concepts",
+        href: "https://vitess.io/docs/user-guides/configuration-basic/",
+      },
+      {
+        label: "MongoDB — sharded cluster and shard key selection",
+        href: "https://www.mongodb.com/docs/manual/core/sharding-shard-key/",
+      },
+      {
+        label: "Discord — how Discord stores trillions of messages",
+        href: "https://discord.com/blog/how-discord-stores-trillions-of-messages",
+      },
+    ],
   },
   {
     slug: "backpressure",
@@ -2799,6 +7461,75 @@ function dfs(start: string, adj: Map<string, string[]>) {
       "Dropping must be safe for the workload.",
       "Autoscaling from queue depth needs cooldowns to avoid oscillation.",
     ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Little's law: concurrency = arrival rate x latency.
+// If you can't slow arrivals, you must bound concurrency and shed the rest.
+class Bulkhead {
+  private inflight = 0;
+  constructor(private limit: number, private queueLimit: number) {}
+  private queue: (() => void)[] = [];
+
+  async run<T>(task: () => Promise<T>): Promise<T> {
+    if (this.inflight >= this.limit) {
+      if (this.queue.length >= this.queueLimit) throw new Error("503: shed load"); // fail fast
+      await new Promise<void>((r) => this.queue.push(r));
+    }
+    this.inflight++;
+    try {
+      return await task();
+    } finally {
+      this.inflight--;
+      this.queue.shift()?.();
+    }
+  }
+}
+// Unbounded queues don't remove overload — they convert it into latency and timeouts.`,
+    },
+    usedBy: [
+      {
+        company: "Netflix",
+        product: "Adaptive concurrency limits",
+        usage:
+          "Netflix open-sourced TCP-congestion-style adaptive limits that discover a service's safe concurrency at runtime.",
+        href: "https://netflixtechblog.medium.com/performance-under-load-3e6fa9a60581",
+      },
+      {
+        company: "Amazon",
+        product: "Load shedding & timeout guidance",
+        usage:
+          "The Builders' Library documents shedding excess work early rather than letting queues absorb overload.",
+        href: "https://aws.amazon.com/builders-library/using-load-shedding-to-avoid-overload/",
+      },
+      {
+        company: "IETF / all browsers",
+        product: "HTTP/2 & gRPC flow control",
+        usage:
+          "Stream and connection windows are literal backpressure: a receiver advertises how many bytes it can absorb.",
+        href: "https://datatracker.ietf.org/doc/html/rfc9113#name-flow-control",
+      },
+      {
+        company: "Reactive Streams / Akka",
+        product: "Demand-based stream protocol",
+        usage:
+          "Subscribers request(n) items, so a fast producer can never overwhelm a slow consumer.",
+        href: "https://www.reactive-streams.org/",
+      },
+    ],
+    references: [
+      {
+        label: "Netflix — performance under load (adaptive concurrency limits)",
+        href: "https://netflixtechblog.medium.com/performance-under-load-3e6fa9a60581",
+      },
+      {
+        label: "AWS Builders' Library — using load shedding to avoid overload",
+        href: "https://aws.amazon.com/builders-library/using-load-shedding-to-avoid-overload/",
+      },
+      {
+        label: "RFC 9113 — HTTP/2 flow control",
+        href: "https://datatracker.ietf.org/doc/html/rfc9113#name-flow-control",
+      },
+    ],
   },
   {
     slug: "topological-sort",
@@ -2824,6 +7555,60 @@ function dfs(start: string, adj: Map<string, string[]>) {
       "Only works on DAGs; cycles must be reported clearly.",
       "Multiple valid orders can exist.",
       "Dynamic dependency graphs need incremental recomputation or invalidation.",
+    ],
+    codeSnippet: {
+      language: "ts",
+      code: `// Kahn's algorithm: repeatedly emit nodes with no remaining dependencies.
+export function topoSort(nodes: string[], edges: [string, string][]): string[] {
+  const indeg = new Map(nodes.map((n) => [n, 0]));
+  const adj = new Map(nodes.map((n) => [n, [] as string[]]));
+  for (const [from, to] of edges) {
+    adj.get(from)!.push(to);
+    indeg.set(to, indeg.get(to)! + 1);
+  }
+  const ready = nodes.filter((n) => indeg.get(n) === 0);
+  const order: string[] = [];
+  while (ready.length) {
+    const n = ready.shift()!; // any ready node -> parallelisable batch
+    order.push(n);
+    for (const next of adj.get(n)!) {
+      indeg.set(next, indeg.get(next)! - 1);
+      if (indeg.get(next) === 0) ready.push(next);
+    }
+  }
+  if (order.length !== nodes.length) throw new Error("cycle detected");
+  return order;
+}`,
+    },
+    usedBy: [
+      {
+        company: "Google",
+        product: "Bazel build graph",
+        usage:
+          'Actions run in dependency order, and every independent "ready" set is dispatched in parallel across workers.',
+        href: "https://bazel.build/basics/build-graph",
+      },
+      {
+        company: "Apache Airflow",
+        product: "DAG task scheduling",
+        usage:
+          "The scheduler queues tasks whose upstream dependencies have all succeeded — Kahn's algorithm with retries.",
+        href: "https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/dags.html",
+      },
+      {
+        company: "Vercel",
+        product: "Turborepo task pipelines",
+        usage:
+          "`turbo run build` topologically orders package tasks and parallelises independent branches of the graph.",
+        href: "https://turbo.build/repo/docs/crafting-your-repository/running-tasks",
+      },
+    ],
+    references: [
+      { label: "Bazel — the build graph", href: "https://bazel.build/basics/build-graph" },
+      {
+        label: "Turborepo — task graph & parallel execution",
+        href: "https://turbo.build/repo/docs/crafting-your-repository/running-tasks",
+      },
     ],
   },
 ];

@@ -91,7 +91,8 @@ function LabIndex() {
         <p className="mt-3 max-w-2xl text-muted-foreground">
           {labRegistry.length} interactive demos of the system design, DSA, security, and
           distributed-systems concepts I work with daily. Each lab is a 2–6 minute play with concept
-          explainer, complexity table, reference implementation, and real-world usage.
+          explainer, reference implementation, production usage at named companies, pitfalls, and
+          references.
         </p>
 
         {/* Category filter */}
