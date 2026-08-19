@@ -22,7 +22,7 @@ export const Route = createFileRoute("/lab/$slug")({
       return { meta: [{ title: "Lab — Not found · Jainil Chauhan" }] };
     }
     const t = `${loaderData.title} — Lab · Jainil Chauhan`;
-    const d = `${loaderData.blurb} Interactive ${loaderData.category.toLowerCase()} demo with concept, complexity table, reference implementation, and real-world usage.`;
+    const d = `${loaderData.blurb} Interactive ${loaderData.category.toLowerCase()} demo with concept, reference implementation, production usage at named companies, and pitfalls.`;
     return {
       meta: [
         { title: t },

@@ -1,5 +1,15 @@
 import { useState } from "react";
-import { ChevronDown, BookOpen, Zap, Code2, Globe, AlertTriangle, Link2 } from "lucide-react";
+import {
+  ChevronDown,
+  BookOpen,
+  Zap,
+  Code2,
+  Globe,
+  AlertTriangle,
+  Link2,
+  Building2,
+  ExternalLink,
+} from "lucide-react";
 import { CodeBlock } from "./CodeBlock";
 import type { LabEntry } from "@/lib/labRegistry";
 
@@ -72,6 +82,50 @@ export function LabContent({ lab }: { lab: LabEntry }) {
       {lab.codeSnippet && (
         <Section icon={<Code2 className="size-4" />} title="Reference implementation">
           <CodeBlock code={lab.codeSnippet.code} language={lab.codeSnippet.language} />
+        </Section>
+      )}
+
+      {lab.usedBy && lab.usedBy.length > 0 && (
+        <Section icon={<Building2 className="size-4" />} title="Used in production" defaultOpen>
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {lab.usedBy.map((item) => {
+              const body = (
+                <>
+                  <span className="flex items-center gap-2 font-mono text-xs">
+                    <span className="font-semibold text-terminal">{item.company}</span>
+                    <span className="text-muted-foreground">/</span>
+                    <span className="text-cyan-accent">{item.product}</span>
+                    {item.href ? (
+                      <ExternalLink className="size-3 text-muted-foreground" />
+                    ) : (
+                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                        commonly used in
+                      </span>
+                    )}
+                  </span>
+                  <span className="mt-1 block text-xs text-foreground/80">{item.usage}</span>
+                </>
+              );
+              const className =
+                "block h-full rounded-md border border-border bg-background/40 px-3 py-2";
+              return (
+                <li key={`${item.company}-${item.product}`}>
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`${className} transition-colors hover:border-terminal/50`}
+                    >
+                      {body}
+                    </a>
+                  ) : (
+                    <div className={className}>{body}</div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         </Section>
       )}
 
