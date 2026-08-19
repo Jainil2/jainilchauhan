@@ -1,15 +1,12 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 @import "tailwindcss" source(none);
 @import "tw-animate-css";
 @source "../src";
 
-@custom-variant dark (&:is(.dark *));
-
 /*
  * Jainil Chauhan — Portfolio
- * Theme: dark "developer terminal".
- * Background: deep near-black; Accent: terminal green; Secondary: soft cyan.
- * Typography: JetBrains Mono (display/mono) + Inter (body).
+ * Theme: light, minimal, professional. Black / white / grey only.
+ * Color enters the page exclusively through brand logos.
+ * Typography: Sora (headings) + Manrope (body). Mono only in terminal/code.
  */
 
 @theme inline {
@@ -53,77 +50,55 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  /* Legacy accent tokens, remapped to the neutral system. */
   --color-terminal: var(--terminal);
   --color-terminal-glow: var(--terminal-glow);
   --color-cyan-accent: var(--cyan-accent);
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Sora", "Manrope", ui-sans-serif, system-ui, sans-serif;
+  /* `font-mono` is intentionally the body face: mono is opt-in via `.font-code`. */
+  --font-mono: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-code: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
 :root {
-  /* Single dark theme — no light mode for this portfolio. */
-  --radius: 0.625rem;
-  --background: oklch(0.16 0.02 150);
-  --foreground: oklch(0.96 0.015 100);
-  --card: oklch(0.20 0.02 150);
-  --card-foreground: oklch(0.96 0.015 100);
-  --popover: oklch(0.18 0.02 150);
-  --popover-foreground: oklch(0.96 0.015 100);
-  --primary: oklch(0.85 0.21 150);
-  --primary-foreground: oklch(0.14 0.02 150);
-  --secondary: oklch(0.24 0.02 150);
-  --secondary-foreground: oklch(0.96 0.015 100);
-  --muted: oklch(0.22 0.02 150);
-  --muted-foreground: oklch(0.68 0.02 150);
-  --accent: oklch(0.78 0.16 200);
-  --accent-foreground: oklch(0.14 0.02 150);
-  --destructive: oklch(0.65 0.22 27);
-  --destructive-foreground: oklch(0.98 0.01 100);
-  --border: oklch(0.30 0.02 150 / 60%);
-  --input: oklch(0.26 0.02 150);
-  --ring: oklch(0.85 0.21 150);
-  --terminal: oklch(0.85 0.21 150);
-  --terminal-glow: oklch(0.85 0.21 150 / 35%);
-  --cyan-accent: oklch(0.78 0.16 200);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.18 0.02 150);
-  --sidebar-foreground: oklch(0.96 0.015 100);
-  --sidebar-primary: oklch(0.85 0.21 150);
-  --sidebar-primary-foreground: oklch(0.14 0.02 150);
-  --sidebar-accent: oklch(0.24 0.02 150);
-  --sidebar-accent-foreground: oklch(0.96 0.015 100);
-  --sidebar-border: oklch(0.30 0.02 150 / 60%);
-  --sidebar-ring: oklch(0.85 0.21 150);
-}
-
-.dark {
-  /* Mirror :root — single dark theme. */
-  --background: oklch(0.16 0.02 150);
-  --foreground: oklch(0.96 0.015 100);
-  --card: oklch(0.20 0.02 150);
-  --card-foreground: oklch(0.96 0.015 100);
-  --popover: oklch(0.18 0.02 150);
-  --popover-foreground: oklch(0.96 0.015 100);
-  --primary: oklch(0.85 0.21 150);
-  --primary-foreground: oklch(0.14 0.02 150);
-  --secondary: oklch(0.24 0.02 150);
-  --secondary-foreground: oklch(0.96 0.015 100);
-  --muted: oklch(0.22 0.02 150);
-  --muted-foreground: oklch(0.68 0.02 150);
-  --accent: oklch(0.78 0.16 200);
-  --accent-foreground: oklch(0.14 0.02 150);
-  --destructive: oklch(0.65 0.22 27);
-  --destructive-foreground: oklch(0.98 0.01 100);
-  --border: oklch(0.30 0.02 150 / 60%);
-  --input: oklch(0.26 0.02 150);
-  --ring: oklch(0.85 0.21 150);
-  --terminal: oklch(0.85 0.21 150);
-  --terminal-glow: oklch(0.85 0.21 150 / 35%);
-  --cyan-accent: oklch(0.78 0.16 200);
+  /* Single light theme — no dark mode. */
+  --radius: 0.5rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.18 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0 0);
+  --primary: oklch(0.18 0 0);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.18 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.52 0 0);
+  --accent: oklch(0.96 0 0);
+  --accent-foreground: oklch(0.18 0 0);
+  --destructive: oklch(0.52 0.19 27);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.90 0 0);
+  --input: oklch(0.90 0 0);
+  --ring: oklch(0.18 0 0);
+  --terminal: oklch(0.18 0 0);
+  --terminal-glow: oklch(0.18 0 0 / 10%);
+  --cyan-accent: oklch(0.52 0 0);
+  --chart-1: oklch(0.22 0 0);
+  --chart-2: oklch(0.40 0 0);
+  --chart-3: oklch(0.55 0 0);
+  --chart-4: oklch(0.70 0 0);
+  --chart-5: oklch(0.84 0 0);
+  --sidebar: oklch(0.99 0 0);
+  --sidebar-foreground: oklch(0.18 0 0);
+  --sidebar-primary: oklch(0.18 0 0);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.18 0 0);
+  --sidebar-border: oklch(0.90 0 0);
+  --sidebar-ring: oklch(0.18 0 0);
 }
 
 @layer base {
@@ -136,12 +111,11 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    background-image:
-      radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in oklab, var(--terminal) 12%, transparent), transparent),
-      linear-gradient(var(--border) 1px, transparent 1px),
-      linear-gradient(90deg, var(--border) 1px, transparent 1px);
-    background-size: auto, 48px 48px, 48px 48px;
-    background-position: 0 0, 0 0, 0 0;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
   }
 
   html {
@@ -150,53 +124,62 @@
   }
 }
 
-@layer utilities {
-  .font-mono {
-    font-family: var(--font-mono);
-  }
-  .text-terminal {
-    color: var(--terminal);
-  }
-  .bg-terminal {
-    background-color: var(--terminal);
-  }
-  .border-terminal {
-    border-color: var(--terminal);
-  }
-  .glow-terminal {
-    box-shadow: 0 0 24px var(--terminal-glow);
-  }
-  .text-cyan-accent {
-    color: var(--cyan-accent);
-  }
-  .caret-blink::after {
+@utility font-code {
+  font-family: var(--font-code);
+}
+
+@utility hairline {
+  border: 1px solid var(--border);
+}
+
+@utility surface {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+@utility glow-terminal {
+  box-shadow: 0 1px 2px oklch(0 0 0 / 8%);
+}
+
+@utility text-terminal {
+  color: var(--foreground);
+}
+
+@utility bg-terminal {
+  background-color: var(--foreground);
+}
+
+@utility border-terminal {
+  border-color: var(--foreground);
+}
+
+@utility text-cyan-accent {
+  color: var(--muted-foreground);
+}
+
+@utility caret-blink {
+  &::after {
     content: "";
     display: inline-block;
-    width: 0.55ch;
+    width: 0.5ch;
     height: 1em;
     margin-left: 0.15ch;
-    background: var(--terminal);
+    background: var(--foreground);
     vertical-align: -0.12em;
     animation: caret-blink 1s step-end infinite;
   }
-  @keyframes caret-blink {
-    50% { opacity: 0; }
-  }
 }
 
-/* Chaos env: subtle destabilizing filter. No-op in prod/staging. */
-@keyframes env-chaos-jitter {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  25%     { transform: translate3d(-0.2px, 0.1px, 0); }
-  50%     { transform: translate3d(0.1px, -0.3px, 0); }
-  75%     { transform: translate3d(0.3px, 0.2px, 0); }
+@keyframes caret-blink {
+  50% { opacity: 0; }
 }
+
+/* Chaos env: subtle desaturating tint. No-op in prod/staging. */
 .env-chaos body {
-  animation: env-chaos-jitter 2.5s ease-in-out infinite;
-  filter: contrast(1.02) saturate(1.05);
+  background-color: oklch(0.98 0 0);
 }
 
-/* Respect users who prefer reduced motion: kill non-essential animations. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
