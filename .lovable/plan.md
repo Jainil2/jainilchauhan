@@ -1,150 +1,66 @@
+# Design Overhaul: Professional Light Portfolio
 
-# Pass 6 — Lab Expansion: More Modules + Deep Learning Content
+Full visual rewrite from the dark "hacker terminal" aesthetic to a clean, minimalist, light professional portfolio. All decisions below are frozen — one large PR, no partial rollout.
 
-You currently have **8 labs** across 4 categories. The goal of this pass is two-fold:
+## Frozen decisions
 
-1. **Add 6 new in-depth modules** spanning DSA, System Design, and Distributed Systems — chosen to cover gaps (concurrency, rate limiting, replication, indexing, hashing, graph traversal beyond Dijkstra).
-2. **Turn each lab page from a "play widget" into a real learning page** — concept explainer, complexity table, annotated code snippet, real-world usage, and references. This is what makes visitors actually *learn* something instead of just clicking around.
+- **Theme:** light only. No dark mode, no theme toggle. Dark tokens removed.
+- **Color:** strictly black / white / greys for all UI. The only color on the page comes from brand logos (AWS, GCP, Kubernetes, PostgreSQL, Redis, GraphQL, Docker, Node, TypeScript, React, etc.).
+- **Typography:** Sora for headings, Manrope for body (loaded via `<link>` in the root route head).
+- **Monospace:** allowed only inside the terminal and code blocks. Everywhere else uses Manrope.
+- **Terminal:** kept and fully functional, restyled light (white surface, black text, grey chrome) to match the site. Opened via ⌘K / ⌘J, nav button, mobile FAB.
+- **HUD:** kept, restyled as a small neutral pill with the same tabs, light styling, reduced visual weight.
+- **Labels:** plain professional wording everywhere — no `~/jainil $` prompts, no `// comment` captions, no `cd ~/`, no filename section dividers (`about.md`, `git log`).
+- **Lab internals:** all 20+ lab/system-design components rethemed to the same light system.
 
-Total after this pass: **14 labs**, each with structured educational content.
+## Brand icon source
 
----
+`simple-icons` (via the `simple-icons` npm package, rendered through a small `<BrandIcon>` wrapper) for technology/service logos — 3000+ official marks with official brand colors, MIT-licensed, tree-shakeable, no network calls. AWS/GCP service-level icons that Simple Icons lacks are covered by the generic vendor mark plus a text label. Lucide stays for functional UI icons (menu, close, arrow, download) rendered in black/grey only.
 
-## Part A — 6 new lab modules
+## Where brand icons appear
 
-Each is a self-contained interactive component under `src/components/system-design/`. All follow the existing `GameCard` shell so they look consistent.
+- Skills section — every technology chip gets its brand mark
+- Experience entries — employer/tech stack marks
+- Projects cards — stack marks per project
+- Infrastructure map nodes — AWS/K8s/Postgres/Redis marks
+- Lab pages — relevant tech mark in the header
+- Contact/footer — GitHub, LinkedIn, email marks
 
-### 1. `ConsistentHashLab` — `/lab/consistent-hashing`
-- **Category**: Distributed Systems
-- **What it shows**: Ring of N virtual nodes; you add/remove physical nodes and watch how only ~K/N keys remap (vs. naive `hash % N` which remaps almost everything). Side-by-side counter: "keys remapped: consistent vs naive".
-- **You already have** `ConsistentHashRing.tsx` used in Projects — this lab wraps it in a fuller educational page with a "Naive Mode" toggle and key-remap counter.
-- **Skill tags**: `Distributed Systems`, `System Design`, `Redis`
+## Design system (src/styles.css)
 
-### 2. `LeakyBucketLab` — `/lab/rate-limiter`
-- **Category**: Distributed Systems
-- **What it shows**: Side-by-side **Token Bucket vs Leaky Bucket vs Fixed Window vs Sliding Window** rate limiters. Click "burst 20 requests" and watch which strategies allow/deny what. Live throughput gauge.
-- **Reuses**: existing `useTokenBucket` hook + `TokenBucket` component logic, expanded to 4 strategies.
-- **Skill tags**: `System Design`, `Distributed Systems`
+Replace the entire token block:
 
-### 3. `BTreeIndexLab` — `/lab/btree-index`
-- **Category**: Data Structures
-- **What it shows**: Animated B-Tree (order 4) — insert keys, watch nodes split and the tree grow upward. Toggle "table scan vs B-tree lookup" to compare comparison counts on 1000 rows. Caption explains why Postgres/MySQL use B-trees instead of binary trees (disk page locality).
-- **Skill tags**: `DSA`, `Postgres`, `System Design`
-
-### 4. `GraphBFSDFSLab` — `/lab/graph-traversal`
-- **Category**: Algorithms
-- **What it shows**: Same graph rendered twice — left runs BFS, right runs DFS. Step through with play/pause/step. Shows queue vs stack contents live. Highlights why BFS finds shortest unweighted path and DFS doesn't.
-- **Complements** the existing Dijkstra lab (which is weighted).
-- **Skill tags**: `DSA`
-
-### 5. `CapTheoremLab` — `/lab/cap-theorem`
-- **Category**: Distributed Systems
-- **What it shows**: A 3-node cluster with a partition slider. Pick **CP** (refuse writes on minority side) or **AP** (accept writes, diverge). Trigger a partition and see read/write availability on each side. After healing, show the conflict-resolution step (last-write-wins vs vector clocks).
-- **Skill tags**: `Distributed Systems`, `System Design`
-
-### 6. `DeadlockLab` — `/lab/deadlock`
-- **Category**: Distributed Systems (concurrency)
-- **What it shows**: Dining philosophers (5 forks, 5 philosophers). Run "naive" mode → instant deadlock visualization (wait-for graph cycle). Switch to "resource ordering" or "asymmetric" → watch them eat. Live wait-for graph.
-- **Skill tags**: `DSA`, `System Design`, `Distributed Systems`
-
----
-
-## Part B — Deep learning content per lab
-
-Right now `LabEntry` only carries `caption` (one line) + `whereUsed`. I'll extend it so every lab page renders a full educational layout below the playable widget.
-
-### Schema additions to `LabEntry` (in `src/lib/labRegistry.ts`)
-
-```ts
-interface LabEntry {
-  // ...existing fields
-  difficulty: "Beginner" | "Intermediate" | "Advanced";
-  readingTimeMin: number;          // e.g. 4
-  concept: string;                 // 2–4 paragraphs of plain-English explanation
-  complexity: {                    // rendered as a small table
-    operation: string;             // e.g. "Insert", "Lookup"
-    time: string;                  // e.g. "O(k)"
-    space?: string;
-  }[];
-  codeSnippet?: {                  // canonical implementation excerpt
-    language: "ts" | "py" | "go" | "sql";
-    code: string;
-  };
-  realWorld: string[];             // bullet list — "Used by Cassandra for…", "Postgres uses…", etc.
-  pitfalls?: string[];             // common mistakes / gotchas
-  references?: { label: string; href: string }[]; // papers, docs, blog posts
-}
+```
+--background: white
+--foreground: near-black (oklch .18)
+--muted-foreground: grey (oklch .52)
+--border: light grey (oklch .90)
+--card: white, --secondary: oklch .97
+--primary: near-black, --primary-foreground: white
+--radius: 0.5rem
 ```
 
-All 14 labs (8 existing + 6 new) will be filled in. For example, the **Bloom Filter** entry would carry:
-- concept: probabilistic membership, why false positives are acceptable in caches/CDNs, how `k` and `m` interact
-- complexity table: insert O(k), lookup O(k), space O(m bits)
-- code snippet: 15-line TS implementation
-- realWorld: Bigtable row key filter, Cassandra SSTable summaries, Chrome's malicious URL list, CDN cache-miss avoidance
-- pitfalls: can't delete (use Counting Bloom), false-positive rate compounds across layers
-- references: Burton Howard Bloom 1970 paper, Google Bigtable paper
+- Remove `--terminal`, `--terminal-glow`, `--cyan-accent`, `.glow-terminal`, `.caret-blink`, the grid/glow body background, the `.dark` block, and the chaos jitter filter.
+- Remove the `@import url(...)` Google Fonts line from `styles.css` (it breaks the build) — fonts move to `<link>` tags in `__root.tsx`.
+- Keep `.env-chaos` behavior but make it a subtle opacity/border tint instead of a filter.
+- Add utilities: `.surface` (white card + hairline border), `.hairline`, `.section` spacing.
 
-### New rendering on the lab detail page (`src/routes/lab.$slug.tsx`)
+## Component work
 
-Below the existing `GameCard`, render four collapsible-by-default sections:
+**Chrome:** `Nav` (white, hairline bottom border, plain labels, black CTA button), `Footer`, `SectionHeading` (plain eyebrow + heading, no shell prompt), `SectionDivider` (thin rule + plain label or removed), `CommandPalette`, `PortfolioHUD`, `MobileShellFab`, `TerminalShell`, `ChaosOverlay`, `Reveal` (keep, subtler motion).
 
-1. **📖 Concept** — prose, 2–4 paragraphs. Open by default.
-2. **⚡ Complexity** — small table.
-3. **💻 Reference implementation** — syntax-highlighted code snippet (use a lightweight highlighter like `prismjs` or a pre/code with manual color classes — leaning toward the latter to avoid a heavy dep).
-4. **🌍 In the wild** — bullet list of real-world systems using this technique, plus pitfalls.
-5. **🔗 References** — links to papers / docs.
+**Content sections:** `Hero` (large Sora headline, plain sub-copy, no typing caret), `About`, `Skills` (brand-icon grid), `Experience`, `Projects`, `Education`, `Now`, `Writing`, `Contact`, `TokenBucketContact`, `InfrastructureMap`, `Counter`.
 
-Difficulty badge + reading-time chip render in the page header next to the title.
+**Routes:** `__root.tsx` (font links, remove `dark` class, 404 page copy), `index.tsx`, `lab.tsx`, `lab.$slug.tsx`, `projects.$slug.tsx`, `writing.$slug.tsx`.
 
-### New rendering on the lab index page (`src/routes/lab.tsx`)
+**Lab internals:** `GameCard`, `CodeBlock`, `LabContent`, and every `src/components/system-design/*` module — swap `text-terminal`/`cyan-accent`/`font-mono` for the neutral system, use black/grey/hairline visuals with a single accent state (solid black fill) for "active", and greyscale-plus-hairline for graphs, grids, and nodes. Code blocks keep mono and a light grey surface.
 
-- **Category filter pills**: "All • Distributed Systems • Data Structures • Algorithms • Security" (4 → 5 filters, since concurrency lives under Distributed Systems).
-- **Group by category** when "All" is selected, with a section header per category.
-- **Difficulty badge** on each card (Beginner = green, Intermediate = amber, Advanced = magenta).
-- **Reading-time chip** ("~4 min read") on each card.
-- Keep the existing progress counter + reset button.
+## Pre-work fixes bundled into the same PR
 
----
+- Fix the build-breaking Google Fonts `@import` in `styles.css` (superseded by the font work above).
+- `src/components/portfolio/Contact.tsx` imports `src/server/contact` directly, which is blocked in the client bundle — move the server function into a client-safe `*.functions.ts` module and import that.
+- Fix TS errors in `CoreTreeLabs.tsx` (comma-operator misuse) and `QuadTreeLab.tsx` (implicit `any[]` on `newPoints`).
 
-## Part C — Wiring & polish
+## Out of scope
 
-- **`labRegistry.ts`**: register the 6 new components and fill in the new fields for all 14 labs.
-- **`public/sitemap.xml`**: add the 6 new `/lab/<slug>` URLs.
-- **CommandPalette**: regenerate lab entries from `labRegistry` (already does this — no change needed beyond the registry growing).
-- **Skills section**: existing `getLabsForSkill` will pick up new entries automatically as long as `skillTags` are populated.
-- **TerminalShell**: if there's a `lab` or `ls /lab` command, it'll list the new ones automatically (will verify and adjust if needed).
-
----
-
-## Files to create
-
-- `src/components/system-design/ConsistentHashLab.tsx`
-- `src/components/system-design/LeakyBucketLab.tsx`
-- `src/components/system-design/BTreeIndexLab.tsx`
-- `src/components/system-design/GraphBFSDFSLab.tsx`
-- `src/components/system-design/CapTheoremLab.tsx`
-- `src/components/system-design/DeadlockLab.tsx`
-- `src/components/system-design/LabContent.tsx` — shared component that renders Concept / Complexity / Code / Real-world / References sections below `GameCard`
-- `src/components/system-design/CodeBlock.tsx` — small syntax-highlighted code block (no extra deps; manual token coloring with Tailwind classes)
-
-## Files to edit
-
-- `src/lib/labRegistry.ts` — extend interface; register 6 new labs; add educational fields to all 14 entries
-- `src/routes/lab.$slug.tsx` — render `<LabContent />` below `<GameCard>`; add difficulty + reading-time chips
-- `src/routes/lab.tsx` — add category filter pills + grouping by category + difficulty/time badges on cards
-- `public/sitemap.xml` — add 6 new lab URLs
-
----
-
-## Out of scope for this pass (ask if you want any moved in)
-
-- Quizzes / "test what you learned" mode after each lab
-- Saving lab notes to the backend
-- Exporting a lab as a PDF cheat sheet
-- A `/lab/playground` open code editor (Monaco) where users can write and run their own implementations
-- Sound effects / haptics
-- Multiplayer Raft / leader-election game
-
----
-
-After approval I'll build it in one pass: 6 new components + extended registry with full educational content for all 14 labs + new index/detail layouts + sitemap update.
+No copy rewrite beyond label de-jargoning, no new sections, no new labs, no backend/logic changes.
