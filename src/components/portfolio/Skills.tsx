@@ -21,7 +21,7 @@ const groups: { title: string; items: string[] }[] = [
 export function Skills() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-      <SectionHeading id="skills" prompt="ls ./skills" title="Skills" />
+      <SectionHeading id="skills" prompt="What I work with" title="Skills" />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {groups.map((g) => {

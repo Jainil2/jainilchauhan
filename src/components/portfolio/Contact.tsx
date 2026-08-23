@@ -96,7 +96,7 @@ export function Contact() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-      <SectionHeading id="contact" prompt="./contact --start" title="Contact" />
+      <SectionHeading id="contact" prompt="Get in touch" title="Contact" />
 
       <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr]">
         <div>

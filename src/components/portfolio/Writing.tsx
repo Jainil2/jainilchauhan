@@ -25,7 +25,7 @@ const drafts = [
 export function Writing() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-      <SectionHeading id="writing" prompt="Writing" title="Notes & articles" />
+      <SectionHeading id="writing" prompt="Thoughts" title="Notes & articles" />
 
       <p className="-mt-4 mb-8 max-w-2xl text-muted-foreground">
         Long-form notes on backend engineering, distributed systems, and the
