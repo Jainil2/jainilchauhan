@@ -26,8 +26,8 @@ export const Route = createFileRoute("/lab")({
 
 const DIFF_COLOR: Record<string, string> = {
   Beginner: "border-terminal/40 text-terminal",
-  Intermediate: "border-amber-500/40 text-amber-300",
-  Advanced: "border-fuchsia-500/40 text-fuchsia-300",
+  Intermediate: "border-border text-muted-foreground",
+  Advanced: "border-border text-muted-foreground",
 };
 
 function LabIndex() {
@@ -121,8 +121,8 @@ function LabIndex() {
           {grouped.map((group) => (
             <section key={group.category}>
               {filter === "All" && (
-                <h2 className="mb-4 font-mono text-xs uppercase tracking-widest text-cyan-accent">
-                  // {group.category}
+                <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  {group.category}
                 </h2>
               )}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -163,7 +163,7 @@ function LabIndex() {
                           <Clock className="mr-1 inline size-3" />~{lab.readingTimeMin}min
                         </span>
                         <span className="ml-auto text-terminal/80 group-hover:text-terminal">
-                          {done ? "✓ replay →" : "▸ try it →"}
+                          {done ? "Replay →" : "Try it →"}
                         </span>
                       </div>
                     </Link>
