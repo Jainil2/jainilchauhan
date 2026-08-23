@@ -11,13 +11,13 @@ function openShell() {
 }
 
 const links = [
-  { href: "#about", label: "about" },
-  { href: "#skills", label: "skills" },
-  { href: "#experience", label: "experience" },
-  { href: "#projects", label: "projects" },
-  { href: "#now", label: "now" },
-  { href: "#writing", label: "writing" },
-  { href: "#contact", label: "contact" },
+  { href: "#about", label: "About" },
+  { href: "#skills", label: "Skills" },
+  { href: "#experience", label: "Experience" },
+  { href: "#projects", label: "Projects" },
+  { href: "#now", label: "Now" },
+  { href: "#writing", label: "Writing" },
+  { href: "#contact", label: "Contact" },
 ];
 
 const sectionIds = links.map((l) => l.href.slice(1));
@@ -38,14 +38,16 @@ export function Nav() {
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all ${
         scrolled
-          ? "border-b border-border bg-background/80 backdrop-blur-md"
+          ? "border-b border-border bg-background/85 backdrop-blur-md"
           : "bg-transparent"
       }`}
     >
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <a href="#top" className="font-mono text-lg font-bold text-foreground">
-          <span className="text-terminal">JC</span>
-          <span className="text-muted-foreground">.</span>
+        <a
+          href="#top"
+          className="text-lg font-semibold tracking-tight text-foreground"
+        >
+          Jainil Chauhan
         </a>
 
         <ul className="hidden items-center gap-1 md:flex">
@@ -54,9 +56,9 @@ export function Nav() {
               <a
                 href={l.href}
                 aria-current={active === l.href.slice(1) ? "true" : undefined}
-                className={`relative rounded-md px-3 py-2 font-mono text-sm transition-colors hover:bg-secondary hover:text-foreground ${
+                className={`relative rounded-md px-3 py-2 text-sm transition-colors hover:bg-secondary hover:text-foreground ${
                   active === l.href.slice(1)
-                    ? "text-terminal"
+                    ? "text-foreground"
                     : "text-muted-foreground"
                 }`}
               >
@@ -64,7 +66,7 @@ export function Nav() {
                 {active === l.href.slice(1) && (
                   <span
                     aria-hidden
-                    className="absolute inset-x-3 -bottom-px h-px bg-terminal"
+                    className="absolute inset-x-3 -bottom-px h-px bg-foreground"
                   />
                 )}
               </a>
@@ -73,30 +75,30 @@ export function Nav() {
           <li>
             <Link
               to="/lab"
-              className="rounded-md px-3 py-2 font-mono text-sm text-cyan-accent transition-colors hover:bg-secondary"
+              className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
-              lab
+              Lab
             </Link>
           </li>
           <li>
             <button
               type="button"
               onClick={openShell}
-              title="Open shell (⌘J)"
-              className="inline-flex items-center gap-1.5 rounded-md px-3 py-2 font-mono text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-terminal"
+              title="Open terminal (⌘J)"
+              className="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
               <TerminalSquare className="size-3.5" />
-              shell
+              Terminal
             </button>
           </li>
           <li>
             <a
               href="/jainil-chauhan-resume.pdf"
               download
-              className="ml-2 inline-flex items-center gap-2 rounded-md border border-terminal/40 bg-terminal/10 px-3 py-2 font-mono text-sm text-terminal transition-all hover:bg-terminal/20 hover:glow-terminal"
+              className="ml-2 inline-flex items-center gap-2 rounded-md bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               <Download className="size-3.5" />
-              resume
+              Resume
             </a>
           </li>
         </ul>
@@ -119,7 +121,7 @@ export function Nav() {
                 <a
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="block rounded-md px-3 py-2 font-mono text-sm text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  className="block rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground"
                 >
                   {l.label}
                 </a>
@@ -129,9 +131,9 @@ export function Nav() {
               <Link
                 to="/lab"
                 onClick={() => setOpen(false)}
-                className="block rounded-md px-3 py-2 font-mono text-sm text-cyan-accent hover:bg-secondary"
+                className="block rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground"
               >
-                lab
+                Lab
               </Link>
             </li>
             <li>
@@ -141,10 +143,10 @@ export function Nav() {
                   setOpen(false);
                   openShell();
                 }}
-                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left font-mono text-sm text-muted-foreground hover:bg-secondary hover:text-terminal"
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-muted-foreground hover:bg-secondary hover:text-foreground"
               >
                 <TerminalSquare className="size-3.5" />
-                shell
+                Terminal
               </button>
             </li>
             <li>
@@ -152,10 +154,10 @@ export function Nav() {
                 href="/jainil-chauhan-resume.pdf"
                 download
                 onClick={() => setOpen(false)}
-                className="inline-flex items-center gap-2 rounded-md border border-terminal/40 bg-terminal/10 px-3 py-2 font-mono text-sm text-terminal"
+                className="mt-1 inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
               >
                 <Download className="size-3.5" />
-                download resume
+                Download resume
               </a>
             </li>
           </ul>
