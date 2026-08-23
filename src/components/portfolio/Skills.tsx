@@ -61,7 +61,7 @@ export function Skills() {
                       params={{ slug: lab.slug }}
                       className="rounded border border-terminal/30 bg-terminal/5 px-2 py-0.5 font-mono text-[10px] text-terminal hover:bg-terminal/15"
                     >
-                      ▸ try {lab.title.toLowerCase()}
+                      Try {lab.title}
                     </Link>
                   ))}
                 </div>

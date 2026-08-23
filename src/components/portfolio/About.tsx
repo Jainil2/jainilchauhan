@@ -31,9 +31,9 @@ export function About() {
           </p>
         </div>
 
-        <aside className="rounded-lg border border-border bg-card/60 p-5 font-mono text-sm">
+        <aside className="rounded-lg border border-border bg-card p-5 text-sm">
           <p className="text-xs uppercase tracking-wider text-muted-foreground">
-            // currently
+            Currently
           </p>
           <ul className="mt-3 space-y-3">
             <li>
