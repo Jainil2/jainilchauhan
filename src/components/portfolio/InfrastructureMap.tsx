@@ -55,8 +55,8 @@ export function InfrastructureMap() {
 
   return (
     <div className="relative w-full overflow-hidden rounded-lg border border-border bg-card/30 p-8">
-      <p className="absolute left-4 top-4 font-mono text-[10px] uppercase tracking-widest text-cyan-accent">
-        // Global Infrastructure Topology
+      <p className="absolute left-4 top-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+        Global infrastructure topology
       </p>
 
       <div className="relative mx-auto mt-8 h-64 w-full max-w-2xl">
