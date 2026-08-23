@@ -107,7 +107,7 @@ export function Projects() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-      <SectionHeading id="projects" prompt="ls -la ./projects" title="Projects" />
+      <SectionHeading id="projects" prompt="Selected work" title="Projects" />
 
       <div className="grid gap-8 lg:grid-cols-[1fr_260px]">
         {/* Project cards */}
@@ -149,7 +149,7 @@ export function Projects() {
                     ))}
                   </ul>
                   <p className="mt-4 font-mono text-xs text-muted-foreground/80 group-hover:text-terminal">
-                    $ cat case-study.md →
+                    Read case study →
                   </p>
                 </div>
               </button>

@@ -26,8 +26,8 @@ export const Route = createFileRoute("/lab")({
 
 const DIFF_COLOR: Record<string, string> = {
   Beginner: "border-terminal/40 text-terminal",
-  Intermediate: "border-amber-500/40 text-amber-300",
-  Advanced: "border-fuchsia-500/40 text-fuchsia-300",
+  Intermediate: "border-border text-muted-foreground",
+  Advanced: "border-border text-muted-foreground",
 };
 
 function LabIndex() {
@@ -58,20 +58,17 @@ function LabIndex() {
           className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-terminal"
         >
           <ArrowLeft className="size-3" />
-          ~/jainil $ cd ..
+          Back to portfolio
         </Link>
 
         <div className="mt-8 flex flex-wrap items-end justify-between gap-4">
           <div className="flex items-center gap-3">
             <Beaker className="size-6 text-terminal" />
-            <h1 className="font-mono text-3xl font-bold">
-              <span className="text-muted-foreground">~/jainil/</span>
-              <span className="text-terminal">lab</span>
-            </h1>
+            <h1 className="text-3xl font-semibold tracking-tight">Lab</h1>
           </div>
           <div className="flex items-center gap-3 font-mono text-xs text-muted-foreground">
             <span>
-              progress:{" "}
+              Progress:{" "}
               <span className="text-terminal">
                 {completedCount}/{labRegistry.length}
               </span>{" "}
@@ -97,7 +94,7 @@ function LabIndex() {
 
         {/* Category filter */}
         <div className="mt-6 flex flex-wrap items-center gap-2 font-mono text-xs">
-          <span className="text-muted-foreground">filter:</span>
+          <span className="text-muted-foreground">Filter:</span>
           {(["All", ...LAB_CATEGORIES] as const).map((cat) => {
             const active = filter === cat;
             const count =
@@ -124,8 +121,8 @@ function LabIndex() {
           {grouped.map((group) => (
             <section key={group.category}>
               {filter === "All" && (
-                <h2 className="mb-4 font-mono text-xs uppercase tracking-widest text-cyan-accent">
-                  // {group.category}
+                <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  {group.category}
                 </h2>
               )}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -166,7 +163,7 @@ function LabIndex() {
                           <Clock className="mr-1 inline size-3" />~{lab.readingTimeMin}min
                         </span>
                         <span className="ml-auto text-terminal/80 group-hover:text-terminal">
-                          {done ? "✓ replay →" : "▸ try it →"}
+                          {done ? "Replay →" : "Try it →"}
                         </span>
                       </div>
                     </Link>

@@ -90,7 +90,7 @@ export function Experience() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-      <SectionHeading id="experience" prompt="git log --oneline" title="Experience" />
+      <SectionHeading id="experience" prompt="Where I have worked" title="Experience" />
 
       {/* Metrics row */}
       <Reveal>
@@ -247,7 +247,7 @@ const bullets = [
 function ClassicExperience() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-      <SectionHeading id="experience" prompt="git log --oneline" title="Experience" />
+      <SectionHeading id="experience" prompt="Where I have worked" title="Experience" />
       <div className="relative rounded-lg border border-border bg-card/60 p-6 sm:p-8">
         <div className="flex flex-col gap-2 border-b border-border pb-5 sm:flex-row sm:items-baseline sm:justify-between">
           <div>

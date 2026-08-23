@@ -405,7 +405,7 @@ export function TerminalShell() {
             className="flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-lg border border-border bg-card/95 shadow-2xl"
           >
             <header className="flex items-center justify-between border-b border-border px-3 py-2">
-              <div className="flex items-center gap-2 font-mono text-xs">
+              <div className="flex items-center gap-2 font-code text-xs">
                 <TerminalSquare className="size-3.5 text-terminal" />
                 <span className="text-terminal">jc-shell</span>
                 <span className="text-muted-foreground">— type 'help'</span>
@@ -421,13 +421,13 @@ export function TerminalShell() {
 
             <div
               ref={bodyRef}
-              className="h-96 flex-1 overflow-y-auto px-3 py-2 font-mono text-[12px] leading-relaxed"
+              className="h-96 flex-1 overflow-y-auto px-3 py-2 font-code text-[12px] leading-relaxed"
             >
               {buffer.map((l, i) => (
                 <Row key={i} line={l} />
               ))}
               <div className="mt-1 flex items-center gap-1.5">
-                <span className="text-terminal">~/jainil $</span>
+                <span className="text-terminal">$</span>
                 <input
                   ref={inputRef}
                   value={value}
@@ -473,7 +473,7 @@ export function TerminalShell() {
               </div>
             </div>
 
-            <footer className="border-t border-border px-3 py-1.5 font-mono text-[10px] text-muted-foreground">
+            <footer className="border-t border-border px-3 py-1.5 font-code text-[10px] text-muted-foreground">
               <kbd className="rounded border border-border bg-background/60 px-1">⌘J</kbd> toggle ·{" "}
               <kbd className="rounded border border-border bg-background/60 px-1">Tab</kbd> complete
               · <kbd className="rounded border border-border bg-background/60 px-1">↑↓</kbd> history
@@ -489,7 +489,7 @@ function Row({ line }: { line: Line }) {
   if (line.kind === "in") {
     return (
       <div className="flex gap-1.5">
-        <span className="text-terminal">~/jainil $</span>
+        <span className="text-terminal">$</span>
         <span className="text-foreground">{line.text}</span>
       </div>
     );

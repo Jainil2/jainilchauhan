@@ -3,7 +3,7 @@ import { SectionHeading } from "./SectionHeading";
 export function About() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-      <SectionHeading id="about" prompt="cat about.md" title="About" />
+      <SectionHeading id="about" prompt="Introduction" title="About" />
 
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="space-y-5 text-pretty leading-relaxed text-muted-foreground lg:col-span-2 lg:text-lg">
@@ -31,9 +31,9 @@ export function About() {
           </p>
         </div>
 
-        <aside className="rounded-lg border border-border bg-card/60 p-5 font-mono text-sm">
+        <aside className="rounded-lg border border-border bg-card p-5 text-sm">
           <p className="text-xs uppercase tracking-wider text-muted-foreground">
-            // currently
+            Currently
           </p>
           <ul className="mt-3 space-y-3">
             <li>

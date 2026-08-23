@@ -1,13 +1,6 @@
 import { MapPin, Github, Linkedin, Mail, Beaker } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
-
-const bootLines = [
-  { prompt: "whoami", out: "jainil chauhan" },
-  { prompt: "role --current", out: "software engineer · backend & distributed systems" },
-  { prompt: "stack --top", out: "node · python · postgres · redis · aws · kubernetes" },
-];
 
 function useDaysSince(iso: string) {
   return useMemo(() => {
@@ -18,131 +11,98 @@ function useDaysSince(iso: string) {
 }
 
 export function Hero() {
-  const reduce = useReducedMotion();
-  const [step, setStep] = useState(reduce ? bootLines.length : 0);
   const days = useDaysSince("2025-01-15");
-
-  useEffect(() => {
-    if (reduce) return;
-    if (step >= bootLines.length) return;
-    const t = setTimeout(() => setStep((s) => s + 1), step === 0 ? 350 : 700);
-    return () => clearTimeout(t);
-  }, [step, reduce]);
 
   return (
     <section
       id="top"
-      className="relative mx-auto flex min-h-[92vh] max-w-6xl flex-col justify-center px-4 pt-24 sm:px-6"
+      className="relative mx-auto flex min-h-[80vh] max-w-6xl flex-col justify-center px-4 pt-28 pb-16 sm:px-6"
     >
-      <div className="grid items-center gap-10 lg:grid-cols-[1.5fr_1fr]">
+      <div className="grid items-center gap-12 lg:grid-cols-[1.5fr_1fr]">
         <div>
-          <div className="font-mono text-sm" aria-label="Terminal boot sequence">
-            {bootLines.slice(0, step).map((line, i) => (
-              <motion.div
-                key={line.prompt}
-                initial={reduce ? false : { opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.25 }}
-                className="leading-relaxed"
-              >
-                <span className="text-muted-foreground">~/jainil $</span>{" "}
-                <span className="text-terminal">{line.prompt}</span>
-                <div className="pl-[7ch] text-foreground/80">{line.out}</div>
-                {i === bootLines.length - 1 && step >= bootLines.length && (
-                  <span className="caret-blink ml-[7ch]" />
-                )}
-              </motion.div>
-            ))}
-          </div>
-
-          <h1 className="mt-6 font-mono text-4xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            Jainil <span className="text-terminal">Chauhan</span>
-          </h1>
-
-          <p className="mt-4 font-mono text-base text-cyan-accent sm:text-lg">
-            Software Engineer · Distributed Systems &amp; Backend
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Software Engineer · Backend &amp; Distributed Systems
           </p>
 
+          <h1 className="mt-5 text-5xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+            Jainil Chauhan
+          </h1>
+
           <p className="mt-6 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            I build <span className="text-foreground">low-latency, high-trust systems that scale quietly</span> —
-            backend services, secure auth platforms, and cloud infrastructure that
-            stay calm under load.
+            I build{" "}
+            <span className="text-foreground">
+              low-latency, high-trust systems that scale quietly
+            </span>{" "}
+            — backend services, secure authentication platforms, and cloud
+            infrastructure that stays calm under load.
           </p>
 
           <div
-            className="mt-6 inline-flex items-center gap-2 rounded-md border border-border bg-card/60 px-3 py-1.5 font-mono text-xs text-muted-foreground"
+            className="mt-7 inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-3 py-1.5 text-xs text-muted-foreground"
             title="Days since I joined Tech Holding"
           >
-            <span className="size-1.5 rounded-full bg-terminal" />
+            <span className="size-1.5 rounded-full bg-foreground" />
             <span>
-              uptime: <span className="text-foreground">{days.toLocaleString()}d</span>{" "}
-              <span className="text-muted-foreground/70">@ tech holding</span>
+              <span className="text-foreground">{days.toLocaleString()} days</span> at
+              Tech Holding
             </span>
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
             <a
               href="#projects"
-              className="inline-flex items-center justify-center rounded-md bg-terminal px-5 py-2.5 font-mono text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 hover:glow-terminal"
+              className="inline-flex items-center justify-center rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
-              view projects →
+              View projects
             </a>
             <a
               href="#contact"
-              className="inline-flex items-center justify-center rounded-md border border-border bg-secondary/40 px-5 py-2.5 font-mono text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+              className="inline-flex items-center justify-center rounded-md border border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
             >
-              get in touch
+              Get in touch
             </a>
             <Link
               to="/lab"
-              className="inline-flex items-center gap-2 rounded-md border border-cyan-accent/40 bg-cyan-accent/10 px-5 py-2.5 font-mono text-sm font-semibold text-cyan-accent transition-colors hover:bg-cyan-accent/20"
+              className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
             >
               <Beaker className="size-4" />
-              open /lab
+              Interactive lab
             </Link>
           </div>
 
-          <p className="mt-5 font-mono text-xs text-muted-foreground">
-            <span className="text-cyan-accent">// </span>
-            this site is interactive — try{" "}
-            <kbd className="rounded border border-border bg-card/60 px-1.5 py-0.5 text-[10px] text-foreground">
+          <p className="mt-6 text-xs text-muted-foreground">
+            This site is interactive — press{" "}
+            <kbd className="rounded border border-border bg-secondary px-1.5 py-0.5 text-[10px] text-foreground">
               ⌘K
             </kbd>{" "}
-            ·{" "}
-            <kbd className="rounded border border-border bg-card/60 px-1.5 py-0.5 text-[10px] text-foreground">
+            to search or{" "}
+            <kbd className="rounded border border-border bg-secondary px-1.5 py-0.5 text-[10px] text-foreground">
               ⌘J
             </kbd>{" "}
-            shell · visit{" "}
-            <Link to="/lab" className="text-terminal hover:underline">
-              /lab
-            </Link>
+            for the terminal.
           </p>
         </div>
 
-        <aside className="rounded-lg border border-border bg-card/60 p-5 font-mono text-sm shadow-lg backdrop-blur-sm">
-          <div className="mb-4 flex items-center gap-2 border-b border-border pb-3">
-              <span className="size-3 rounded-full bg-destructive/80" />
-              <span className="size-3 rounded-full bg-cyan-accent/70" />
-              <span className="size-3 rounded-full bg-terminal" />
-            <span className="ml-2 text-xs text-muted-foreground">~/jainil/whoami</span>
-          </div>
+        <aside className="rounded-lg border border-border bg-card p-6 text-sm">
+          <p className="border-b border-border pb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            At a glance
+          </p>
 
-          <ul className="space-y-3 text-muted-foreground">
+          <ul className="mt-4 space-y-3 text-muted-foreground">
             <li className="flex items-center gap-3">
-              <MapPin className="size-4 text-terminal" />
+              <MapPin className="size-4 text-foreground" />
               <span>Nadiad, India</span>
             </li>
             <li className="flex items-center gap-3">
-              <span className="relative flex size-3 items-center justify-center">
-                <span className="absolute inline-flex size-3 animate-ping rounded-full bg-terminal opacity-60" />
-                <span className="relative inline-flex size-2 rounded-full bg-terminal" />
+              <span className="flex size-4 items-center justify-center">
+                <span className="inline-flex size-2 rounded-full bg-foreground" />
               </span>
               <span>
-                <span className="text-foreground">available</span> for new roles
+                <span className="text-foreground">Available</span> for new roles
               </span>
             </li>
             <li className="flex items-center gap-3">
-              <Mail className="size-4 text-terminal" />
+              <Mail className="size-4 text-foreground" />
               <a
                 href="mailto:jainil.chauhan@example.com"
                 className="hover:text-foreground"
@@ -151,7 +111,7 @@ export function Hero() {
               </a>
             </li>
             <li className="flex items-center gap-3">
-              <Linkedin className="size-4 text-terminal" />
+              <Linkedin className="size-4 text-foreground" />
               <a
                 href="https://www.linkedin.com/in/jainil-chauhan"
                 target="_blank"
@@ -162,7 +122,7 @@ export function Hero() {
               </a>
             </li>
             <li className="flex items-center gap-3">
-              <Github className="size-4 text-terminal" />
+              <Github className="size-4 text-foreground" />
               <a
                 href="https://github.com/jainil-chauhan"
                 target="_blank"

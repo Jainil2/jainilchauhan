@@ -26,7 +26,7 @@ const items = [
 export function Now() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-      <SectionHeading id="now" prompt="cat ./now.txt" title="Now" />
+      <SectionHeading id="now" prompt="Current focus" title="Now" />
       <p className="mb-8 max-w-2xl text-muted-foreground">
         A snapshot of what I&apos;m focused on this season — updated when life
         changes, in the spirit of{" "}

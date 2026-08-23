@@ -24,20 +24,20 @@ export function CodeBlock({ code, language = "ts" }: CodeBlockProps) {
   return (
     <div className="relative overflow-hidden rounded-md border border-border bg-background/80">
       <div className="flex items-center justify-between border-b border-border bg-card/60 px-3 py-1.5">
-        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+        <span className="font-code text-[10px] uppercase tracking-widest text-muted-foreground">
           {language}
         </span>
         <button
           type="button"
           onClick={copy}
-          className="inline-flex items-center gap-1 rounded border border-border/60 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground hover:border-terminal/40 hover:text-terminal"
+          className="inline-flex items-center gap-1 rounded border border-border/60 px-1.5 py-0.5 font-code text-[10px] text-muted-foreground hover:border-terminal/40 hover:text-terminal"
           aria-label="Copy code"
         >
           {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
           {copied ? "copied" : "copy"}
         </button>
       </div>
-      <pre className="overflow-x-auto px-4 py-3 font-mono text-[12px] leading-relaxed">
+      <pre className="overflow-x-auto px-4 py-3 font-code text-[12px] leading-relaxed">
         <code>{highlight(code, language)}</code>
       </pre>
     </div>

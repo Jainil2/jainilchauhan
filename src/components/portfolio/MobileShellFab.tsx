@@ -18,8 +18,8 @@ export function MobileShellFab() {
     <button
       type="button"
       onClick={open}
-      aria-label="Open shell"
-      className="fixed bottom-5 right-5 z-40 inline-flex size-12 items-center justify-center rounded-full border border-terminal/40 bg-card/90 text-terminal shadow-lg backdrop-blur-md transition-colors hover:bg-terminal/15 md:hidden"
+      aria-label="Open terminal"
+      className="fixed bottom-5 right-5 z-40 inline-flex size-12 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-md transition-colors hover:bg-secondary md:hidden"
     >
       <TerminalSquare className="size-5" />
     </button>

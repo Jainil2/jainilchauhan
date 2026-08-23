@@ -23,7 +23,7 @@ export function Education() {
     <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
       <SectionHeading
         id="education"
-        prompt="cat education.json"
+        prompt="Education"
         title="Education & Achievements"
       />
 

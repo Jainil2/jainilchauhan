@@ -40,10 +40,10 @@ function NotFound() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 font-mono">
       <div className="text-center">
-        <p className="text-terminal text-sm">~/jainil/lab $ cat ./unknown</p>
-        <h1 className="mt-4 text-4xl font-bold text-foreground">demo not found</h1>
+        <p className="text-terminal text-sm">Lab</p>
+        <h1 className="mt-4 text-4xl font-bold text-foreground">Demo not found</h1>
         <Link to="/lab" className="mt-6 inline-block text-terminal hover:underline">
-          ← back to /lab
+          ← Back to the lab
         </Link>
       </div>
     </div>
@@ -51,9 +51,9 @@ function NotFound() {
 }
 
 const DIFF_COLOR: Record<string, string> = {
-  Beginner: "border-terminal/40 text-terminal",
-  Intermediate: "border-amber-500/40 text-amber-300",
-  Advanced: "border-fuchsia-500/40 text-fuchsia-300",
+  Beginner: "border-foreground/40 text-foreground",
+  Intermediate: "border-border text-muted-foreground",
+  Advanced: "border-border text-muted-foreground",
 };
 
 function LabDetail() {
@@ -86,7 +86,7 @@ function LabDetail() {
           className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-terminal"
         >
           <ArrowLeft className="size-3" />
-          ~/jainil/lab $ ls
+          All labs
         </Link>
 
         <div className="mt-6 mb-8">

@@ -21,7 +21,7 @@ const groups: { title: string; items: string[] }[] = [
 export function Skills() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-      <SectionHeading id="skills" prompt="ls ./skills" title="Skills" />
+      <SectionHeading id="skills" prompt="What I work with" title="Skills" />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {groups.map((g) => {
@@ -61,7 +61,7 @@ export function Skills() {
                       params={{ slug: lab.slug }}
                       className="rounded border border-terminal/30 bg-terminal/5 px-2 py-0.5 font-mono text-[10px] text-terminal hover:bg-terminal/15"
                     >
-                      ▸ try {lab.title.toLowerCase()}
+                      Try {lab.title}
                     </Link>
                   ))}
                 </div>
