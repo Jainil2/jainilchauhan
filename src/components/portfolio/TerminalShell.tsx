@@ -4,6 +4,7 @@ import { X, TerminalSquare } from "lucide-react";
 import { labRegistry } from "@/lib/labRegistry";
 import { useSimulationStore } from "@/lib/useSimulationStore";
 import { useControlPlane, type EnvMode } from "@/lib/useControlPlane";
+import { useTheme } from "@/lib/useTheme";
 
 const SECTIONS = [
   "top",
@@ -33,6 +34,7 @@ const HELP_LINES = [
   "  kill node-<n>           crash a simulated node",
   "  restore node-<n>        restore a simulated node",
   "  tokens +N | -N          adjust the token bucket",
+  "  theme [light|dark|system]  read or switch the theme",
   "  clear                   clear the buffer",
   "  exit                    close the shell (Esc works too)",
   "",
@@ -108,6 +110,7 @@ export function TerminalShell() {
       "kill",
       "restore",
       "tokens",
+      "theme",
       "clear",
       "exit",
     ];
@@ -128,7 +131,9 @@ export function TerminalShell() {
               ? ["/", "/lab"]
               : cmd === "env"
                 ? ["prod", "staging", "chaos"]
-                : [];
+                : cmd === "theme"
+                  ? ["light", "dark", "system"]
+                  : [];
     const matches = pool.filter((p) => p.startsWith(last));
     if (matches.length === 1) {
       tokens[tokens.length - 1] = matches[0];
