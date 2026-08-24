@@ -124,14 +124,14 @@ export function DeadlockLab() {
         </div>
 
         <div className="rounded border border-border bg-background/40 p-3 font-mono text-xs">
-          <p className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">stats</p>
+          <p className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">stats</p>
           <p>tick: <span className="text-terminal">{tick}</span></p>
           <p>meals served: <span className="text-terminal">{totalMeals}</span></p>
           <p className={`mt-2 ${deadlock ? "text-destructive" : "text-muted-foreground"}`}>
             {deadlock ? "💀 DEADLOCK — wait-for cycle" : running ? "running…" : "paused"}
           </p>
           <hr className="my-2 border-border" />
-          <p className="text-[10px] text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             <span className="text-foreground">naive:</span> all grab left first → cycle<br />
             <span className="text-foreground">ordered:</span> always lower fork first → no cycle<br />
             <span className="text-foreground">asymmetric:</span> last philosopher reverses → breaks cycle

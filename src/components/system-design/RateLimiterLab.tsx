@@ -125,16 +125,16 @@ export function RateLimiterLab() {
               <div className="flex items-center justify-between">
                 <span className="font-mono text-xs font-semibold" style={{ color: meta.color }}>{meta.label}</span>
                 {lastResult[s] && (
-                  <span className={`rounded border px-1.5 py-0.5 font-mono text-[10px] ${lastResult[s] === "allow" ? "border-terminal/50 text-terminal" : "border-destructive/50 text-destructive"}`}>
+                  <span className={`rounded border px-1.5 py-0.5 font-mono text-xs ${lastResult[s] === "allow" ? "border-terminal/50 text-terminal" : "border-destructive/50 text-destructive"}`}>
                     {lastResult[s] === "allow" ? "200 OK" : "429"}
                   </span>
                 )}
               </div>
-              <p className="mt-1 font-mono text-[10px] text-muted-foreground">{meta.blurb}</p>
+              <p className="mt-1 font-mono text-xs text-muted-foreground">{meta.blurb}</p>
               <div className="mt-2 h-1.5 overflow-hidden rounded bg-card">
                 <div className="h-full transition-all duration-200" style={{ width: `${levelPct}%`, background: meta.color }} />
               </div>
-              <div className="mt-1 flex justify-between font-mono text-[10px] text-muted-foreground">
+              <div className="mt-1 flex justify-between font-mono text-xs text-muted-foreground">
                 <span>{levelLabel}</span>
                 <span><span className="text-terminal">{state.allowed[s]}</span> / <span className="text-destructive">{state.denied[s]}</span> ({allowRate.toFixed(0)}%)</span>
               </div>

@@ -39,7 +39,7 @@ function Section({ icon, title, defaultOpen = false, children }: SectionProps) {
         />
       </button>
       {open && (
-        <div className="border-t border-border px-4 py-4 text-sm leading-relaxed text-foreground/85">
+        <div className="border-t border-border px-4 py-4 text-sm leading-relaxed text-foreground">
           {children}
         </div>
       )}
@@ -98,12 +98,12 @@ export function LabContent({ lab }: { lab: LabEntry }) {
                     {item.href ? (
                       <ExternalLink className="size-3 text-muted-foreground" />
                     ) : (
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                      <span className="text-xs uppercase tracking-wider text-muted-foreground">
                         commonly used in
                       </span>
                     )}
                   </span>
-                  <span className="mt-1 block text-xs text-foreground/80">{item.usage}</span>
+                  <span className="mt-1 block text-xs text-foreground">{item.usage}</span>
                 </>
               );
               const className =

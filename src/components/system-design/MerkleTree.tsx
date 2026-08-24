@@ -121,7 +121,7 @@ export function MerkleTree() {
       } else if (isRequired) {
         borderClass = "border-terminal bg-terminal/20 text-terminal border-dashed";
       } else if (id !== "root") {
-        borderClass = "border-border/50 bg-card/20 text-muted-foreground/50 opacity-40";
+        borderClass = "border-border/50 bg-card/20 text-muted-foreground opacity-40";
       }
     }
 
@@ -161,7 +161,7 @@ export function MerkleTree() {
         </p>
         <button
           onClick={reset}
-          className="flex items-center gap-1 rounded border border-border px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:bg-secondary hover:text-foreground"
+          className="flex items-center gap-1 rounded border border-border px-2 py-1 font-mono text-xs uppercase tracking-wider text-muted-foreground hover:bg-secondary hover:text-foreground"
         >
           <RefreshCw className="size-3" /> reset
         </button>
@@ -171,7 +171,7 @@ export function MerkleTree() {
         
         {/* Level 0: Root */}
         <div className="relative z-10 w-48">
-          <div className="absolute -top-4 -left-4 text-muted-foreground/30"><Fingerprint className="size-24" /></div>
+          <div className="absolute -top-4 -left-4 text-muted-foreground"><Fingerprint className="size-24" /></div>
           <NodeView id="root" label="Root Hash" />
         </div>
 
@@ -207,7 +207,7 @@ export function MerkleTree() {
                 type="text"
                 value={block}
                 onChange={(e) => updateBlock(i, e.target.value)}
-                className={`w-full truncate rounded border p-2 font-mono text-[10px] transition-colors outline-none focus:ring-1 focus:ring-terminal ${
+                className={`w-full truncate rounded border p-2 font-mono text-xs transition-colors outline-none focus:ring-1 focus:ring-terminal ${
                   block !== INITIAL_DATA[i] 
                   ? "border-destructive bg-destructive/10 text-destructive focus:border-destructive focus:ring-destructive" 
                   : "border-border bg-background/50 text-foreground"

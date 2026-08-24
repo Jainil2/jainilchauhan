@@ -106,7 +106,7 @@ export function ConsistentHashLab() {
       <div className="grid gap-4 md:grid-cols-2">
         {/* Ring */}
         <div className="rounded border border-border bg-background/40 p-3">
-          <p className="mb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">consistent hash ring</p>
+          <p className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">consistent hash ring</p>
           <svg viewBox="0 0 220 220" className="w-full">
             <circle cx="110" cy="110" r="90" fill="none" stroke="oklch(0.30 0.02 150 / 40%)" strokeDasharray="3 4" />
             {ring.map((v, i) => {
@@ -131,7 +131,7 @@ export function ConsistentHashLab() {
 
         {/* Counters */}
         <div className="rounded border border-border bg-background/40 p-3 font-mono text-xs">
-          <p className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">key-remap after change</p>
+          <p className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">key-remap after change</p>
           {snapshot ? (
             <>
               <div className="mb-3 flex items-baseline justify-between">

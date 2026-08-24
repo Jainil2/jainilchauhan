@@ -421,7 +421,7 @@ export function TerminalShell() {
 
             <div
               ref={bodyRef}
-              className="h-96 flex-1 overflow-y-auto px-3 py-2 font-code text-[12px] leading-relaxed"
+              className="h-96 flex-1 overflow-y-auto px-3 py-2 font-code text-xs leading-relaxed"
             >
               {buffer.map((l, i) => (
                 <Row key={i} line={l} />
@@ -473,7 +473,7 @@ export function TerminalShell() {
               </div>
             </div>
 
-            <footer className="border-t border-border px-3 py-1.5 font-code text-[10px] text-muted-foreground">
+            <footer className="border-t border-border px-3 py-1.5 font-code text-xs text-muted-foreground">
               <kbd className="rounded border border-border bg-background/60 px-1">⌘J</kbd> toggle ·{" "}
               <kbd className="rounded border border-border bg-background/60 px-1">Tab</kbd> complete
               · <kbd className="rounded border border-border bg-background/60 px-1">↑↓</kbd> history

@@ -154,7 +154,7 @@ export function LSMTree() {
            
            <div className="h-48 overflow-y-auto rounded border border-cyan-accent/20 bg-cyan-accent/5 p-2">
              {memTable.length === 0 ? (
-                <div className="flex h-full items-center justify-center font-mono text-xs text-muted-foreground/50">
+                <div className="flex h-full items-center justify-center font-mono text-xs text-muted-foreground">
                   Empty
                 </div>
              ) : (
@@ -183,7 +183,7 @@ export function LSMTree() {
            
            <div className="flex h-48 flex-col gap-2 overflow-y-auto pr-2">
              {ssTables.length === 0 ? (
-                <div className="flex h-full items-center justify-center rounded border border-border bg-secondary/10 font-mono text-xs text-muted-foreground/50">
+                <div className="flex h-full items-center justify-center rounded border border-border bg-secondary/10 font-mono text-xs text-muted-foreground">
                   No SSTables on disk
                 </div>
              ) : (
@@ -194,13 +194,13 @@ export function LSMTree() {
                      animate={{ opacity: 1, y: 0 }}
                      className={`rounded border p-2 ${table.level === 0 ? 'border-amber-500/30 bg-amber-500/5' : 'border-fuchsia-500/30 bg-fuchsia-500/5'}`}
                    >
-                     <div className="mb-1 flex justify-between font-mono text-[10px] uppercase text-muted-foreground">
+                     <div className="mb-1 flex justify-between font-mono text-xs uppercase text-muted-foreground">
                        <span>SSTable #{table.id}</span>
                        <span className={table.level === 0 ? 'text-amber-500' : 'text-fuchsia-400'}>Level {table.level}</span>
                      </div>
                      <div className="flex flex-wrap gap-1">
                         {table.entries.map(e => (
-                          <span key={e.key} className="rounded bg-secondary/50 px-1 py-0.5 font-mono text-[10px] text-foreground">
+                          <span key={e.key} className="rounded bg-secondary/50 px-1 py-0.5 font-mono text-xs text-foreground">
                             {e.key}={e.val}
                           </span>
                         ))}
@@ -215,7 +215,7 @@ export function LSMTree() {
       <div className="rounded-lg border border-border bg-card/40 p-4 font-mono text-xs">
         <h3 className="mb-3 uppercase tracking-wider text-muted-foreground">Operations Log</h3>
         <ul className="space-y-1">
-          {log.length === 0 && <li className="text-muted-foreground/50">Insert keys to begin...</li>}
+          {log.length === 0 && <li className="text-muted-foreground">Insert keys to begin...</li>}
           {log.map((entry) => (
              <motion.li 
                key={entry.id} 

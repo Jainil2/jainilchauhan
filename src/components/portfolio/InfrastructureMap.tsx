@@ -55,7 +55,7 @@ export function InfrastructureMap() {
 
   return (
     <div className="relative w-full overflow-hidden rounded-lg border border-border bg-card/30 p-8">
-      <p className="absolute left-4 top-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+      <p className="absolute left-4 top-4 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
         Global infrastructure topology
       </p>
 
@@ -109,10 +109,10 @@ export function InfrastructureMap() {
       </div>
 
       <div className="absolute bottom-4 right-4 text-right">
-        <p className="font-mono text-[9px] text-muted-foreground/60">
+        <p className="font-mono text-[9px] text-muted-foreground">
           Status: <span className="text-terminal">Optimal</span>
         </p>
-        <p className="font-mono text-[9px] text-muted-foreground/60">
+        <p className="font-mono text-[9px] text-muted-foreground">
           Latency: <span className="text-cyan-accent">12ms</span>
         </p>
       </div>

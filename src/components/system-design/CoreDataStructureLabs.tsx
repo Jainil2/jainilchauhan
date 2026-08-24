@@ -78,7 +78,7 @@ export function DynamicArrayLab() {
         {Array.from({ length: capacity }, (_, i) => (
           <div
             key={i}
-            className={`${cellClass} ${i < items.length ? "text-foreground" : "text-muted-foreground/40"}`}
+            className={`${cellClass} ${i < items.length ? "text-foreground" : "text-muted-foreground"}`}
           >
             {items[i] ?? "empty"}
           </div>
@@ -372,7 +372,7 @@ export function SparseMatrixLab() {
         <div className="rounded border border-border bg-background/40 p-3 font-mono text-xs">
           <p className="text-muted-foreground">COO triples</p>
           {points.map((p, i) => (
-            <div key={i} className={i === selected ? "text-terminal" : "text-foreground/80"}>
+            <div key={i} className={i === selected ? "text-terminal" : "text-foreground"}>
               ({p[0]}, {p[1]}, {p[2]})
             </div>
           ))}

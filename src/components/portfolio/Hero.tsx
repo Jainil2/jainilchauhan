@@ -20,7 +20,7 @@ export function Hero() {
     >
       <div className="grid items-center gap-12 lg:grid-cols-[1.5fr_1fr]">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             Software Engineer · Backend &amp; Distributed Systems
           </p>
 
@@ -72,11 +72,11 @@ export function Hero() {
 
           <p className="mt-6 text-xs text-muted-foreground">
             This site is interactive — press{" "}
-            <kbd className="rounded border border-border bg-secondary px-1.5 py-0.5 text-[10px] text-foreground">
+            <kbd className="rounded border border-border bg-secondary px-1.5 py-0.5 text-xs text-foreground">
               ⌘K
             </kbd>{" "}
             to search or{" "}
-            <kbd className="rounded border border-border bg-secondary px-1.5 py-0.5 text-[10px] text-foreground">
+            <kbd className="rounded border border-border bg-secondary px-1.5 py-0.5 text-xs text-foreground">
               ⌘J
             </kbd>{" "}
             for the terminal.
@@ -84,7 +84,7 @@ export function Hero() {
         </div>
 
         <aside className="rounded-lg border border-border bg-card p-6 text-sm">
-          <p className="border-b border-border pb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="border-b border-border pb-3 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             At a glance
           </p>
 

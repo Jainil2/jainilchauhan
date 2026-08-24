@@ -53,7 +53,7 @@ function trace(algo: Algo, start: string): Step[] {
 function GraphView({ step, label }: { step: Step | null; label: string }) {
   return (
     <div className="rounded border border-border bg-background/40 p-3">
-      <p className="mb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
+      <p className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">{label}</p>
       <svg viewBox="0 0 260 240" className="w-full">
         {EDGES.map(([a, b], i) => {
           const na = NODES.find((n) => n.id === a)!;
@@ -111,13 +111,13 @@ export function GraphTraversalLab() {
       <div className="grid gap-3 md:grid-cols-2">
         <div>
           <GraphView step={bfs} label="BFS — uses Queue" />
-          <p className="mt-2 font-mono text-[11px] text-muted-foreground">
+          <p className="mt-2 font-mono text-xs text-muted-foreground">
             queue: <span className="text-terminal">[{bfs?.frontier.join(", ") ?? ""}]</span>
           </p>
         </div>
         <div>
           <GraphView step={dfs} label="DFS — uses Stack" />
-          <p className="mt-2 font-mono text-[11px] text-muted-foreground">
+          <p className="mt-2 font-mono text-xs text-muted-foreground">
             stack: <span className="text-cyan-accent">[{dfs?.frontier.join(", ") ?? ""}]</span>
           </p>
         </div>

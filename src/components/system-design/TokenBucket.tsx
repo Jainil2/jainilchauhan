@@ -17,7 +17,7 @@ export function TokenBucket({ tokens, maxTokens, isRateLimited }: TokenBucketPro
   return (
     <div className="flex flex-col items-center gap-2">
       {/* Label */}
-      <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+      <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
         token bucket
       </p>
 

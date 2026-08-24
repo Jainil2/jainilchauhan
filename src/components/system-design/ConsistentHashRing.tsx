@@ -130,14 +130,14 @@ export function ConsistentHashRing({ projects, onProjectHover }: Props) {
   return (
     <div className="flex flex-col items-center gap-6">
       {/* Legend */}
-      <div className="flex gap-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+      <div className="flex gap-4 font-mono text-xs uppercase tracking-widest text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <span className="inline-block size-2 rounded-full bg-terminal" /> healthy
         </span>
         <span className="flex items-center gap-1.5">
           <span className="inline-block size-2 rounded-full bg-destructive/70" /> dead
         </span>
-        <span className="text-muted-foreground/50">click node to toggle</span>
+        <span className="text-muted-foreground">click node to toggle</span>
       </div>
 
       {/* SVG Network Graph */}
@@ -368,9 +368,9 @@ export function ConsistentHashRing({ projects, onProjectHover }: Props) {
               className="flex w-full items-center justify-between rounded border border-border bg-card/60 px-3 py-2 text-left font-mono text-xs transition-colors hover:border-terminal/40"
               aria-label={`Project: ${p.title}`}
             >
-              <span className="text-foreground/80">{p.title}</span>
+              <span className="text-foreground">{p.title}</span>
               <span
-                className="flex items-center gap-1.5 text-[10px]"
+                className="flex items-center gap-1.5 text-xs"
                 style={{ color: nodeInfo?.color ?? "oklch(0.68 0.02 150)" }}
               >
                 <span

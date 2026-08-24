@@ -59,7 +59,7 @@ export function Skills() {
                       key={lab.slug}
                       to="/lab/$slug"
                       params={{ slug: lab.slug }}
-                      className="rounded border border-terminal/30 bg-terminal/5 px-2 py-0.5 font-mono text-[10px] text-terminal hover:bg-terminal/15"
+                      className="rounded border border-terminal/30 bg-terminal/5 px-2 py-0.5 font-mono text-xs text-terminal hover:bg-terminal/15"
                     >
                       Try {lab.title}
                     </Link>

@@ -148,7 +148,7 @@ export function Projects() {
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-4 font-mono text-xs text-muted-foreground/80 group-hover:text-terminal">
+                  <p className="mt-4 font-mono text-xs text-muted-foreground group-hover:text-terminal">
                     Read case study →
                   </p>
                 </div>
@@ -161,7 +161,7 @@ export function Projects() {
         {simulationsEnabled && (
           <Reveal delay={0.2}>
             <aside className="sticky top-24 rounded-lg border border-border bg-card/60 p-4">
-              <p className="mb-3 font-mono text-[10px] uppercase tracking-widest text-cyan-accent">
+              <p className="mb-3 font-mono text-xs uppercase tracking-widest text-cyan-accent">
                 // load balancer · consistent hashing
               </p>
               <ConsistentHashRing
@@ -196,7 +196,7 @@ export function Projects() {
                 <Block label="approach">
                   <ul className="space-y-2 font-mono text-sm">
                     {active.approach.map((a) => (
-                      <li key={a} className="flex gap-2 text-foreground/90">
+                      <li key={a} className="flex gap-2 text-foreground">
                         <span className="text-terminal">▹</span>
                         <span className="font-sans text-muted-foreground">{a}</span>
                       </li>

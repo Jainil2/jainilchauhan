@@ -188,7 +188,7 @@ export function TrieLab() {
             <h3 className="mb-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Trie Structure</h3>
             
             {Object.keys(root.children).length === 0 ? (
-               <div className="flex h-32 items-center justify-center font-mono text-sm text-muted-foreground/50">
+               <div className="flex h-32 items-center justify-center font-mono text-sm text-muted-foreground">
                  Empty Trie
                </div>
             ) : (
@@ -197,7 +197,7 @@ export function TrieLab() {
                    <div className="flex size-8 items-center justify-center rounded-lg border-2 border-border bg-secondary/50 font-mono text-xs text-muted-foreground">
                      *
                    </div>
-                   <span className="font-mono text-[10px] uppercase text-muted-foreground">Root</span>
+                   <span className="font-mono text-xs uppercase text-muted-foreground">Root</span>
                  </div>
                  {renderNode(root, 0, "")}
                </div>
@@ -221,7 +221,7 @@ export function TrieLab() {
                
                {searchVal && (
                  <div className="mt-4">
-                   <h4 className="mb-2 font-mono text-[10px] uppercase text-muted-foreground">Suggestions ({suggestions.length})</h4>
+                   <h4 className="mb-2 font-mono text-xs uppercase text-muted-foreground">Suggestions ({suggestions.length})</h4>
                    <div className="flex flex-wrap gap-2">
                      {suggestions.length === 0 ? (
                        <span className="font-mono text-xs text-destructive">No matches</span>
@@ -241,7 +241,7 @@ export function TrieLab() {
               <h3 className="mb-2 uppercase tracking-wider text-muted-foreground">Dictionary ({words.length})</h3>
               <div className="flex flex-wrap gap-1">
                 {words.length === 0 ? (
-                  <span className="text-muted-foreground/50">Empty</span>
+                  <span className="text-muted-foreground">Empty</span>
                 ) : (
                   words.map(w => (
                     <span key={w} className="text-foreground after:content-[','] last:after:content-['']">{w}</span>

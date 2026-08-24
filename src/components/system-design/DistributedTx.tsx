@@ -193,7 +193,7 @@ export function DistributedTx() {
       <div className="rounded-lg border border-border bg-card/40 p-4 font-mono text-xs">
         <h3 className="mb-2 uppercase tracking-wider text-muted-foreground">Transaction Log</h3>
         <ul className="space-y-1">
-          {log.length === 0 && <li className="text-muted-foreground/50">waiting to start...</li>}
+          {log.length === 0 && <li className="text-muted-foreground">waiting to start...</li>}
           {log.map((entry, i) => (
              <motion.li 
                key={i} 
@@ -227,7 +227,7 @@ function NodeCard({ name, state, colorClass, animate }: { name: string, state: s
       key={state}
       className={`flex flex-col items-center justify-center rounded-lg border p-4 text-center transition-colors duration-300 ${colorClass}`}
     >
-      <span className="mb-2 font-mono text-[10px] font-bold uppercase tracking-wider opacity-80">{name}</span>
+      <span className="mb-2 font-mono text-xs font-bold uppercase tracking-wider opacity-80">{name}</span>
       <span className="font-mono text-sm">{state}</span>
     </motion.div>
   );

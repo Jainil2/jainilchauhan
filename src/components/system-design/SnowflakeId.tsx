@@ -110,23 +110,23 @@ export function SnowflakeId() {
              
              <div className="flex flex-wrap justify-center gap-x-2 gap-y-4 text-center font-mono">
                <div className="flex flex-col gap-1">
-                 <span className="text-[10px] uppercase text-muted-foreground">Sign (1)</span>
+                 <span className="text-xs uppercase text-muted-foreground">Sign (1)</span>
                  <span className="rounded bg-secondary/50 px-1 py-0.5 text-xs text-muted-foreground">{bin.sign}</span>
                </div>
                <div className="flex flex-col gap-1">
-                 <span className="text-[10px] uppercase text-cyan-accent">Timestamp (41)</span>
+                 <span className="text-xs uppercase text-cyan-accent">Timestamp (41)</span>
                  <span className="rounded border border-cyan-accent/30 bg-cyan-accent/10 px-1 py-0.5 text-xs text-cyan-accent">{bin.ts}</span>
                </div>
                <div className="flex flex-col gap-1">
-                 <span className="text-[10px] uppercase text-amber-500">DC (5)</span>
+                 <span className="text-xs uppercase text-amber-500">DC (5)</span>
                  <span className="rounded border border-amber-500/30 bg-amber-500/10 px-1 py-0.5 text-xs text-amber-500">{bin.dc}</span>
                </div>
                <div className="flex flex-col gap-1">
-                 <span className="text-[10px] uppercase text-fuchsia-400">Worker (5)</span>
+                 <span className="text-xs uppercase text-fuchsia-400">Worker (5)</span>
                  <span className="rounded border border-fuchsia-500/30 bg-fuchsia-500/10 px-1 py-0.5 text-xs text-fuchsia-400">{bin.worker}</span>
                </div>
                <div className="flex flex-col gap-1">
-                 <span className="text-[10px] uppercase text-terminal">Sequence (12)</span>
+                 <span className="text-xs uppercase text-terminal">Sequence (12)</span>
                  <span className="rounded border border-terminal/30 bg-terminal/10 px-1 py-0.5 text-xs text-terminal">{bin.seq}</span>
                </div>
              </div>

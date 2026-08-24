@@ -103,7 +103,7 @@ export function Experience() {
               <div className="font-mono text-2xl font-bold text-terminal">
                 <Counter value={m.value} suffix={m.suffix} decimals={m.decimals ?? 0} />
               </div>
-              <div className="mt-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+              <div className="mt-1 font-mono text-xs uppercase tracking-wider text-muted-foreground">
                 {m.label}
               </div>
             </li>
@@ -117,10 +117,10 @@ export function Experience() {
         <div className="rounded-lg border border-border bg-card/60 p-5">
           <div className="mb-3 flex items-center justify-between">
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-widest text-cyan-accent">
+              <p className="font-mono text-xs uppercase tracking-widest text-cyan-accent">
                 // MemTable · in-memory append log
               </p>
-              <p className="mt-0.5 font-mono text-[10px] text-muted-foreground/60">
+              <p className="mt-0.5 font-mono text-xs text-muted-foreground">
                 recent writes not yet flushed to disk
               </p>
             </div>
@@ -128,7 +128,7 @@ export function Experience() {
               type="button"
               onClick={compacted ? reset : runCompaction}
               disabled={compacting}
-              className="rounded border border-terminal/40 bg-terminal/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-terminal transition-all hover:bg-terminal/20 hover:glow-terminal disabled:cursor-wait disabled:opacity-50"
+              className="rounded border border-terminal/40 bg-terminal/10 px-3 py-1.5 font-mono text-xs uppercase tracking-widest text-terminal transition-all hover:bg-terminal/20 hover:glow-terminal disabled:cursor-wait disabled:opacity-50"
             >
               {compacting ? "flushing…" : compacted ? "↺ reset" : "⚡ run compaction"}
             </button>
@@ -154,11 +154,11 @@ export function Experience() {
                   }
                   className="flex items-start gap-2 rounded border border-border/50 bg-background/30 px-3 py-2"
                 >
-                  <span className="shrink-0 text-muted-foreground/50">{entry.timestamp}</span>
+                  <span className="shrink-0 text-muted-foreground">{entry.timestamp}</span>
                   <span className="shrink-0 rounded bg-terminal/10 px-1 text-terminal">
                     {entry.op}
                   </span>
-                  <span className="break-all text-foreground/70">{entry.value}</span>
+                  <span className="break-all text-foreground">{entry.value}</span>
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -167,7 +167,7 @@ export function Experience() {
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="pt-2 text-center text-muted-foreground/40"
+                className="pt-2 text-center text-muted-foreground"
               >
                 ↳ flushed to SSTable
               </motion.p>
@@ -177,10 +177,10 @@ export function Experience() {
 
         {/* RIGHT — SSTables (Disk layer) */}
         <div className="rounded-lg border border-border bg-card/60 p-5">
-          <p className="mb-3 font-mono text-[10px] uppercase tracking-widest text-cyan-accent">
+          <p className="mb-3 font-mono text-xs uppercase tracking-widest text-cyan-accent">
             // SSTables · compacted on-disk blocks
           </p>
-          <p className="mb-4 font-mono text-[10px] text-muted-foreground/60">
+          <p className="mb-4 font-mono text-xs text-muted-foreground">
             sorted, immutable segments — fast range reads
           </p>
 
@@ -198,12 +198,12 @@ export function Experience() {
                   style={{ borderColor: `${sst.color}40` }}
                 >
                   <p
-                    className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-wider"
+                    className="mb-2 font-mono text-xs font-semibold uppercase tracking-wider"
                     style={{ color: sst.color }}
                   >
                     {sst.label}
                   </p>
-                  <ul className="space-y-1 font-mono text-[11px] text-foreground/60">
+                  <ul className="space-y-1 font-mono text-xs text-foreground">
                     {sst.keys.map((k) => (
                       <li key={k} className="flex items-start gap-1.5">
                         <span style={{ color: sst.color }} className="shrink-0 opacity-60">
@@ -218,7 +218,7 @@ export function Experience() {
             </AnimatePresence>
 
             {sstables.length === 1 && !compacting && !compacted && (
-              <p className="pt-3 text-center font-mono text-[10px] text-muted-foreground/40">
+              <p className="pt-3 text-center font-mono text-xs text-muted-foreground">
                 run compaction to flush MemTable →
               </p>
             )}
@@ -227,7 +227,7 @@ export function Experience() {
       </div>
 
       {/* Explainer */}
-      <p className="mt-4 text-center font-mono text-[10px] text-muted-foreground/40">
+      <p className="mt-4 text-center font-mono text-xs text-muted-foreground">
         Inspired by LSM-Tree storage engines (LevelDB, RocksDB, Cassandra) — append-only writes flush to
         sorted SSTables, which compact over time for fast reads.
       </p>
@@ -269,7 +269,7 @@ function ClassicExperience() {
                 <div className="font-mono text-2xl font-bold text-terminal">
                   <Counter value={m.value} suffix={m.suffix} decimals={m.decimals ?? 0} />
                 </div>
-                <div className="mt-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                <div className="mt-1 font-mono text-xs uppercase tracking-wider text-muted-foreground">
                   {m.label}
                 </div>
               </li>

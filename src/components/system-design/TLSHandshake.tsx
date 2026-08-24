@@ -63,7 +63,7 @@ export function TLSHandshake() {
                        <span className="font-mono text-xs font-bold uppercase">Encrypted Channel</span>
                      </motion.div>
                   ) : (
-                     <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-muted-foreground/50">
+                     <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-muted-foreground">
                        <Unlock className="size-4" />
                        <span className="font-mono text-xs">Unencrypted</span>
                      </div>
@@ -117,9 +117,9 @@ export function TLSHandshake() {
          {/* Context Panel */}
          <div className="flex flex-col gap-4">
             <div className="rounded-xl border border-border bg-card/40 p-4 min-h-[150px]">
-               <h3 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Current Step Status</h3>
+               <h3 className="mb-2 font-mono text-xs uppercase tracking-wider text-muted-foreground">Current Step Status</h3>
                {currentStep === 0 ? (
-                 <p className="font-mono text-xs text-muted-foreground/80">Click 'Start Handshake' to begin the TLS negotiation process.</p>
+                 <p className="font-mono text-xs text-muted-foreground">Click 'Start Handshake' to begin the TLS negotiation process.</p>
                ) : (
                  <motion.div 
                    key={currentStep}
@@ -138,18 +138,18 @@ export function TLSHandshake() {
                
                <div className="space-y-3">
                  <div className={`flex flex-col border-l-2 pl-2 ${currentStep >= 2 ? 'border-amber-500' : 'border-border'}`}>
-                   <span className="text-[10px] text-muted-foreground">Server Public Key</span>
-                   <span className={currentStep >= 2 ? 'text-amber-500' : 'text-muted-foreground/30'}>{currentStep >= 2 ? 'Transmitted in Cert' : 'Unknown'}</span>
+                   <span className="text-xs text-muted-foreground">Server Public Key</span>
+                   <span className={currentStep >= 2 ? 'text-amber-500' : 'text-muted-foreground'}>{currentStep >= 2 ? 'Transmitted in Cert' : 'Unknown'}</span>
                  </div>
                  
                  <div className={`flex flex-col border-l-2 pl-2 ${currentStep >= 3 ? 'border-fuchsia-400' : 'border-border'}`}>
-                   <span className="text-[10px] text-muted-foreground">Premaster Secret</span>
-                   <span className={currentStep >= 3 ? 'text-fuchsia-400' : 'text-muted-foreground/30'}>{currentStep >= 3 ? 'Encrypted with PubKey' : 'Not generated'}</span>
+                   <span className="text-xs text-muted-foreground">Premaster Secret</span>
+                   <span className={currentStep >= 3 ? 'text-fuchsia-400' : 'text-muted-foreground'}>{currentStep >= 3 ? 'Encrypted with PubKey' : 'Not generated'}</span>
                  </div>
 
                  <div className={`flex flex-col border-l-2 pl-2 ${currentStep >= 4 ? 'border-terminal' : 'border-border'}`}>
-                   <span className="text-[10px] text-muted-foreground">Symmetric Session Key</span>
-                   <span className={currentStep >= 4 ? 'text-terminal font-bold shadow-[0_0_5px_rgba(20,184,166,0.5)]' : 'text-muted-foreground/30'}>{currentStep >= 4 ? 'Derived & Active' : 'Not derived'}</span>
+                   <span className="text-xs text-muted-foreground">Symmetric Session Key</span>
+                   <span className={currentStep >= 4 ? 'text-terminal font-bold shadow-[0_0_5px_rgba(20,184,166,0.5)]' : 'text-muted-foreground'}>{currentStep >= 4 ? 'Derived & Active' : 'Not derived'}</span>
                  </div>
                </div>
             </div>

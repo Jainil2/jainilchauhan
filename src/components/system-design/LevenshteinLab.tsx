@@ -189,7 +189,7 @@ export function LevenshteinLab() {
 
          <div className="space-y-4">
             <div className="rounded-xl border border-border bg-card/40 p-4 text-center">
-               <h3 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Edit Distance</h3>
+               <h3 className="mb-2 font-mono text-xs uppercase tracking-wider text-muted-foreground">Edit Distance</h3>
                <div className="font-mono text-4xl text-fuchsia-400">
                   {result !== null ? result : "-"}
                </div>
@@ -197,8 +197,8 @@ export function LevenshteinLab() {
 
             <div className="rounded-xl border border-border bg-card/40 p-4 font-mono text-xs">
                <h3 className="mb-2 uppercase tracking-wider text-muted-foreground">Algorithm Info</h3>
-               <p className="text-muted-foreground/80 mb-2">Cost matrix computation:</p>
-               <ul className="flex flex-col gap-1 text-[10px]">
+               <p className="text-muted-foreground mb-2">Cost matrix computation:</p>
+               <ul className="flex flex-col gap-1 text-xs">
                  <li className="flex items-center gap-2"><span className="text-amber-500">Current (i,j)</span> = min of:</li>
                  <li className="pl-2 border-l border-border/50 ml-1 text-terminal/80">Top + 1 (Delete)</li>
                  <li className="pl-2 border-l border-border/50 ml-1 text-terminal/80">Left + 1 (Insert)</li>

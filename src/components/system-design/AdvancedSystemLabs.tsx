@@ -99,7 +99,7 @@ export function LoadBalancerLab() {
           </div>
         ))}
       </div>
-      <div className="rounded border border-border bg-background/40 p-3 font-mono text-[11px] text-muted-foreground">
+      <div className="rounded border border-border bg-background/40 p-3 font-mono text-xs text-muted-foreground">
         {log.length
           ? log.map((line) => <div key={line}>{line}</div>)
           : "Send requests to compare routing decisions."}
@@ -177,7 +177,7 @@ export function CircuitBreakerLab() {
           </p>
         </div>
       </div>
-      <div className="rounded border border-border bg-background/40 p-3 font-mono text-[11px] text-muted-foreground">
+      <div className="rounded border border-border bg-background/40 p-3 font-mono text-xs text-muted-foreground">
         {log.length
           ? log.map((line, i) => <div key={`${line}-${i}`}>{line}</div>)
           : "Call the service until the breaker trips."}
@@ -301,7 +301,7 @@ export function ShardingReplicationLab() {
           </div>
         ))}
       </div>
-      <div className="rounded border border-border bg-background/40 p-3 font-mono text-[11px] text-muted-foreground">
+      <div className="rounded border border-border bg-background/40 p-3 font-mono text-xs text-muted-foreground">
         {writes.length
           ? writes.map((line) => <div key={line}>{line}</div>)
           : "Choose a key and write to see routing plus replication semantics."}
@@ -407,7 +407,7 @@ export function TopologicalSortLab() {
               className={`rounded border p-3 text-left font-mono text-xs ${isDone ? "border-terminal bg-terminal/10 text-terminal" : isReady ? "border-cyan-accent text-cyan-accent" : "border-border text-muted-foreground"}`}
             >
               <div>{task.id}</div>
-              <div className="mt-2 text-[10px]">deps: {task.deps.join(", ") || "none"}</div>
+              <div className="mt-2 text-xs">deps: {task.deps.join(", ") || "none"}</div>
             </button>
           );
         })}

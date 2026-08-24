@@ -153,7 +153,7 @@ export function MessageQueue() {
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-border bg-card/60 p-4">
         <div className="flex items-center gap-6 flex-wrap">
           <div className="flex flex-col gap-1">
-            <label className="font-mono text-[10px] uppercase text-muted-foreground flex justify-between">
+            <label className="font-mono text-xs uppercase text-muted-foreground flex justify-between">
               Producer Rate <span>{producerRate}/s</span>
             </label>
             <input 
@@ -164,7 +164,7 @@ export function MessageQueue() {
           </div>
           
           <div className="flex flex-col gap-1">
-            <label className="font-mono text-[10px] uppercase text-muted-foreground flex justify-between">
+            <label className="font-mono text-xs uppercase text-muted-foreground flex justify-between">
               Consumer Rate <span>{consumerRate}/s</span>
             </label>
             <input 
@@ -175,11 +175,11 @@ export function MessageQueue() {
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="font-mono text-[10px] uppercase text-muted-foreground">Partition Strategy</label>
+            <label className="font-mono text-xs uppercase text-muted-foreground">Partition Strategy</label>
             <select 
               value={strategy} 
               onChange={(e) => setStrategy(e.target.value as any)}
-              className="rounded border border-border bg-background px-2 py-1 font-mono text-[10px] text-foreground outline-none focus:border-terminal"
+              className="rounded border border-border bg-background px-2 py-1 font-mono text-xs text-foreground outline-none focus:border-terminal"
             >
               <option value="round-robin">Round-Robin</option>
               <option value="hash">Hash(Key)</option>
@@ -189,7 +189,7 @@ export function MessageQueue() {
 
         <button
           onClick={reset}
-          className="rounded border border-border px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:bg-secondary hover:text-foreground"
+          className="rounded border border-border px-3 py-1 font-mono text-xs uppercase tracking-wider text-muted-foreground hover:bg-secondary hover:text-foreground"
         >
           reset
         </button>
@@ -254,7 +254,7 @@ export function MessageQueue() {
                         animate={{ opacity: 1, scale: 1, x: 0 }}
                         exit={animate ? { opacity: 0, scale: 0.5, y: 20 } : { opacity: 0 }}
                         transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        className="group relative flex shrink-0 cursor-pointer items-center justify-center rounded bg-terminal/15 px-2 py-1 font-mono text-[10px] border border-terminal/30 text-terminal hover:bg-terminal hover:text-black"
+                        className="group relative flex shrink-0 cursor-pointer items-center justify-center rounded bg-terminal/15 px-2 py-1 font-mono text-xs border border-terminal/30 text-terminal hover:bg-terminal hover:text-black"
                       >
                         #{msg.id}
                         
@@ -291,7 +291,7 @@ export function MessageQueue() {
           </p>
           
           <div className="flex flex-col items-center gap-1">
-            <p className={`font-mono text-[10px] px-2 py-0.5 rounded ${consumerStatus === "lagging" ? "bg-destructive/20 text-destructive animate-pulse" : "bg-terminal/20 text-terminal"}`}>
+            <p className={`font-mono text-xs px-2 py-0.5 rounded ${consumerStatus === "lagging" ? "bg-destructive/20 text-destructive animate-pulse" : "bg-terminal/20 text-terminal"}`}>
               {consumerStatus === "lagging" ? "LAGGING" : "ACTIVE"}
             </p>
             <p className="font-mono text-[9px] text-muted-foreground mt-1">

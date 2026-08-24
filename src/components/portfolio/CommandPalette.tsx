@@ -84,7 +84,7 @@ export function CommandPalette() {
         aria-label="Open command palette"
         className="fixed bottom-5 right-5 z-40 hidden items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-2 font-mono text-xs text-muted-foreground shadow-lg backdrop-blur-md transition-colors hover:border-terminal/50 hover:text-foreground md:inline-flex"
       >
-        <span className="rounded border border-border bg-background/60 px-1.5 py-0.5 text-[10px]">
+        <span className="rounded border border-border bg-background/60 px-1.5 py-0.5 text-xs">
           ⌘K
         </span>
         <span>jump anywhere</span>
@@ -138,7 +138,7 @@ export function CommandPalette() {
                 }
               >
                 <Beaker className="size-4" /> {lab.title}
-                <span className="ml-auto font-mono text-[10px] text-muted-foreground">
+                <span className="ml-auto font-mono text-xs text-muted-foreground">
                   {lab.category}
                 </span>
               </CommandItem>
@@ -168,7 +168,7 @@ export function CommandPalette() {
                 }}
               >
                 <Activity className="size-4" /> env: {mode}
-                <span className="ml-auto font-mono text-[10px] text-muted-foreground">
+                <span className="ml-auto font-mono text-xs text-muted-foreground">
                   {env === mode ? "ACTIVE" : "switch"}
                 </span>
               </CommandItem>
@@ -209,13 +209,13 @@ export function CommandPalette() {
                 <>
                   <EyeOff className="size-4" />
                   Disable Simulations
-                  <span className="ml-auto font-mono text-[10px] text-terminal">ON</span>
+                  <span className="ml-auto font-mono text-xs text-terminal">ON</span>
                 </>
               ) : (
                 <>
                   <Cpu className="size-4" />
                   Enable Simulations
-                  <span className="ml-auto font-mono text-[10px] text-muted-foreground">OFF</span>
+                  <span className="ml-auto font-mono text-xs text-muted-foreground">OFF</span>
                 </>
               )}
             </CommandItem>

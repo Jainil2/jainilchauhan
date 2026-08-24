@@ -324,7 +324,7 @@ export function OIDCFlow({ onMeaningfulInteraction }: OIDCFlowProps) {
                 setFlow(k);
                 fireInteraction();
               }}
-              className={`rounded-md border px-2.5 py-1 font-mono text-[11px] transition-colors ${
+              className={`rounded-md border px-2.5 py-1 font-mono text-xs transition-colors ${
                 active
                   ? toneBorder(FLOW_META[k].tone) +
                     " " +
@@ -366,7 +366,7 @@ export function OIDCFlow({ onMeaningfulInteraction }: OIDCFlowProps) {
         >
           reset
         </button>
-        <span className="ml-auto self-center font-mono text-[11px] text-muted-foreground">
+        <span className="ml-auto self-center font-mono text-xs text-muted-foreground">
           step {Math.max(0, stepIdx + 1)} / {steps.length}
         </span>
       </div>
@@ -487,7 +487,7 @@ export function OIDCFlow({ onMeaningfulInteraction }: OIDCFlowProps) {
       {/* Step detail + PKCE values */}
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-md border border-border bg-background/40 p-3">
-          <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
             current step
           </p>
           {activeStep ? (
@@ -497,7 +497,7 @@ export function OIDCFlow({ onMeaningfulInteraction }: OIDCFlowProps) {
                 {activeStep.detail}
               </p>
               {activeStep.payload && (
-                <p className="mt-2 rounded border border-border bg-secondary/40 px-2 py-1 font-mono text-[11px] text-cyan-accent">
+                <p className="mt-2 rounded border border-border bg-secondary/40 px-2 py-1 font-mono text-xs text-cyan-accent">
                   {activeStep.payload}
                 </p>
               )}
@@ -510,10 +510,10 @@ export function OIDCFlow({ onMeaningfulInteraction }: OIDCFlowProps) {
         </div>
 
         <div className="rounded-md border border-border bg-background/40 p-3">
-          <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
             pkce parameters
           </p>
-          <div className="mt-2 space-y-1 font-mono text-[11px]">
+          <div className="mt-2 space-y-1 font-mono text-xs">
             <p>
               <span className="text-muted-foreground">verifier:</span>{" "}
               <span className="text-foreground">{verifier ? truncate(verifier, 26) : "—"}</span>
@@ -532,11 +532,11 @@ export function OIDCFlow({ onMeaningfulInteraction }: OIDCFlowProps) {
 
       {/* Event log */}
       <div className="rounded-md border border-border bg-background/40 p-3">
-        <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+        <p className="mb-2 font-mono text-xs uppercase tracking-wider text-muted-foreground">
           event log{envMode === "staging" ? " · trace_id=a19f-0c8b" : ""}
         </p>
-        <ul aria-live="polite" className="space-y-1 font-mono text-[11px] text-muted-foreground">
-          {log.length === 0 && <li className="text-muted-foreground/70">no events yet</li>}
+        <ul aria-live="polite" className="space-y-1 font-mono text-xs text-muted-foreground">
+          {log.length === 0 && <li className="text-muted-foreground">no events yet</li>}
           {log.map((l, i) => (
             <li key={i} className={i === 0 ? "text-terminal" : ""}>
               &gt; {l}
