@@ -153,6 +153,9 @@ export function Nav() {
               </button>
             </li>
             <li>
+              <ThemeToggle withText className="w-full justify-start" />
+            </li>
+            <li>
               <a
                 href="/jainil-chauhan-resume.pdf"
                 download
