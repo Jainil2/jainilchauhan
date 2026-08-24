@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Menu, X, Download, TerminalSquare } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useScrollSpy } from "@/hooks/use-scroll-spy";
+import { ThemeToggle } from "./ThemeToggle";
 
 function openShell() {
   if (typeof window === "undefined") return;
