@@ -65,7 +65,7 @@ export function LRUCache() {
       </div>
 
       <div className="rounded-md border border-border bg-background/40 p-4">
-        <div className="mb-2 flex justify-between font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+        <div className="mb-2 flex justify-between font-mono text-xs uppercase tracking-wider text-muted-foreground">
           <span>head (most recent)</span>
           <span>tail (next eviction)</span>
         </div>
@@ -95,7 +95,7 @@ export function LRUCache() {
           {Array.from({ length: Math.max(0, CAPACITY - list.length) }).map((_, i) => (
             <div
               key={`empty-${i}`}
-              className="rounded-md border border-dashed border-border px-3 py-2 font-mono text-xs text-muted-foreground/50"
+              className="rounded-md border border-dashed border-border px-3 py-2 font-mono text-xs text-muted-foreground"
             >
               ∅
             </div>

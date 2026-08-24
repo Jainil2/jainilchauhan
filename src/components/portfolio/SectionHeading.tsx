@@ -8,7 +8,7 @@ interface Props {
 export function SectionHeading({ prompt, title, id }: Props) {
   return (
     <div id={id} className="mb-10 scroll-mt-24">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+      <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
         {prompt}
       </p>
       <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">

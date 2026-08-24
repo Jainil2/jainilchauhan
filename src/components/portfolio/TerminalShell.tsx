@@ -4,6 +4,7 @@ import { X, TerminalSquare } from "lucide-react";
 import { labRegistry } from "@/lib/labRegistry";
 import { useSimulationStore } from "@/lib/useSimulationStore";
 import { useControlPlane, type EnvMode } from "@/lib/useControlPlane";
+import { useTheme } from "@/lib/useTheme";
 
 const SECTIONS = [
   "top",
@@ -33,6 +34,7 @@ const HELP_LINES = [
   "  kill node-<n>           crash a simulated node",
   "  restore node-<n>        restore a simulated node",
   "  tokens +N | -N          adjust the token bucket",
+  "  theme [light|dark|system]  read or switch the theme",
   "  clear                   clear the buffer",
   "  exit                    close the shell (Esc works too)",
   "",
@@ -108,6 +110,7 @@ export function TerminalShell() {
       "kill",
       "restore",
       "tokens",
+      "theme",
       "clear",
       "exit",
     ];
@@ -128,7 +131,9 @@ export function TerminalShell() {
               ? ["/", "/lab"]
               : cmd === "env"
                 ? ["prod", "staging", "chaos"]
-                : [];
+                : cmd === "theme"
+                  ? ["light", "dark", "system"]
+                  : [];
     const matches = pool.filter((p) => p.startsWith(last));
     if (matches.length === 1) {
       tokens[tokens.length - 1] = matches[0];
@@ -385,6 +390,22 @@ export function TerminalShell() {
         break;
       }
 
+      case "theme": {
+        const want = args.trim().toLowerCase();
+        if (!want) {
+          out({ kind: "out", text: `theme: ${themeChoice} (resolved: ${resolvedTheme})` });
+          break;
+        }
+        if (want !== "light" && want !== "dark" && want !== "system") {
+          out({ kind: "err", text: "theme: expected light | dark | system" });
+          break;
+        }
+        setThemeChoice(want);
+        out({ kind: "out", text: `theme set to ${want}` });
+        break;
+      }
+
+
       default:
         out({ kind: "err", text: `command not found: ${cmd}  (try 'help')` });
     }
@@ -421,7 +442,7 @@ export function TerminalShell() {
 
             <div
               ref={bodyRef}
-              className="h-96 flex-1 overflow-y-auto px-3 py-2 font-code text-[12px] leading-relaxed"
+              className="h-96 flex-1 overflow-y-auto px-3 py-2 font-code text-xs leading-relaxed"
             >
               {buffer.map((l, i) => (
                 <Row key={i} line={l} />
@@ -473,7 +494,7 @@ export function TerminalShell() {
               </div>
             </div>
 
-            <footer className="border-t border-border px-3 py-1.5 font-code text-[10px] text-muted-foreground">
+            <footer className="border-t border-border px-3 py-1.5 font-code text-xs text-muted-foreground">
               <kbd className="rounded border border-border bg-background/60 px-1">⌘J</kbd> toggle ·{" "}
               <kbd className="rounded border border-border bg-background/60 px-1">Tab</kbd> complete
               · <kbd className="rounded border border-border bg-background/60 px-1">↑↓</kbd> history

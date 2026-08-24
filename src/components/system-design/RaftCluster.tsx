@@ -216,10 +216,10 @@ export function RaftCluster() {
 
       <div className="space-y-3">
         <div className="rounded-md border border-border bg-background/40 p-3">
-          <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
             event log
           </p>
-          <ul className="mt-2 space-y-1 font-mono text-xs text-foreground/90" aria-live="polite">
+          <ul className="mt-2 space-y-1 font-mono text-xs text-foreground" aria-live="polite">
             {log.map((l, i) => (
               <li key={i} className={i === 0 ? "text-terminal" : "text-muted-foreground"}>
                 {">"} {l}

@@ -7,12 +7,13 @@ import { MobileShellFab } from "@/components/portfolio/MobileShellFab";
 import { useWebVitals } from "@/lib/useWebVitals";
 import { useBuildStatus } from "@/lib/useBuildStatus";
 import { useHydrateControlPlane } from "@/lib/useControlPlane";
+import { themeBootScript } from "@/lib/useTheme";
 
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 font-mono">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Error 404</p>
         <h1 className="mt-4 text-7xl font-bold text-foreground">404</h1>
@@ -88,6 +89,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>
       <body>
         {children}

@@ -152,7 +152,7 @@ export function WebAuthnLab() {
                  <Smartphone className="size-7" />
                </div>
                <span>Device</span>
-               <span className="text-[9px] text-cyan-accent/70">(Authenticator)</span>
+               <span className="text-xs text-cyan-accent/70">(Authenticator)</span>
              </div>
 
              <div className="flex flex-col items-center gap-2">
@@ -160,13 +160,13 @@ export function WebAuthnLab() {
                  <Server className="size-7" />
                </div>
                <span>Server</span>
-               <span className="text-[9px] text-amber-500/70">(Relying Party)</span>
+               <span className="text-xs text-amber-500/70">(Relying Party)</span>
              </div>
            </div>
 
            <div className="relative mx-12 space-y-4">
              {phase === "idle" && (
-               <div className="flex h-24 items-center justify-center font-mono text-xs text-muted-foreground/50">
+               <div className="flex h-24 items-center justify-center font-mono text-xs text-muted-foreground">
                  Click "Register" to begin the WebAuthn flow
                </div>
              )}
@@ -212,14 +212,14 @@ export function WebAuthnLab() {
              <div className={`space-y-2 border rounded p-2 ${registered ? 'border-cyan-accent/30 bg-cyan-accent/5' : 'border-border bg-background/50'}`}>
                <div className="flex justify-between">
                  <span className="text-muted-foreground">Private Key</span>
-                 <span className={registered ? 'text-cyan-accent' : 'text-muted-foreground/30'}>{registered ? "Stored (secure)" : "—"}</span>
+                 <span className={registered ? 'text-cyan-accent' : 'text-muted-foreground'}>{registered ? "Stored (secure)" : "—"}</span>
                </div>
                <div className="flex justify-between">
                  <span className="text-muted-foreground">Biometric</span>
-                 <span className={registered ? 'text-cyan-accent' : 'text-muted-foreground/30'}>{registered ? "Required" : "—"}</span>
+                 <span className={registered ? 'text-cyan-accent' : 'text-muted-foreground'}>{registered ? "Required" : "—"}</span>
                </div>
              </div>
-             <p className="mt-2 text-[10px] text-muted-foreground/60">Private key never leaves the device hardware.</p>
+             <p className="mt-2 text-xs text-muted-foreground">Private key never leaves the device hardware.</p>
            </div>
 
            <div className="rounded-xl border border-border bg-card/40 p-4">
@@ -229,14 +229,14 @@ export function WebAuthnLab() {
              <div className={`space-y-2 border rounded p-2 ${serverState?.publicKey ? 'border-amber-500/30 bg-amber-500/5' : 'border-border bg-background/50'}`}>
                <div className="flex justify-between">
                  <span className="text-muted-foreground">Username</span>
-                 <span className={serverState ? 'text-amber-500' : 'text-muted-foreground/30'}>{serverState ? username : "—"}</span>
+                 <span className={serverState ? 'text-amber-500' : 'text-muted-foreground'}>{serverState ? username : "—"}</span>
                </div>
                <div className="flex flex-col gap-1">
                  <span className="text-muted-foreground">Public Key</span>
-                 <span className={serverState?.publicKey ? 'text-amber-500/80 break-all text-[10px]' : 'text-muted-foreground/30'}>{serverState?.publicKey ? serverState.publicKey.slice(0, 24) + "..." : "—"}</span>
+                 <span className={serverState?.publicKey ? 'text-amber-500/80 break-all text-xs' : 'text-muted-foreground'}>{serverState?.publicKey ? serverState.publicKey.slice(0, 24) + "..." : "—"}</span>
                </div>
              </div>
-             <p className="mt-2 text-[10px] text-muted-foreground/60">Server only stores the public key — never passwords.</p>
+             <p className="mt-2 text-xs text-muted-foreground">Server only stores the public key — never passwords.</p>
            </div>
         </div>
       </div>

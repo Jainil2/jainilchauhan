@@ -105,7 +105,7 @@ export function BloomFilter() {
               animate={animate ? { scale: isHi ? 1.18 : 1 } : false}
               transition={{ duration: 0.25 }}
               aria-label={`bit ${i} ${on ? "set" : "unset"}`}
-              className={`flex aspect-square items-center justify-center rounded font-mono text-[10px] transition-colors ${
+              className={`flex aspect-square items-center justify-center rounded font-mono text-xs transition-colors ${
                 on
                   ? isHi
                     ? "border border-terminal bg-terminal/40 text-foreground glow-terminal"
@@ -161,7 +161,7 @@ export function BloomFilter() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border border-border bg-background/40 px-3 py-2">
-      <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+      <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
         {label}
       </p>
       <p className="font-mono text-lg text-terminal">{value}</p>

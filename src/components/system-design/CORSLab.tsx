@@ -108,13 +108,13 @@ export function CORSLab() {
               onChange={e => { setOriginB(e.target.value); reset(); }}
               className="w-full rounded border border-border bg-background px-2 py-1.5 outline-none focus:border-amber-500/50 mb-3"
             />
-            <h4 className="mb-1 text-muted-foreground text-[10px]">Request Method</h4>
+            <h4 className="mb-1 text-muted-foreground text-xs">Request Method</h4>
             <div className="flex flex-wrap gap-1">
               {METHODS.map(m => (
                 <button
                   key={m}
                   onClick={() => { setMethod(m); reset(); }}
-                  className={`rounded px-2 py-1 text-[10px] font-bold transition-colors ${method === m ? 'bg-amber-500/20 text-amber-500 border border-amber-500/40' : 'bg-secondary/50 text-muted-foreground'}`}
+                  className={`rounded px-2 py-1 text-xs font-bold transition-colors ${method === m ? 'bg-amber-500/20 text-amber-500 border border-amber-500/40' : 'bg-secondary/50 text-muted-foreground'}`}
                 >
                   {m}
                 </button>
@@ -136,7 +136,7 @@ export function CORSLab() {
               <span className={serverAllowsCors ? "text-terminal" : "text-muted-foreground"}>CORS Enabled</span>
             </label>
 
-            <h4 className="mb-1 text-muted-foreground text-[10px]">Access-Control-Allow-Origin</h4>
+            <h4 className="mb-1 text-muted-foreground text-xs">Access-Control-Allow-Origin</h4>
             <input
               type="text"
               value={allowedOrigin}
@@ -155,7 +155,7 @@ export function CORSLab() {
                   <Globe className="size-7" />
                 </div>
                 <span className="text-xs">Browser</span>
-                <span className="text-[10px] text-cyan-accent/80 break-all text-center max-w-[120px]">{originA}</span>
+                <span className="text-xs text-cyan-accent/80 break-all text-center max-w-[120px]">{originA}</span>
               </div>
 
               <div className="flex flex-col items-center gap-2">
@@ -163,7 +163,7 @@ export function CORSLab() {
                   <Server className="size-7" />
                 </div>
                 <span className="text-xs">API Server</span>
-                <span className="text-[10px] text-amber-500/80 break-all text-center max-w-[120px]">{originB}</span>
+                <span className="text-xs text-amber-500/80 break-all text-center max-w-[120px]">{originB}</span>
               </div>
             </div>
 
@@ -225,7 +225,7 @@ export function CORSLab() {
               )}
 
               {step === "idle" && (
-                <div className="flex h-24 items-center justify-center font-mono text-xs text-muted-foreground/50">
+                <div className="flex h-24 items-center justify-center font-mono text-xs text-muted-foreground">
                   Configure and click "Simulate Request"
                 </div>
               )}
@@ -235,11 +235,11 @@ export function CORSLab() {
           {/* Analysis */}
           <div className="grid grid-cols-2 gap-4 font-mono text-xs">
             <div className={`rounded-xl border p-3 ${isCrossOrigin ? 'border-amber-500/30 bg-amber-500/5' : 'border-border bg-card/40'}`}>
-              <span className="text-muted-foreground text-[10px] uppercase tracking-wider">Cross-Origin?</span>
+              <span className="text-muted-foreground text-xs uppercase tracking-wider">Cross-Origin?</span>
               <div className={`font-bold mt-1 ${isCrossOrigin ? 'text-amber-500' : 'text-terminal'}`}>{isCrossOrigin ? "Yes ⚡" : "No ✓"}</div>
             </div>
             <div className={`rounded-xl border p-3 ${needsPreflight && isCrossOrigin ? 'border-fuchsia-400/30 bg-fuchsia-400/5' : 'border-border bg-card/40'}`}>
-              <span className="text-muted-foreground text-[10px] uppercase tracking-wider">Preflight Needed?</span>
+              <span className="text-muted-foreground text-xs uppercase tracking-wider">Preflight Needed?</span>
               <div className={`font-bold mt-1 ${needsPreflight && isCrossOrigin ? 'text-fuchsia-400' : 'text-muted-foreground'}`}>
                 {isCrossOrigin && needsPreflight ? "Yes (non-simple method)" : "No"}
               </div>

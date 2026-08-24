@@ -197,8 +197,8 @@ export function AStarSearch() {
                        animate={animate ? { scale: isP ? [0.8, 1.1, 1] : 1 } : false}
                        className={`flex size-6 sm:size-8 cursor-pointer items-center justify-center rounded-sm transition-colors duration-300 ${bgClass}`}
                      >
-                        {isStart && <span className="font-mono text-[10px] font-bold">S</span>}
-                        {isEnd && <span className="font-mono text-[10px] font-bold">E</span>}
+                        {isStart && <span className="font-mono text-xs font-bold">S</span>}
+                        {isEnd && <span className="font-mono text-xs font-bold">E</span>}
                      </motion.div>
                    )
                 })

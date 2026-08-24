@@ -121,7 +121,7 @@ function LabIndex() {
           {grouped.map((group) => (
             <section key={group.category}>
               {filter === "All" && (
-                <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                   {group.category}
                 </h2>
               )}
@@ -145,14 +145,14 @@ function LabIndex() {
                           aria-label="completed"
                         />
                       )}
-                      <p className="font-mono text-[10px] uppercase tracking-wider text-cyan-accent">
+                      <p className="font-mono text-xs uppercase tracking-wider text-cyan-accent">
                         {lab.category}
                       </p>
                       <h3 className="mt-2 font-mono text-lg font-semibold text-foreground group-hover:text-terminal">
                         {lab.title}
                       </h3>
                       <p className="mt-2 flex-1 text-sm text-muted-foreground">{lab.blurb}</p>
-                      <div className="mt-4 flex flex-wrap items-center gap-2 font-mono text-[10px]">
+                      <div className="mt-4 flex flex-wrap items-center gap-2 font-mono text-xs">
                         <span
                           className={`rounded border px-1.5 py-0.5 ${DIFF_COLOR[lab.difficulty]}`}
                         >

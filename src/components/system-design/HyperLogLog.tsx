@@ -155,11 +155,11 @@ export function HyperLogLog() {
 
       <div className="grid grid-cols-2 gap-4">
          <div className="rounded-xl border border-border bg-background/50 p-4 text-center">
-            <h3 className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Actual Unique Count</h3>
+            <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Actual Unique Count</h3>
             <div className="mt-1 font-mono text-3xl text-foreground">{actualVal}</div>
          </div>
          <div className="rounded-xl border border-terminal/30 bg-terminal/5 p-4 text-center shadow-[0_0_15px_rgba(20,184,166,0.1)]">
-            <h3 className="font-mono text-[10px] uppercase tracking-wider text-terminal/80">HyperLogLog Estimate</h3>
+            <h3 className="font-mono text-xs uppercase tracking-wider text-terminal/80">HyperLogLog Estimate</h3>
             <div className="mt-1 font-mono text-3xl text-terminal">{estimateVal}</div>
          </div>
       </div>
@@ -178,7 +178,7 @@ export function HyperLogLog() {
                 animate={animate ? { scale: [0.95, 1], backgroundColor: val > 0 ? "rgba(20,184,166,0.2)" : "rgba(var(--secondary), 0.3)" } : false}
                 className={`flex aspect-square flex-col items-center justify-center rounded border border-border text-center font-mono`}
               >
-                <span className="text-[9px] text-muted-foreground/60">{i}</span>
+                <span className="text-xs text-muted-foreground">{i}</span>
                 <span className={val > 0 ? "text-terminal font-bold" : "text-muted-foreground"}>{val}</span>
               </motion.div>
             ))}
@@ -202,7 +202,7 @@ export function HyperLogLog() {
                     <span className="rounded bg-secondary/50 px-1 py-0.5 text-amber-500">Bucket {entry.bucket}</span>
                     <span className="rounded bg-secondary/50 px-1 py-0.5 text-fuchsia-400">Zeros: {entry.zeros}</span>
                   </div>
-                  <div className="text-[10px] tracking-widest text-muted-foreground/70 break-all">
+                  <div className="text-xs tracking-widest text-muted-foreground break-all">
                     <span className="text-amber-500/80">{entry.hashBin.slice(0, BITS)}</span>
                     <span className="text-fuchsia-400/80">{entry.hashBin.slice(BITS)}</span>
                   </div>

@@ -121,7 +121,7 @@ export function MerkleTree() {
       } else if (isRequired) {
         borderClass = "border-terminal bg-terminal/20 text-terminal border-dashed";
       } else if (id !== "root") {
-        borderClass = "border-border/50 bg-card/20 text-muted-foreground/50 opacity-40";
+        borderClass = "border-border/50 bg-card/20 text-muted-foreground opacity-40";
       }
     }
 
@@ -134,7 +134,7 @@ export function MerkleTree() {
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
           className={`flex flex-col items-center justify-center rounded border p-2 transition-all ${borderClass}`}
         >
-          <span className="font-mono text-[9px] uppercase tracking-wider opacity-70">
+          <span className="font-mono text-xs uppercase tracking-wider opacity-70">
             {label || id} {isRequired && "(PROOF)"}
           </span>
           <span className={`font-mono text-xs font-semibold`}>
@@ -144,7 +144,7 @@ export function MerkleTree() {
         
         {/* Full Hash Tooltip */}
         <div className="absolute bottom-full left-1/2 z-50 mb-2 hidden -translate-x-1/2 flex-col rounded border border-border bg-card p-2 text-left shadow-xl group-hover:flex w-[280px]">
-          <p className="font-mono text-[9px] text-muted-foreground break-all">
+          <p className="font-mono text-xs text-muted-foreground break-all">
             <span className="text-terminal">SHA256:</span><br/>
             {node.hash}
           </p>
@@ -161,7 +161,7 @@ export function MerkleTree() {
         </p>
         <button
           onClick={reset}
-          className="flex items-center gap-1 rounded border border-border px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:bg-secondary hover:text-foreground"
+          className="flex items-center gap-1 rounded border border-border px-2 py-1 font-mono text-xs uppercase tracking-wider text-muted-foreground hover:bg-secondary hover:text-foreground"
         >
           <RefreshCw className="size-3" /> reset
         </button>
@@ -171,7 +171,7 @@ export function MerkleTree() {
         
         {/* Level 0: Root */}
         <div className="relative z-10 w-48">
-          <div className="absolute -top-4 -left-4 text-muted-foreground/30"><Fingerprint className="size-24" /></div>
+          <div className="absolute -top-4 -left-4 text-muted-foreground"><Fingerprint className="size-24" /></div>
           <NodeView id="root" label="Root Hash" />
         </div>
 
@@ -207,7 +207,7 @@ export function MerkleTree() {
                 type="text"
                 value={block}
                 onChange={(e) => updateBlock(i, e.target.value)}
-                className={`w-full truncate rounded border p-2 font-mono text-[10px] transition-colors outline-none focus:ring-1 focus:ring-terminal ${
+                className={`w-full truncate rounded border p-2 font-mono text-xs transition-colors outline-none focus:ring-1 focus:ring-terminal ${
                   block !== INITIAL_DATA[i] 
                   ? "border-destructive bg-destructive/10 text-destructive focus:border-destructive focus:ring-destructive" 
                   : "border-border bg-background/50 text-foreground"
@@ -217,7 +217,7 @@ export function MerkleTree() {
               
               <button
                 onClick={() => setProofTarget(proofTarget === i ? null : i)}
-                className={`w-full flex items-center justify-center gap-1 rounded border p-1.5 font-mono text-[9px] transition-colors ${
+                className={`w-full flex items-center justify-center gap-1 rounded border p-1.5 font-mono text-xs transition-colors ${
                   proofTarget === i 
                   ? "border-cyan-accent bg-cyan-accent/20 text-cyan-accent" 
                   : "border-border bg-background text-muted-foreground hover:border-cyan-accent/50 hover:text-cyan-accent"

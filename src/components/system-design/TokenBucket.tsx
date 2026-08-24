@@ -17,7 +17,7 @@ export function TokenBucket({ tokens, maxTokens, isRateLimited }: TokenBucketPro
   return (
     <div className="flex flex-col items-center gap-2">
       {/* Label */}
-      <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+      <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
         token bucket
       </p>
 
@@ -89,7 +89,7 @@ export function TokenBucket({ tokens, maxTokens, isRateLimited }: TokenBucketPro
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.7, y: -4 }}
               transition={{ type: "spring", stiffness: 400, damping: 22 }}
-              className="absolute -top-3 -right-3 rounded border border-destructive/60 bg-destructive/20 px-1.5 py-0.5 font-mono text-[9px] font-bold text-destructive"
+              className="absolute -top-3 -right-3 rounded border border-destructive/60 bg-destructive/20 px-1.5 py-0.5 font-mono text-xs font-bold text-destructive"
             >
               429
             </motion.div>

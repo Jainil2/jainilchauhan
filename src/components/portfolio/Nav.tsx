@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Menu, X, Download, TerminalSquare } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useScrollSpy } from "@/hooks/use-scroll-spy";
+import { ThemeToggle } from "./ThemeToggle";
 
 function openShell() {
   if (typeof window === "undefined") return;
@@ -92,6 +93,9 @@ export function Nav() {
             </button>
           </li>
           <li>
+            <ThemeToggle />
+          </li>
+          <li>
             <a
               href="/jainil-chauhan-resume.pdf"
               download
@@ -148,6 +152,9 @@ export function Nav() {
                 <TerminalSquare className="size-3.5" />
                 Terminal
               </button>
+            </li>
+            <li>
+              <ThemeToggle withText className="w-full justify-start" />
             </li>
             <li>
               <a

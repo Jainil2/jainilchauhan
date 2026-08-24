@@ -137,7 +137,7 @@ export function VectorClocks() {
       <div className="rounded-lg border border-border bg-card/40 p-4 font-mono text-xs">
         <h3 className="mb-3 uppercase tracking-wider text-muted-foreground">Event Log</h3>
         <ul className="space-y-2">
-          {log.length === 0 && <li className="text-muted-foreground/50">Perform an event to see vector clocks update...</li>}
+          {log.length === 0 && <li className="text-muted-foreground">Perform an event to see vector clocks update...</li>}
           {log.map((entry) => {
              const textClass = entry.node === "A" ? "text-cyan-accent" : 
                                entry.node === "B" ? "text-amber-500" : 

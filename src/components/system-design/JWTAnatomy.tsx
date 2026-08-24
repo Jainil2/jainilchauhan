@@ -138,7 +138,7 @@ export function JWTAnatomy() {
          {/* Decoded Output */}
          <div className="flex flex-col gap-4">
             <div className="rounded-xl border border-border bg-card/40 p-4">
-               <h3 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-fuchsia-400">Header: Algorithm & Token Type</h3>
+               <h3 className="mb-2 font-mono text-xs uppercase tracking-wider text-fuchsia-400">Header: Algorithm & Token Type</h3>
                <textarea
                  value={headerJson}
                  readOnly
@@ -148,9 +148,9 @@ export function JWTAnatomy() {
             </div>
             
             <div className="rounded-xl border border-border bg-card/40 p-4 relative group">
-               <h3 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-amber-500 flex items-center justify-between">
+               <h3 className="mb-2 font-mono text-xs uppercase tracking-wider text-amber-500 flex items-center justify-between">
                  <span>Payload: Data</span>
-                 <span className="text-[9px] text-muted-foreground bg-secondary/50 px-1.5 py-0.5 rounded opacity-0 transition-opacity group-hover:opacity-100">Editable!</span>
+                 <span className="text-xs text-muted-foreground bg-secondary/50 px-1.5 py-0.5 rounded opacity-0 transition-opacity group-hover:opacity-100">Editable!</span>
                </h3>
                <textarea
                  value={payloadJson}
@@ -161,7 +161,7 @@ export function JWTAnatomy() {
             </div>
 
             <div className="rounded-xl border border-border bg-card/40 p-4">
-               <h3 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-cyan-accent">Verify Signature</h3>
+               <h3 className="mb-2 font-mono text-xs uppercase tracking-wider text-cyan-accent">Verify Signature</h3>
                <p className="font-mono text-xs text-cyan-accent/80 break-all leading-tight">
                  {signature}
                </p>

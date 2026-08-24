@@ -76,7 +76,7 @@ export function PortfolioHUD() {
             onClick={() => setExpanded(true)}
             aria-expanded="false"
             aria-label="Expand HUD dock"
-            className="group flex items-center gap-2.5 rounded-full border border-border bg-card/90 px-3 py-1.5 font-mono text-[11px] shadow-lg backdrop-blur-md transition-all hover:border-terminal/40 hover:shadow-[0_0_15px_rgba(20,184,166,0.15)]"
+            className="group flex items-center gap-2.5 rounded-full border border-border bg-card/90 px-3 py-1.5 font-mono text-xs shadow-lg backdrop-blur-md transition-all hover:border-terminal/40 hover:shadow-[0_0_15px_rgba(20,184,166,0.15)]"
           >
             <span className="relative flex items-center gap-1.5">
               <span className="size-1.5 animate-pulse rounded-full bg-terminal" />
@@ -88,10 +88,10 @@ export function PortfolioHUD() {
                 />
               )}
             </span>
-            <span className="text-muted-foreground/60">·</span>
+            <span className="text-muted-foreground">·</span>
             <span className="text-cyan-accent">{tps.toFixed(1)}</span>
             <span className="text-muted-foreground">tps</span>
-            <span className="text-muted-foreground/60">·</span>
+            <span className="text-muted-foreground">·</span>
             <span className={nodesOk ? "text-terminal" : "text-destructive"}>
               {activeNodes.length}/3
             </span>
@@ -113,7 +113,7 @@ export function PortfolioHUD() {
             <div className="flex items-center gap-2 font-mono text-xs">
               <span className="size-1.5 animate-pulse rounded-full bg-terminal" />
               <span className="text-terminal">jc-hud</span>
-              <span className="text-muted-foreground/60">
+              <span className="text-muted-foreground">
                 · <span className="text-cyan-accent">{shortSha(status.commit)}</span>
               </span>
             </div>
@@ -204,7 +204,7 @@ function TabBar({
             role="tab"
             aria-selected={active}
             onClick={() => onChange(t.k)}
-            className={`relative flex-1 rounded-t px-2 py-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors ${
+            className={`relative flex-1 rounded-t px-2 py-1.5 font-mono text-xs uppercase tracking-wider transition-colors ${
               active
                 ? "bg-background/50 text-terminal"
                 : "text-muted-foreground hover:text-foreground"
@@ -239,7 +239,7 @@ function StatsTab(props: {
     <div className="space-y-3">
       <EnvSwitcher value={props.env} onChange={props.setEnv} />
 
-      <div className="grid grid-cols-3 gap-2 font-mono text-[10px]">
+      <div className="grid grid-cols-3 gap-2 font-mono text-xs">
         <Cell label="tokens" value={String(props.tokenCount)} accent="terminal" />
         <Cell label="tps" value={props.tps.toFixed(1)} accent="cyan" />
         <Cell
@@ -251,7 +251,7 @@ function StatsTab(props: {
 
       <Sparkline series={props.tpsHistory} />
 
-      <div className="grid grid-cols-3 gap-2 font-mono text-[10px]">
+      <div className="grid grid-cols-3 gap-2 font-mono text-xs">
         <Cell
           label="lcp"
           value={props.vitals.lcp === null ? "…" : `${props.vitals.lcp}ms`}
@@ -280,11 +280,11 @@ function StatsTab(props: {
 function MeTab({ bundleKb }: { bundleKb: number | null }) {
   return (
     <div className="space-y-3">
-      <div className="rounded-md border border-border bg-background/50 px-3 py-2 font-mono text-[11px]">
+      <div className="rounded-md border border-border bg-background/50 px-3 py-2 font-mono text-xs">
         <p className="text-muted-foreground">
           <span className="text-terminal">jainil</span>@portfolio:~$
         </p>
-        <p className="mt-0.5 text-foreground/90">SWE · backend · distributed</p>
+        <p className="mt-0.5 text-foreground">SWE · backend · distributed</p>
         <p className="text-muted-foreground">
           Nadiad, IN · bundle{" "}
           <span className="text-foreground">
@@ -298,7 +298,7 @@ function MeTab({ bundleKb }: { bundleKb: number | null }) {
           href="/jainil-chauhan-resume.pdf"
           download
           title="Resume"
-          className="flex-1 rounded-md border border-terminal/40 bg-terminal/10 px-2 py-1.5 text-center font-mono text-[10px] text-terminal hover:bg-terminal/20"
+          className="flex-1 rounded-md border border-terminal/40 bg-terminal/10 px-2 py-1.5 text-center font-mono text-xs text-terminal hover:bg-terminal/20"
         >
           <Download className="mx-auto size-3" />
         </a>
@@ -363,7 +363,7 @@ function OpsTab({
       <div className="flex items-center gap-1.5">
         <button
           onClick={() => setSimulationsEnabled(!simulationsEnabled)}
-          className="flex flex-1 items-center justify-between rounded-md border border-border bg-background/50 px-3 py-1.5 font-mono text-[10px] text-muted-foreground hover:text-foreground"
+          className="flex flex-1 items-center justify-between rounded-md border border-border bg-background/50 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:text-foreground"
         >
           <span className="flex items-center gap-2">
             <Cpu className="size-3" /> simulations
@@ -376,14 +376,14 @@ function OpsTab({
           onClick={openShell}
           title="Open shell (⌘J)"
           aria-label="Open shell"
-          className="rounded-md border border-border bg-background/50 px-2 py-1.5 font-mono text-[10px] text-muted-foreground hover:text-terminal"
+          className="rounded-md border border-border bg-background/50 px-2 py-1.5 font-mono text-xs text-muted-foreground hover:text-terminal"
         >
           <TerminalSquare className="size-3" />
         </button>
       </div>
 
       {incidents.length === 0 ? (
-        <p className="rounded-md border border-dashed border-border bg-background/30 px-3 py-2 font-mono text-[10px] text-muted-foreground/70">
+        <p className="rounded-md border border-dashed border-border bg-background/30 px-3 py-2 font-mono text-xs text-muted-foreground">
           // no open incidents
         </p>
       ) : (
@@ -391,7 +391,7 @@ function OpsTab({
           {incidents.map((i) => (
             <li
               key={i.id}
-              className="flex items-start justify-between gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-2 py-1.5 font-mono text-[10px]"
+              className="flex items-start justify-between gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-2 py-1.5 font-mono text-xs"
             >
               <div className="flex flex-1 items-start gap-1.5">
                 <AlertTriangle className="mt-0.5 size-3 text-destructive" />
@@ -441,7 +441,7 @@ function EnvSwitcher({ value, onChange }: { value: EnvMode; onChange: (e: EnvMod
     },
   ];
   return (
-    <div className="flex items-center gap-1 rounded-md border border-border bg-background/50 p-0.5 font-mono text-[10px]">
+    <div className="flex items-center gap-1 rounded-md border border-border bg-background/50 p-0.5 font-mono text-xs">
       {items.map((it) => {
         const active = value === it.k;
         return (

@@ -40,7 +40,7 @@ export function Writing() {
           >
             <div className="flex items-center justify-between">
               <FileText className="size-4 text-muted-foreground" />
-              <span className="rounded-full border border-border px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+              <span className="rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
                 {d.tag}
               </span>
             </div>

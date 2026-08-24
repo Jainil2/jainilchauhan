@@ -51,7 +51,7 @@ export function Now() {
                   <Icon className="size-4 text-terminal" />
                   {item.label}
                 </div>
-                <p className="mt-3 leading-relaxed text-foreground/90">
+                <p className="mt-3 leading-relaxed text-foreground">
                   {item.body}
                 </p>
               </article>

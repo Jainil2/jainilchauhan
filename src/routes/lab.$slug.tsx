@@ -90,12 +90,12 @@ function LabDetail() {
         </Link>
 
         <div className="mt-6 mb-8">
-          <p className="font-mono text-[10px] uppercase tracking-wider text-cyan-accent">
+          <p className="font-mono text-xs uppercase tracking-wider text-cyan-accent">
             {lab.category}
           </p>
           <h1 className="mt-1 font-mono text-3xl font-bold text-foreground">{lab.title}</h1>
           <p className="mt-2 text-muted-foreground">{lab.blurb}</p>
-          <div className="mt-3 flex flex-wrap items-center gap-2 font-mono text-[10px]">
+          <div className="mt-3 flex flex-wrap items-center gap-2 font-mono text-xs">
             <span className={`rounded border px-1.5 py-0.5 uppercase tracking-wider ${DIFF_COLOR[lab.difficulty]}`}>
               <Gauge className="mr-1 inline size-3" /> {lab.difficulty}
             </span>

@@ -111,7 +111,7 @@ export function BrandIcon({ name, size = 16, className, color = true }: BrandIco
     return (
       <span
         aria-hidden
-        className={`inline-flex shrink-0 items-center justify-center rounded-[3px] border border-border bg-secondary text-[9px] font-semibold uppercase text-muted-foreground ${className ?? ""}`}
+        className={`inline-flex shrink-0 items-center justify-center rounded-[3px] border border-border bg-secondary text-xs font-semibold uppercase text-muted-foreground ${className ?? ""}`}
         style={{ width: size, height: size }}
       >
         {name.trim().charAt(0)}

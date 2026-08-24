@@ -110,7 +110,7 @@ export function CapTheoremLab() {
               </div>
               <div className="mt-3 flex gap-2">
                 <button onClick={() => write(side, `v${Math.floor(Math.random() * 99) + 1}`)} disabled={!writable}
-                  className="flex-1 rounded border border-border px-2 py-1 font-mono text-xs hover:border-terminal/50 hover:text-terminal disabled:opacity-30 disabled:hover:text-foreground/50">
+                  className="flex-1 rounded border border-border px-2 py-1 font-mono text-xs hover:border-terminal/50 hover:text-terminal disabled:opacity-30 disabled:hover:text-foreground">
                   {writable ? "write" : "✗ refused"}
                 </button>
                 <button className="flex-1 rounded border border-border px-2 py-1 font-mono text-xs text-cyan-accent">read → {sideNodes[0]?.value}</button>
@@ -120,12 +120,12 @@ export function CapTheoremLab() {
         })}
       </div>
 
-      <div className="rounded border border-border bg-background/40 p-3 font-mono text-[11px]">
-        <p className="mb-1 text-[10px] uppercase tracking-widest text-muted-foreground">cluster log</p>
+      <div className="rounded border border-border bg-background/40 p-3 font-mono text-xs">
+        <p className="mb-1 text-xs uppercase tracking-widest text-muted-foreground">cluster log</p>
         {log.length === 0 ? (
           <p className="text-muted-foreground">No events yet — try writing on each side, then partition.</p>
         ) : (
-          log.map((l, i) => <div key={i} className="text-foreground/80">{l}</div>)
+          log.map((l, i) => <div key={i} className="text-foreground">{l}</div>)
         )}
       </div>
     </div>
