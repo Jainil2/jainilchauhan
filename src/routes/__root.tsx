@@ -7,6 +7,7 @@ import { MobileShellFab } from "@/components/portfolio/MobileShellFab";
 import { useWebVitals } from "@/lib/useWebVitals";
 import { useBuildStatus } from "@/lib/useBuildStatus";
 import { useHydrateControlPlane } from "@/lib/useControlPlane";
+import { themeBootScript } from "@/lib/useTheme";
 
 import appCss from "../styles.css?url";
 
