@@ -92,6 +92,9 @@ export function Nav() {
             </button>
           </li>
           <li>
+            <ThemeToggle />
+          </li>
+          <li>
             <a
               href="/jainil-chauhan-resume.pdf"
               download
