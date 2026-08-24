@@ -152,7 +152,7 @@ export function WebAuthnLab() {
                  <Smartphone className="size-7" />
                </div>
                <span>Device</span>
-               <span className="text-[9px] text-cyan-accent/70">(Authenticator)</span>
+               <span className="text-xs text-cyan-accent/70">(Authenticator)</span>
              </div>
 
              <div className="flex flex-col items-center gap-2">
@@ -160,7 +160,7 @@ export function WebAuthnLab() {
                  <Server className="size-7" />
                </div>
                <span>Server</span>
-               <span className="text-[9px] text-amber-500/70">(Relying Party)</span>
+               <span className="text-xs text-amber-500/70">(Relying Party)</span>
              </div>
            </div>
 

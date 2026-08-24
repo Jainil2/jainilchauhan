@@ -134,7 +134,7 @@ export function MerkleTree() {
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
           className={`flex flex-col items-center justify-center rounded border p-2 transition-all ${borderClass}`}
         >
-          <span className="font-mono text-[9px] uppercase tracking-wider opacity-70">
+          <span className="font-mono text-xs uppercase tracking-wider opacity-70">
             {label || id} {isRequired && "(PROOF)"}
           </span>
           <span className={`font-mono text-xs font-semibold`}>
@@ -144,7 +144,7 @@ export function MerkleTree() {
         
         {/* Full Hash Tooltip */}
         <div className="absolute bottom-full left-1/2 z-50 mb-2 hidden -translate-x-1/2 flex-col rounded border border-border bg-card p-2 text-left shadow-xl group-hover:flex w-[280px]">
-          <p className="font-mono text-[9px] text-muted-foreground break-all">
+          <p className="font-mono text-xs text-muted-foreground break-all">
             <span className="text-terminal">SHA256:</span><br/>
             {node.hash}
           </p>
@@ -217,7 +217,7 @@ export function MerkleTree() {
               
               <button
                 onClick={() => setProofTarget(proofTarget === i ? null : i)}
-                className={`w-full flex items-center justify-center gap-1 rounded border p-1.5 font-mono text-[9px] transition-colors ${
+                className={`w-full flex items-center justify-center gap-1 rounded border p-1.5 font-mono text-xs transition-colors ${
                   proofTarget === i 
                   ? "border-cyan-accent bg-cyan-accent/20 text-cyan-accent" 
                   : "border-border bg-background text-muted-foreground hover:border-cyan-accent/50 hover:text-cyan-accent"

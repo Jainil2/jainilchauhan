@@ -178,7 +178,7 @@ export function HyperLogLog() {
                 animate={animate ? { scale: [0.95, 1], backgroundColor: val > 0 ? "rgba(20,184,166,0.2)" : "rgba(var(--secondary), 0.3)" } : false}
                 className={`flex aspect-square flex-col items-center justify-center rounded border border-border text-center font-mono`}
               >
-                <span className="text-[9px] text-muted-foreground">{i}</span>
+                <span className="text-xs text-muted-foreground">{i}</span>
                 <span className={val > 0 ? "text-terminal font-bold" : "text-muted-foreground"}>{val}</span>
               </motion.div>
             ))}

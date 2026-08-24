@@ -137,7 +137,7 @@ export function TrieLab() {
                      {k}
                    </motion.div>
                    {child.isEnd && (
-                     <span className="rounded bg-terminal/20 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-terminal">
+                     <span className="rounded bg-terminal/20 px-1.5 py-0.5 font-mono text-xs uppercase tracking-wider text-terminal">
                        end
                      </span>
                    )}

@@ -150,7 +150,7 @@ export function JWTAnatomy() {
             <div className="rounded-xl border border-border bg-card/40 p-4 relative group">
                <h3 className="mb-2 font-mono text-xs uppercase tracking-wider text-amber-500 flex items-center justify-between">
                  <span>Payload: Data</span>
-                 <span className="text-[9px] text-muted-foreground bg-secondary/50 px-1.5 py-0.5 rounded opacity-0 transition-opacity group-hover:opacity-100">Editable!</span>
+                 <span className="text-xs text-muted-foreground bg-secondary/50 px-1.5 py-0.5 rounded opacity-0 transition-opacity group-hover:opacity-100">Editable!</span>
                </h3>
                <textarea
                  value={payloadJson}

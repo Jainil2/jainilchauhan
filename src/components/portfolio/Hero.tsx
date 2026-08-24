@@ -24,7 +24,7 @@ export function Hero() {
             Software Engineer · Backend &amp; Distributed Systems
           </p>
 
-          <h1 className="mt-5 text-5xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+          <h1 className="mt-5 text-5xl font-semibold leading-tight tracking-tight text-foreground sm:text-6xl lg:text-7xl">
             Jainil Chauhan
           </h1>
 

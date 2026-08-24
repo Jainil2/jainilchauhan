@@ -46,7 +46,7 @@ export function InfrastructureMap() {
             </span>
           )}
         </div>
-        <p className={`mt-2 font-mono text-[9px] uppercase tracking-wider ${isActive ? "text-terminal" : "text-muted-foreground"}`}>
+        <p className={`mt-2 font-mono text-xs uppercase tracking-wider ${isActive ? "text-terminal" : "text-muted-foreground"}`}>
           {label}
         </p>
       </motion.div>
@@ -109,10 +109,10 @@ export function InfrastructureMap() {
       </div>
 
       <div className="absolute bottom-4 right-4 text-right">
-        <p className="font-mono text-[9px] text-muted-foreground">
+        <p className="font-mono text-xs text-muted-foreground">
           Status: <span className="text-terminal">Optimal</span>
         </p>
-        <p className="font-mono text-[9px] text-muted-foreground">
+        <p className="font-mono text-xs text-muted-foreground">
           Latency: <span className="text-cyan-accent">12ms</span>
         </p>
       </div>
