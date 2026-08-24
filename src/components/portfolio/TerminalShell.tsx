@@ -385,6 +385,22 @@ export function TerminalShell() {
         break;
       }
 
+      case "theme": {
+        const want = args.trim().toLowerCase();
+        if (!want) {
+          out({ kind: "out", text: `theme: ${themeChoice} (resolved: ${resolvedTheme})` });
+          break;
+        }
+        if (want !== "light" && want !== "dark" && want !== "system") {
+          out({ kind: "err", text: "theme: expected light | dark | system" });
+          break;
+        }
+        setThemeChoice(want);
+        out({ kind: "out", text: `theme set to ${want}` });
+        break;
+      }
+
+
       default:
         out({ kind: "err", text: `command not found: ${cmd}  (try 'help')` });
     }
