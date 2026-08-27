@@ -75,4 +75,88 @@ SET lock_timeout = '2s';`,
       href: "https://go.dev/ref/mem",
     },
   ],
+  challenge: {
+    prompt:
+      "Detect deadlock by finding a cycle in the wait-for graph. Every transaction in that cycle is waiting on another one in it, so none can ever proceed and the database has to break the tie by aborting someone.",
+    entry: "findDeadlock",
+    starter: `/**
+ * @param {number} n - transactions 0..n-1.
+ * @param {Array<[number, number]>} waitsFor - [a, b] means a waits on b.
+ * @returns {number[]|null} the transactions in one cycle, ascending, or null
+ *   when nothing is deadlocked.
+ */
+function findDeadlock(n, waitsFor) {
+  // A transaction waiting on one that has already finished waiting is fine.
+  // Only a cycle is a deadlock.
+}
+`,
+    tests: [
+      {
+        name: "two transactions waiting on each other",
+        body: `assertEquals(solution(2, [[0, 1], [1, 0]]), [0, 1]);`,
+      },
+      {
+        name: "a chain is not a deadlock",
+        body: `assertEquals(solution(3, [[0, 1], [1, 2]]), null);`,
+      },
+      {
+        name: "a three-way cycle",
+        body: `assertEquals(solution(3, [[0, 1], [1, 2], [2, 0]]), [0, 1, 2]);`,
+      },
+      {
+        name: "a transaction waiting on itself",
+        body: `assertEquals(solution(1, [[0, 0]]), [0]);`,
+      },
+      {
+        name: "nobody waiting",
+        body: `assertEquals(solution(3, []), null);`,
+      },
+      {
+        name: "finds a cycle among non-waiting transactions",
+        body: `assertEquals(solution(4, [[0, 1], [2, 3], [3, 2]]), [2, 3]);`,
+      },
+      {
+        name: "a diamond of waits is not a cycle",
+        body: `assertEquals(solution(4, [[0, 1], [0, 2], [1, 3], [2, 3]]), null);`,
+      },
+    ],
+    hints: [
+      "This is directed cycle detection: a three-state DFS distinguishes 'on the current path' from 'already finished'.",
+      "When you meet a node that is still on the current path, the cycle is the slice of the path from that node onward.",
+      "Sort the members before returning so the answer does not depend on where the search started.",
+    ],
+    reference: `function findDeadlock(n, waitsFor) {
+  const adj = Array.from({ length: n }, () => []);
+  for (const [a, b] of waitsFor) adj[a].push(b);
+
+  const state = new Array(n).fill(0); // 0 unseen, 1 on path, 2 finished
+  const path = [];
+
+  const walk = (node) => {
+    state[node] = 1;
+    path.push(node);
+    for (const next of adj[node]) {
+      if (state[next] === 1) {
+        // Everything from 'next' onwards in the path is the cycle.
+        return path.slice(path.indexOf(next)).sort((a, b) => a - b);
+      }
+      if (state[next] === 0) {
+        const found = walk(next);
+        if (found) return found;
+      }
+    }
+    path.pop();
+    state[node] = 2; // finished: safe to reach again later
+    return null;
+  };
+
+  for (let i = 0; i < n; i++) {
+    if (state[i] !== 0) continue;
+    const found = walk(i);
+    if (found) return found;
+  }
+  return null;
+}
+`,
+  },
 };

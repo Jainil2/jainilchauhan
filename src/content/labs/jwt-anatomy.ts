@@ -76,4 +76,67 @@ const { payload } = await jwtVerify(token, jwks, {
       href: "https://datatracker.ietf.org/doc/html/rfc8725",
     },
   ],
+  challenge: {
+    prompt:
+      "Validate the claims of a decoded JWT and list everything wrong with it. Note what is missing here: the signature. A token whose claims all look right is still worthless until the signature is checked, and 'alg: none' exists to make you forget that.",
+    entry: "validateClaims",
+    starter: `/**
+ * @param {{alg: string, iss: string, aud: string, exp: number, nbf: number}} token
+ * @param {{now: number, issuer: string, audience: string}} expected
+ * @returns {string[]} problems, ascending alphabetically. Empty when valid.
+ *   Use: 'alg' when the algorithm is 'none', 'aud', 'exp' when expired (exp is
+ *   exclusive), 'iss', and 'nbf' when used too early.
+ */
+function validateClaims(token, expected) {
+  // Every failing check contributes, so a caller sees all of them at once.
+}
+`,
+    tests: [
+      {
+        name: "a valid token has no problems",
+        body: `assertEquals(solution({ alg: 'HS256', iss: 'me', aud: 'you', exp: 100, nbf: 0 }, { now: 50, issuer: 'me', audience: 'you' }), []);`,
+      },
+      {
+        name: "rejects alg none",
+        body: `assertEquals(solution({ alg: 'none', iss: 'me', aud: 'you', exp: 100, nbf: 0 }, { now: 50, issuer: 'me', audience: 'you' }), ['alg']);`,
+      },
+      {
+        name: "detects an expired token",
+        body: `assertEquals(solution({ alg: 'HS256', iss: 'me', aud: 'you', exp: 10, nbf: 0 }, { now: 50, issuer: 'me', audience: 'you' }), ['exp']);`,
+      },
+      {
+        name: "expiry is exclusive",
+        body: `assertEquals(solution({ alg: 'HS256', iss: 'me', aud: 'you', exp: 50, nbf: 0 }, { now: 50, issuer: 'me', audience: 'you' }), ['exp']);`,
+      },
+      {
+        name: "detects a wrong issuer and audience",
+        body: `assertEquals(solution({ alg: 'HS256', iss: 'them', aud: 'other', exp: 100, nbf: 0 }, { now: 50, issuer: 'me', audience: 'you' }), ['aud', 'iss']);`,
+      },
+      {
+        name: "detects a token used too early",
+        body: `assertEquals(solution({ alg: 'HS256', iss: 'me', aud: 'you', exp: 100, nbf: 90 }, { now: 50, issuer: 'me', audience: 'you' }), ['nbf']);`,
+      },
+      {
+        name: "reports every problem at once",
+        body: `var out = solution({ alg: 'none', iss: 'x', aud: 'y', exp: 1, nbf: 99 }, { now: 50, issuer: 'me', audience: 'you' });
+assertEquals(out, ['alg', 'aud', 'exp', 'iss', 'nbf']);`,
+      },
+    ],
+    hints: [
+      "Collect problems into an array rather than returning at the first failure.",
+      "Expiry is exclusive, so now equal to exp is already expired; nbf is inclusive.",
+      "Sort the array before returning so the order does not depend on your check order.",
+    ],
+    reference: `function validateClaims(token, expected) {
+  const problems = [];
+  // 'none' means the signature is skipped entirely -- always reject it.
+  if (token.alg === 'none') problems.push('alg');
+  if (token.iss !== expected.issuer) problems.push('iss');
+  if (token.aud !== expected.audience) problems.push('aud');
+  if (expected.now >= token.exp) problems.push('exp'); // exclusive
+  if (expected.now < token.nbf) problems.push('nbf'); // inclusive
+  return problems.sort();
+}
+`,
+  },
 };

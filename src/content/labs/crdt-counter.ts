@@ -92,4 +92,76 @@ const value = (c: PNCounter) =>
       href: "https://automerge.org/docs/hello/",
     },
   ],
+  challenge: {
+    prompt:
+      "Merge PN-counter replicas that have been updating independently. Each replica owns its own increment and decrement tallies; merging takes the maximum per replica, never a sum. That is what makes the merge idempotent, so replaying the same state twice is harmless.",
+    entry: "mergeCounters",
+    starter: `/**
+ * A replica state is { inc: {replicaId: count}, dec: {replicaId: count} }.
+ *
+ * @param {Array<{inc: object, dec: object}>} replicas
+ * @returns {number} the merged counter value: total increments minus decrements.
+ */
+function mergeCounters(replicas) {
+  // Per replica id take the MAXIMUM seen, not the sum. Summing double-counts
+  // whenever two replicas have already heard about the same update.
+}
+`,
+    tests: [
+      {
+        name: "a single replica",
+        body: `assertEquals(solution([{ inc: { a: 3 }, dec: {} }]), 3);`,
+      },
+      {
+        name: "merges disjoint replicas",
+        body: `assertEquals(solution([{ inc: { a: 3 }, dec: {} }, { inc: { b: 2 }, dec: {} }]), 5);`,
+      },
+      {
+        name: "overlapping knowledge is not double counted",
+        body: `assertEquals(solution([{ inc: { a: 3 }, dec: {} }, { inc: { a: 3 }, dec: {} }]), 3);`,
+      },
+      {
+        name: "takes the larger of two views",
+        body: `assertEquals(solution([{ inc: { a: 3 }, dec: {} }, { inc: { a: 5 }, dec: {} }]), 5);`,
+      },
+      {
+        name: "decrements subtract",
+        body: `assertEquals(solution([{ inc: { a: 5 }, dec: { a: 2 } }]), 3);`,
+      },
+      {
+        name: "merging is idempotent",
+        body: `var r = { inc: { a: 4 }, dec: { b: 1 } };
+assertEquals(solution([r, r, r]), solution([r]));`,
+      },
+      {
+        name: "merging is order independent",
+        body: `var x = { inc: { a: 2 }, dec: {} };
+var y = { inc: { b: 7 }, dec: { a: 1 } };
+assertEquals(solution([x, y]), solution([y, x]));`,
+      },
+      {
+        name: "no replicas",
+        body: `assertEquals(solution([]), 0);`,
+      },
+    ],
+    hints: [
+      "Build two merged maps, one for increments and one for decrements.",
+      "For every replica id keep the maximum value seen across all replicas.",
+      "The answer is the sum of the merged increments minus the sum of the merged decrements.",
+    ],
+    reference: `function mergeCounters(replicas) {
+  const mergeMax = (key) => {
+    const merged = {};
+    for (const replica of replicas) {
+      for (const [id, count] of Object.entries(replica[key] || {})) {
+        // Max, never sum: two replicas may already know the same update.
+        if (merged[id] === undefined || count > merged[id]) merged[id] = count;
+      }
+    }
+    return Object.values(merged).reduce((a, b) => a + b, 0);
+  };
+  return mergeMax('inc') - mergeMax('dec');
+}
+`,
+  },
 };

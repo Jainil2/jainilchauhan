@@ -90,4 +90,76 @@ function compare(a: Clock, b: Clock): "before" | "after" | "concurrent" {
       href: "https://cassandra.apache.org/doc/latest/cassandra/architecture/dynamo.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Compare two vector clocks and say how the events relate. Concurrent is the interesting answer: neither happened first, so the system has a genuine conflict to resolve rather than an ordering to discover.",
+    entry: "compare",
+    starter: `/**
+ * @param {Record<string, number>} a
+ * @param {Record<string, number>} b - a missing replica counts as 0.
+ * @returns {'equal'|'before'|'after'|'concurrent'}
+ */
+function compare(a, b) {
+  // 'before' means every entry of a is <= b AND at least one is strictly less.
+  // If each clock leads somewhere, they are concurrent.
+}
+`,
+    tests: [
+      {
+        name: "identical clocks are equal",
+        body: `assertEquals(solution({ a: 1, b: 2 }, { a: 1, b: 2 }), 'equal');`,
+      },
+      {
+        name: "strictly smaller is before",
+        body: `assertEquals(solution({ a: 1 }, { a: 2 }), 'before');`,
+      },
+      {
+        name: "strictly larger is after",
+        body: `assertEquals(solution({ a: 3 }, { a: 2 }), 'after');`,
+      },
+      {
+        name: "each leading somewhere is concurrent",
+        body: `assertEquals(solution({ a: 2, b: 1 }, { a: 1, b: 2 }), 'concurrent');`,
+      },
+      {
+        name: "a missing replica counts as zero",
+        body: `assertEquals(solution({ a: 1 }, { a: 1, b: 1 }), 'before');`,
+      },
+      {
+        name: "empty clocks are equal",
+        body: `assertEquals(solution({}, {}), 'equal');`,
+      },
+      {
+        name: "an empty clock precedes a populated one",
+        body: `assertEquals(solution({}, { a: 1 }), 'before');`,
+      },
+      {
+        name: "disjoint replicas are concurrent",
+        body: `assertEquals(solution({ a: 1 }, { b: 1 }), 'concurrent');`,
+      },
+    ],
+    hints: [
+      "Take the union of both key sets so a replica present in only one clock still counts.",
+      "Track two booleans as you scan: does a lead anywhere, and does b lead anywhere.",
+      "Neither leading is equal, both leading is concurrent, otherwise whoever leads is after.",
+    ],
+    reference: `function compare(a, b) {
+  // The union matters: a replica absent from one clock is at 0 there, which is
+  // information, not a gap to skip.
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  let aLeads = false;
+  let bLeads = false;
+  for (const key of keys) {
+    const x = a[key] || 0;
+    const y = b[key] || 0;
+    if (x > y) aLeads = true;
+    if (y > x) bLeads = true;
+  }
+  if (aLeads && bLeads) return 'concurrent'; // a genuine conflict
+  if (aLeads) return 'after';
+  if (bLeads) return 'before';
+  return 'equal';
+}
+`,
+  },
 };

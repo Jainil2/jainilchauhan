@@ -74,4 +74,62 @@ SELECT last_seen FROM presence WHERE user_id = 42;
       href: "https://cassandra.apache.org/doc/latest/cassandra/architecture/dynamo.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Decide what a replica does with each request during a network partition. CP refuses rather than risk disagreeing; AP answers from what it has and may be stale. The theorem is not a menu of three — during a partition you only get to pick one of two.",
+    entry: "handle",
+    starter: `/**
+ * @param {Array<'read'|'write'>} requests
+ * @param {boolean} partitioned - true when this replica cannot reach a quorum.
+ * @param {'CP'|'AP'} mode
+ * @returns {string[]} one of 'ok', 'stale' or 'error' per request.
+ *   Not partitioned: everything is 'ok'.
+ *   CP while partitioned: everything is 'error'.
+ *   AP while partitioned: reads are 'stale', writes are 'ok' (reconciled later).
+ */
+function handle(requests, partitioned, mode) {
+  // Availability and consistency only conflict once the partition exists.
+}
+`,
+    tests: [
+      {
+        name: "no partition means business as usual",
+        body: `assertEquals(solution(['read', 'write'], false, 'CP'), ['ok', 'ok']);
+assertEquals(solution(['read', 'write'], false, 'AP'), ['ok', 'ok']);`,
+      },
+      {
+        name: "CP refuses everything under partition",
+        body: `assertEquals(solution(['read', 'write'], true, 'CP'), ['error', 'error']);`,
+      },
+      {
+        name: "AP serves possibly stale reads",
+        body: `assertEquals(solution(['read'], true, 'AP'), ['stale']);`,
+      },
+      {
+        name: "AP accepts writes to reconcile later",
+        body: `assertEquals(solution(['write'], true, 'AP'), ['ok']);`,
+      },
+      {
+        name: "no requests",
+        body: `assertEquals(solution([], true, 'CP'), []);`,
+      },
+      {
+        name: "order is preserved",
+        body: `assertEquals(solution(['write', 'read', 'write'], true, 'AP'), ['ok', 'stale', 'ok']);`,
+      },
+    ],
+    hints: [
+      "Handle the not-partitioned case first and return early — there is no tradeoff to make.",
+      "CP gives up availability, so every request fails regardless of kind.",
+      "AP gives up consistency, so only reads are suspect; writes are accepted and merged afterwards.",
+    ],
+    reference: `function handle(requests, partitioned, mode) {
+  // Without a partition there is nothing to trade away.
+  if (!partitioned) return requests.map(() => 'ok');
+  if (mode === 'CP') return requests.map(() => 'error');
+  // AP: stay up, admit the read may be behind.
+  return requests.map((r) => (r === 'read' ? 'stale' : 'ok'));
+}
+`,
+  },
 };

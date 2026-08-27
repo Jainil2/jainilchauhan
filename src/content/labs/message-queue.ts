@@ -79,4 +79,80 @@ async function handle(msg: { id: string; body: unknown; attempt: number }) {
       href: "https://docs.stripe.com/webhooks",
     },
   ],
+  challenge: {
+    prompt:
+      "Assign messages to partitions and report the consumer lag left on each. Hashing by key is what guarantees ordering per key; round-robin spreads load but gives that up. Lag is the gap between what was written and what has been acknowledged.",
+    entry: "partitionLag",
+    starter: `/**
+ * @param {number} partitions
+ * @param {Array<{key: string|null}>} messages - a null key means round-robin.
+ * @param {number[]} committed - messages acknowledged per partition.
+ * @param {(s: string) => number} hash
+ * @returns {number[]} remaining lag per partition, never below zero.
+ *   Round-robin starts at partition 0 and advances only on null-keyed messages.
+ */
+function partitionLag(partitions, messages, committed, hash) {
+  // A keyed message goes to hash(key) % partitions, which is what keeps all
+  // messages for one key in order.
+}
+`,
+    tests: [
+      {
+        name: "keyed messages land by hash",
+        body: `var h = function (s) { return s.length; };
+assertEquals(solution(2, [{ key: 'ab' }], [0, 0], h), [1, 0]);`,
+      },
+      {
+        name: "the same key always lands together",
+        body: `var h = function (s) { return s.length; };
+assertEquals(solution(2, [{ key: 'a' }, { key: 'a' }], [0, 0], h), [0, 2]);`,
+      },
+      {
+        name: "null keys round-robin",
+        body: `var h = function () { return 0; };
+assertEquals(solution(2, [{ key: null }, { key: null }], [0, 0], h), [1, 1]);`,
+      },
+      {
+        name: "commits reduce lag",
+        body: `var h = function () { return 0; };
+assertEquals(solution(1, [{ key: 'a' }, { key: 'a' }], [1], h), [1]);`,
+      },
+      {
+        name: "lag never goes negative",
+        body: `var h = function () { return 0; };
+assertEquals(solution(1, [], [5], h), [0]);`,
+      },
+      {
+        name: "no messages leaves no lag",
+        body: `var h = function () { return 0; };
+assertEquals(solution(2, [], [0, 0], h), [0, 0]);`,
+      },
+      {
+        name: "mixed keyed and round-robin",
+        body: `var h = function () { return 1; };
+assertEquals(solution(2, [{ key: 'x' }, { key: null }, { key: null }], [0, 0], h), [1, 2]);`,
+      },
+    ],
+    hints: [
+      "Count how many messages each partition receives before worrying about commits.",
+      "Keep a separate cursor for round-robin so keyed messages do not advance it.",
+      "Lag is the count minus what was committed, clamped at zero.",
+    ],
+    reference: `function partitionLag(partitions, messages, committed, hash) {
+  const counts = new Array(partitions).fill(0);
+  let cursor = 0;
+  for (const message of messages) {
+    if (message.key === null) {
+      counts[cursor % partitions]++;
+      cursor++; // only null keys advance the cursor
+    } else {
+      // Hashing the key is what keeps one key's messages in one partition,
+      // and therefore in order.
+      counts[hash(message.key) % partitions]++;
+    }
+  }
+  return counts.map((c, i) => Math.max(0, c - (committed[i] || 0)));
+}
+`,
+  },
 };

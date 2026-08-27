@@ -95,4 +95,57 @@ async function runSaga(order: Order) {
       href: "https://learn.microsoft.com/en-us/azure/architecture/patterns/saga",
     },
   ],
+  challenge: {
+    prompt:
+      "Work out which compensations a saga must run when a step fails. A saga cannot roll back like a database, so it undoes completed steps in reverse order — and a step that never ran must not be compensated.",
+    entry: "compensations",
+    starter: `/**
+ * @param {string[]} steps - step names, executed in order.
+ * @param {number} failAt - index of the step that failed, or -1 when all succeed.
+ * @returns {string[]} compensations to run, in the order they should run.
+ *   The failing step itself did not complete, so it is not compensated.
+ */
+function compensations(steps, failAt) {
+  // Undo the steps that actually completed, most recent first.
+}
+`,
+    tests: [
+      {
+        name: "all steps succeed",
+        body: `assertEquals(solution(['a', 'b', 'c'], -1), []);`,
+      },
+      {
+        name: "undoes completed steps in reverse",
+        body: `assertEquals(solution(['a', 'b', 'c'], 2), ['b', 'a']);`,
+      },
+      {
+        name: "the failing step is not compensated",
+        body: `assertEquals(solution(['a', 'b'], 1), ['a']);`,
+      },
+      {
+        name: "failing on the first step undoes nothing",
+        body: `assertEquals(solution(['a', 'b'], 0), []);`,
+      },
+      {
+        name: "no steps",
+        body: `assertEquals(solution([], -1), []);`,
+      },
+      {
+        name: "a long saga unwinds fully",
+        body: `assertEquals(solution(['a', 'b', 'c', 'd'], 3), ['c', 'b', 'a']);`,
+      },
+    ],
+    hints: [
+      "When failAt is -1 nothing needs undoing.",
+      "The completed steps are the ones strictly before failAt.",
+      "Reverse them: the most recent side effect must be undone first.",
+    ],
+    reference: `function compensations(steps, failAt) {
+  if (failAt < 0) return []; // everything committed
+  // Strictly before failAt: the failing step never completed, so there is
+  // nothing of its to undo.
+  return steps.slice(0, failAt).reverse();
+}
+`,
+  },
 };

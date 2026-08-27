@@ -89,4 +89,86 @@ await fetch(\`\${issuer}/token\`, {
       href: "https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect",
     },
   ],
+  challenge: {
+    prompt:
+      "Verify a PKCE code challenge. The client keeps a secret verifier and sends only its hash up front, so an attacker who steals the authorization code off a redirect still cannot exchange it. Note that the 'plain' method provides none of that protection.",
+    entry: "verifyPkce",
+    starter: `/**
+ * @param {string} verifier - the client's secret, sent at token exchange.
+ * @param {string} challenge - what was sent at the authorization request.
+ * @param {'S256'|'plain'} method
+ * @param {(s: string) => string} sha256 - hashing function for S256.
+ * @returns {{valid: boolean, reason: string}} reason is 'ok', 'mismatch',
+ *   'method' for an unknown method, or 'length' when the verifier is outside
+ *   43 to 128 characters. Check length first, then method, then the match.
+ */
+function verifyPkce(verifier, challenge, method, sha256) {
+  // S256 compares sha256(verifier) with the challenge. 'plain' compares them
+  // directly, which is why it protects against nothing.
+}
+`,
+    tests: [
+      {
+        name: "a matching S256 challenge",
+        body: `var v = new Array(44).join('a') + 'b';
+var h = function (s) { return 'H(' + s + ')'; };
+assertEquals(solution(v, 'H(' + v + ')', 'S256', h), { valid: true, reason: 'ok' });`,
+      },
+      {
+        name: "a mismatched S256 challenge",
+        body: `var v = new Array(44).join('a') + 'b';
+var h = function (s) { return 'H(' + s + ')'; };
+assertEquals(solution(v, 'H(something-else)', 'S256', h).reason, 'mismatch');`,
+      },
+      {
+        name: "plain compares directly",
+        body: `var v = new Array(44).join('a') + 'b';
+var h = function (s) { return 'H(' + s + ')'; };
+assertEquals(solution(v, v, 'plain', h).valid, true);`,
+      },
+      {
+        name: "a verifier that is too short",
+        body: `var h = function (s) { return s; };
+assertEquals(solution('short', 'short', 'plain', h).reason, 'length');`,
+      },
+      {
+        name: "a verifier that is too long",
+        body: `var v = new Array(200).join('a');
+var h = function (s) { return s; };
+assertEquals(solution(v, v, 'plain', h).reason, 'length');`,
+      },
+      {
+        name: "an unknown method",
+        body: `var v = new Array(44).join('a') + 'b';
+var h = function (s) { return s; };
+assertEquals(solution(v, v, 'S512', h).reason, 'method');`,
+      },
+      {
+        name: "length is checked before the match",
+        body: `var h = function (s) { return s; };
+assertEquals(solution('tiny', 'totally-different', 'plain', h).reason, 'length');`,
+      },
+    ],
+    hints: [
+      "Check the verifier length first: the spec requires between 43 and 128 characters.",
+      "Then reject any method that is not S256 or plain.",
+      "S256 hashes the verifier before comparing; plain compares the raw strings.",
+    ],
+    reference: `function verifyPkce(verifier, challenge, method, sha256) {
+  // Length first: a short verifier is guessable, which defeats the whole point.
+  if (verifier.length < 43 || verifier.length > 128) {
+    return { valid: false, reason: 'length' };
+  }
+  if (method !== 'S256' && method !== 'plain') {
+    return { valid: false, reason: 'method' };
+  }
+  // 'plain' sends the secret in the first request, so a stolen code is still
+  // exchangeable. S256 is the only variant that actually protects anything.
+  const derived = method === 'S256' ? sha256(verifier) : verifier;
+  return derived === challenge
+    ? { valid: true, reason: 'ok' }
+    : { valid: false, reason: 'mismatch' };
+}
+`,
+  },
 };

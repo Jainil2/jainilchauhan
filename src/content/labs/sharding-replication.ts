@@ -88,4 +88,70 @@ GROUP BY tenant_id;  -- fans out to every shard, then merges`,
       href: "https://discord.com/blog/how-discord-stores-trillions-of-messages",
     },
   ],
+  challenge: {
+    prompt:
+      "Resolve a quorum read. Enough replicas must answer, and among those that do the newest version wins. Quorum works because reads and writes overlap by at least one replica when R plus W exceeds N.",
+    entry: "quorumRead",
+    starter: `/**
+ * @param {Array<{value: any, version: number}|null>} replicas - null means the
+ *   replica did not answer.
+ * @param {number} r - responses required.
+ * @returns {any|null} the value with the highest version, or null when fewer
+ *   than r replicas answered. Ties go to the earliest replica.
+ */
+function quorumRead(replicas, r) {
+  // Count the answers first. Without a quorum you must not return anything,
+  // even if the replicas that did answer agree.
+}
+`,
+    tests: [
+      {
+        name: "returns the newest version",
+        body: `assertEquals(solution([{ value: 'old', version: 1 }, { value: 'new', version: 2 }], 2), 'new');`,
+      },
+      {
+        name: "refuses without a quorum",
+        body: `assertEquals(solution([{ value: 'a', version: 1 }, null, null], 2), null);`,
+      },
+      {
+        name: "an exact quorum is enough",
+        body: `assertEquals(solution([{ value: 'a', version: 1 }, null], 1), 'a');`,
+      },
+      {
+        name: "ignores replicas that did not answer",
+        body: `assertEquals(solution([null, { value: 'b', version: 5 }], 1), 'b');`,
+      },
+      {
+        name: "ties go to the earliest replica",
+        body: `assertEquals(solution([{ value: 'x', version: 3 }, { value: 'y', version: 3 }], 2), 'x');`,
+      },
+      {
+        name: "no replicas answered",
+        body: `assertEquals(solution([null, null], 1), null);`,
+      },
+      {
+        name: "a quorum of zero always succeeds",
+        body: `assertEquals(solution([{ value: 'a', version: 1 }], 0), 'a');`,
+      },
+    ],
+    hints: [
+      "Filter out the nulls before doing anything else, and compare that count against r.",
+      "Then scan the responders keeping the highest version seen.",
+      "Use a strict greater-than when comparing versions so the earliest replica wins a tie.",
+    ],
+    reference: `function quorumRead(replicas, r) {
+  const answered = replicas.filter((x) => x !== null);
+  // Below quorum you must not answer at all: the missing replicas could hold
+  // a newer write.
+  if (answered.length < r) return null;
+
+  let best = null;
+  for (const reply of answered) {
+    // Strict >: the first replica at a given version keeps the tie.
+    if (best === null || reply.version > best.version) best = reply;
+  }
+  return best === null ? null : best.value;
+}
+`,
+  },
 };

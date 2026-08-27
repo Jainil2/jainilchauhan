@@ -85,4 +85,78 @@ function pick(backends: { id: string; inflight: number; healthy: boolean }[]) {
       href: "https://blog.cloudflare.com/unimog-cloudflares-edge-load-balancer/",
     },
   ],
+  challenge: {
+    prompt:
+      "Route requests with least-connections, the policy that actually respects how long work takes. Round-robin assumes every request costs the same; least-connections notices when one backend is still busy and sends the next request elsewhere.",
+    entry: "route",
+    starter: `/**
+ * @param {number} nodes - backends 0..nodes-1, all starting idle.
+ * @param {Array<['start']|['done', number]>} events
+ *   ['start'] routes a request; ['done', node] frees one connection there.
+ * @returns {number[]} the backend chosen for each 'start', in order.
+ *   Ties go to the lowest index.
+ */
+function route(nodes, events) {
+  // Send each request to whichever backend currently holds the fewest open
+  // connections.
+}
+`,
+    tests: [
+      {
+        name: "spreads across idle backends",
+        body: `assertEquals(solution(3, [['start'], ['start'], ['start']]), [0, 1, 2]);`,
+      },
+      {
+        name: "wraps once everyone is equal",
+        body: `assertEquals(solution(2, [['start'], ['start'], ['start']]), [0, 1, 0]);`,
+      },
+      {
+        name: "a freed backend is chosen again",
+        body: `assertEquals(solution(2, [['start'], ['start'], ['done', 0], ['start']]), [0, 1, 0]);`,
+      },
+      {
+        name: "avoids a backend still busy",
+        body: `assertEquals(solution(2, [['start'], ['done', 0], ['start'], ['start']]), [0, 0, 1]);`,
+      },
+      {
+        name: "ties go to the lowest index",
+        body: `assertEquals(solution(3, [['start'], ['done', 0], ['start']]), [0, 0]);`,
+      },
+      {
+        name: "no requests",
+        body: `assertEquals(solution(2, []), []);`,
+      },
+      {
+        name: "stays balanced over many requests",
+        body: `var events = [];
+for (var i = 0; i < 900; i++) events.push(['start']);
+var out = solution(3, events);
+var counts = [0, 0, 0];
+for (var j = 0; j < out.length; j++) counts[out[j]]++;
+assertEquals(counts, [300, 300, 300]);`,
+      },
+    ],
+    hints: [
+      "Keep an array of open connection counts, one per backend.",
+      "For a start, scan for the smallest count and take the first index that holds it.",
+      "A done event decrements that backend, never below zero.",
+    ],
+    reference: `function route(nodes, events) {
+  const open = new Array(nodes).fill(0);
+  const out = [];
+  for (const [kind, node] of events) {
+    if (kind === 'done') {
+      if (open[node] > 0) open[node]--;
+      continue;
+    }
+    // Strict < keeps the earliest index on a tie.
+    let best = 0;
+    for (let i = 1; i < nodes; i++) if (open[i] < open[best]) best = i;
+    open[best]++;
+    out.push(best);
+  }
+  return out;
+}
+`,
+  },
 };

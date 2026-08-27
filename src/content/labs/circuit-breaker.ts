@@ -98,4 +98,96 @@ class CircuitBreaker {
       href: "https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/outlier",
     },
   ],
+  challenge: {
+    prompt:
+      "Run the circuit breaker state machine and report its state after each call. Closed lets traffic through, open fails fast without touching the dependency, half-open lets a single probe decide. Failing fast is the whole point: retrying a dead dependency turns its outage into yours.",
+    entry: "runBreaker",
+    starter: `/**
+ * @param {Array<['call'|'tick', boolean|number]>} events
+ *   ['call', succeeded] attempts a call; ['tick', ms] advances time.
+ * @param {number} threshold - consecutive failures that trip the breaker.
+ * @param {number} cooldown - ms open before it moves to half-open.
+ * @returns {string[]} state after each event: 'closed', 'open' or 'half-open'.
+ *   A call while open is rejected and changes nothing. A successful half-open
+ *   probe closes the breaker; a failed one opens it again.
+ */
+function runBreaker(events, threshold, cooldown) {
+  // Consecutive failures, not total. One success resets the count.
+}
+`,
+    tests: [
+      {
+        name: "successes keep it closed",
+        body: `assertEquals(solution([['call', true], ['call', true]], 2, 1000), ['closed', 'closed']);`,
+      },
+      {
+        name: "consecutive failures trip it",
+        body: `assertEquals(solution([['call', false], ['call', false]], 2, 1000), ['closed', 'open']);`,
+      },
+      {
+        name: "a success resets the streak",
+        body: `assertEquals(solution([['call', false], ['call', true], ['call', false]], 2, 1000), ['closed', 'closed', 'closed']);`,
+      },
+      {
+        name: "cooldown moves it to half-open",
+        body: `assertEquals(solution([['call', false], ['tick', 1000]], 1, 1000), ['open', 'half-open']);`,
+      },
+      {
+        name: "a good probe closes it",
+        body: `assertEquals(solution([['call', false], ['tick', 1000], ['call', true]], 1, 1000), ['open', 'half-open', 'closed']);`,
+      },
+      {
+        name: "a bad probe reopens it",
+        body: `assertEquals(solution([['call', false], ['tick', 1000], ['call', false]], 1, 1000), ['open', 'half-open', 'open']);`,
+      },
+      {
+        name: "calls while open change nothing",
+        body: `assertEquals(solution([['call', false], ['call', true]], 1, 1000), ['open', 'open']);`,
+      },
+      {
+        name: "a partial cooldown is not enough",
+        body: `assertEquals(solution([['call', false], ['tick', 500]], 1, 1000), ['open', 'open']);`,
+      },
+    ],
+    hints: [
+      "Track the state, the consecutive failure count, and how long the breaker has been open.",
+      "While open, a call is rejected outright — do not let it touch the failure count.",
+      "In half-open a single call decides: success closes and resets, failure reopens and restarts the cooldown.",
+    ],
+    reference: `function runBreaker(events, threshold, cooldown) {
+  let state = 'closed';
+  let failures = 0;
+  let openFor = 0;
+  const out = [];
+
+  for (const [kind, arg] of events) {
+    if (kind === 'tick') {
+      if (state === 'open') {
+        openFor += arg;
+        if (openFor >= cooldown) state = 'half-open';
+      }
+    } else if (state === 'open') {
+      // Rejected without touching the dependency -- that is 'fail fast'.
+    } else if (state === 'half-open') {
+      if (arg) {
+        state = 'closed';
+        failures = 0;
+      } else {
+        state = 'open';
+        openFor = 0;
+      }
+    } else {
+      // Consecutive, not cumulative: one success clears the streak.
+      if (arg) failures = 0;
+      else if (++failures >= threshold) {
+        state = 'open';
+        openFor = 0;
+      }
+    }
+    out.push(state);
+  }
+  return out;
+}
+`,
+  },
 };

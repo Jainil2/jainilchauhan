@@ -98,4 +98,67 @@ await navigator.credentials.get({ publicKey: { challenge, rpId: "example.com" } 
       href: "https://blog.cloudflare.com/2022-07-sms-phishing-attacks/",
     },
   ],
+  challenge: {
+    prompt:
+      "Verify the clientDataJSON of a WebAuthn assertion. The origin check is the part that makes passkeys phishing-resistant: the browser reports where the ceremony really happened, so a credential simply will not work on a lookalike domain.",
+    entry: "verifyClientData",
+    starter: `/**
+ * @param {{type: string, challenge: string, origin: string, crossOrigin: boolean}} clientData
+ * @param {{type: string, challenge: string, origin: string}} expected
+ * @returns {string[]} problems, ascending alphabetically. Empty when valid.
+ *   Use 'type', 'challenge', 'origin' and 'crossOrigin'.
+ */
+function verifyClientData(clientData, expected) {
+  // Compare the challenge exactly -- it is the replay defence, and accepting a
+  // stale one throws that away.
+}
+`,
+    tests: [
+      {
+        name: "a valid assertion",
+        body: `assertEquals(solution({ type: 'webauthn.get', challenge: 'abc', origin: 'https://a.com', crossOrigin: false }, { type: 'webauthn.get', challenge: 'abc', origin: 'https://a.com' }), []);`,
+      },
+      {
+        name: "detects a wrong ceremony type",
+        body: `assertEquals(solution({ type: 'webauthn.create', challenge: 'abc', origin: 'https://a.com', crossOrigin: false }, { type: 'webauthn.get', challenge: 'abc', origin: 'https://a.com' }), ['type']);`,
+      },
+      {
+        name: "detects a replayed challenge",
+        body: `assertEquals(solution({ type: 'webauthn.get', challenge: 'old', origin: 'https://a.com', crossOrigin: false }, { type: 'webauthn.get', challenge: 'abc', origin: 'https://a.com' }), ['challenge']);`,
+      },
+      {
+        name: "rejects a lookalike origin",
+        body: `assertEquals(solution({ type: 'webauthn.get', challenge: 'abc', origin: 'https://a.com.evil.com', crossOrigin: false }, { type: 'webauthn.get', challenge: 'abc', origin: 'https://a.com' }), ['origin']);`,
+      },
+      {
+        name: "rejects a cross-origin ceremony",
+        body: `assertEquals(solution({ type: 'webauthn.get', challenge: 'abc', origin: 'https://a.com', crossOrigin: true }, { type: 'webauthn.get', challenge: 'abc', origin: 'https://a.com' }), ['crossOrigin']);`,
+      },
+      {
+        name: "http is not https",
+        body: `assertEquals(solution({ type: 'webauthn.get', challenge: 'abc', origin: 'http://a.com', crossOrigin: false }, { type: 'webauthn.get', challenge: 'abc', origin: 'https://a.com' }), ['origin']);`,
+      },
+      {
+        name: "reports every problem, sorted",
+        body: `assertEquals(solution({ type: 'x', challenge: 'y', origin: 'z', crossOrigin: true }, { type: 'webauthn.get', challenge: 'abc', origin: 'https://a.com' }), ['challenge', 'crossOrigin', 'origin', 'type']);`,
+      },
+    ],
+    hints: [
+      "Collect problems rather than returning at the first one.",
+      "Origin must match exactly — no prefix or suffix matching, which is the whole anti-phishing property.",
+      "Sort before returning so the output does not depend on your check order.",
+    ],
+    reference: `function verifyClientData(clientData, expected) {
+  const problems = [];
+  if (clientData.type !== expected.type) problems.push('type');
+  // Exact match: the challenge is the replay defence.
+  if (clientData.challenge !== expected.challenge) problems.push('challenge');
+  // Exact match again. Any fuzzy comparison here reintroduces phishing --
+  // https://a.com.evil.com must not satisfy https://a.com.
+  if (clientData.origin !== expected.origin) problems.push('origin');
+  if (clientData.crossOrigin) problems.push('crossOrigin');
+  return problems.sort();
+}
+`,
+  },
 };

@@ -74,4 +74,82 @@ state := conn.ConnectionState()
       href: "https://developer.apple.com/documentation/security/preventing-insecure-network-connections",
     },
   ],
+  challenge: {
+    prompt:
+      "Negotiate a TLS cipher suite. The server picks from its own ordered preferences among what the client offered, and refuses anything below the minimum version. Letting the client choose is how downgrade attacks happen.",
+    entry: "negotiate",
+    starter: `/**
+ * @param {string[]} clientOffers - suites the client supports.
+ * @param {Array<{name: string, version: number, weak: boolean}>} serverSuites
+ *   in the SERVER's preference order.
+ * @param {number} minVersion
+ * @returns {string|null} the chosen suite name, or null when none qualifies.
+ *   A suite qualifies when the client offered it, its version is at least
+ *   minVersion, and it is not weak.
+ */
+function negotiate(clientOffers, serverSuites, minVersion) {
+  // Walk the SERVER's order, not the client's. The first qualifying suite wins.
+}
+`,
+    tests: [
+      {
+        name: "picks the server's first acceptable suite",
+        body: `var s = [{ name: 'A', version: 3, weak: false }, { name: 'B', version: 3, weak: false }];
+assertEquals(solution(['A', 'B'], s, 3), 'A');`,
+      },
+      {
+        name: "server preference beats client order",
+        body: `var s = [{ name: 'A', version: 3, weak: false }, { name: 'B', version: 3, weak: false }];
+assertEquals(solution(['B', 'A'], s, 3), 'A');`,
+      },
+      {
+        name: "skips suites the client did not offer",
+        body: `var s = [{ name: 'A', version: 3, weak: false }, { name: 'B', version: 3, weak: false }];
+assertEquals(solution(['B'], s, 3), 'B');`,
+      },
+      {
+        name: "rejects a version below the minimum",
+        body: `var s = [{ name: 'OLD', version: 1, weak: false }, { name: 'NEW', version: 3, weak: false }];
+assertEquals(solution(['OLD', 'NEW'], s, 3), 'NEW');`,
+      },
+      {
+        name: "skips weak suites",
+        body: `var s = [{ name: 'RC4', version: 3, weak: true }, { name: 'AES', version: 3, weak: false }];
+assertEquals(solution(['RC4', 'AES'], s, 3), 'AES');`,
+      },
+      {
+        name: "no overlap means no handshake",
+        body: `var s = [{ name: 'A', version: 3, weak: false }];
+assertEquals(solution(['Z'], s, 3), null);`,
+      },
+      {
+        name: "everything too old means no handshake",
+        body: `var s = [{ name: 'A', version: 1, weak: false }];
+assertEquals(solution(['A'], s, 3), null);`,
+      },
+      {
+        name: "no offers at all",
+        body: `var s = [{ name: 'A', version: 3, weak: false }];
+assertEquals(solution([], s, 3), null);`,
+      },
+    ],
+    hints: [
+      "Iterate the server list, since that is the preference order that matters.",
+      "A suite qualifies only if the client offered it, its version reaches the minimum, and it is not weak.",
+      "Return the first qualifying suite; return null if the loop finishes.",
+    ],
+    reference: `function negotiate(clientOffers, serverSuites, minVersion) {
+  const offered = new Set(clientOffers);
+  // Server order, deliberately: honouring the client's preference is how a
+  // downgrade attack talks a server into its weakest option.
+  for (const suite of serverSuites) {
+    if (!offered.has(suite.name)) continue;
+    if (suite.version < minVersion) continue;
+    if (suite.weak) continue;
+    return suite.name;
+  }
+  return null;
+}
+`,
+  },
 };

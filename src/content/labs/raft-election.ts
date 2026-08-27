@@ -87,4 +87,71 @@ func (r *Raft) run() {
       href: "https://www.cockroachlabs.com/docs/stable/architecture/replication-layer.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Implement the RequestVote rule that keeps Raft safe. A follower grants its vote only for a term at least as new as its own, only once per term, and only to a candidate whose log is at least as up to date as its own. That last condition is what stops a stale leader erasing committed entries.",
+    entry: "grantVote",
+    starter: `/**
+ * @param {{term: number, votedFor: string|null, lastLogTerm: number, lastLogIndex: number}} voter
+ * @param {{term: number, id: string, lastLogTerm: number, lastLogIndex: number}} request
+ * @returns {boolean} whether the vote is granted.
+ *   A log is at least as up to date when its last term is higher, or the terms
+ *   match and its index is at least as large.
+ */
+function grantVote(voter, request) {
+  // Three gates, all of which must pass: term, one-vote-per-term, log freshness.
+}
+`,
+    tests: [
+      {
+        name: "grants for a newer term with an equal log",
+        body: `assertEquals(solution({ term: 1, votedFor: null, lastLogTerm: 1, lastLogIndex: 5 }, { term: 2, id: 'a', lastLogTerm: 1, lastLogIndex: 5 }), true);`,
+      },
+      {
+        name: "refuses an older term",
+        body: `assertEquals(solution({ term: 3, votedFor: null, lastLogTerm: 1, lastLogIndex: 5 }, { term: 2, id: 'a', lastLogTerm: 1, lastLogIndex: 5 }), false);`,
+      },
+      {
+        name: "refuses when it already voted this term",
+        body: `assertEquals(solution({ term: 2, votedFor: 'b', lastLogTerm: 1, lastLogIndex: 5 }, { term: 2, id: 'a', lastLogTerm: 1, lastLogIndex: 5 }), false);`,
+      },
+      {
+        name: "grants again to the same candidate",
+        body: `assertEquals(solution({ term: 2, votedFor: 'a', lastLogTerm: 1, lastLogIndex: 5 }, { term: 2, id: 'a', lastLogTerm: 1, lastLogIndex: 5 }), true);`,
+      },
+      {
+        name: "refuses a candidate with a stale log term",
+        body: `assertEquals(solution({ term: 1, votedFor: null, lastLogTerm: 3, lastLogIndex: 2 }, { term: 5, id: 'a', lastLogTerm: 2, lastLogIndex: 99 }), false);`,
+      },
+      {
+        name: "refuses a shorter log at the same term",
+        body: `assertEquals(solution({ term: 1, votedFor: null, lastLogTerm: 2, lastLogIndex: 9 }, { term: 5, id: 'a', lastLogTerm: 2, lastLogIndex: 8 }), false);`,
+      },
+      {
+        name: "grants for a higher log term even with fewer entries",
+        body: `assertEquals(solution({ term: 1, votedFor: null, lastLogTerm: 1, lastLogIndex: 99 }, { term: 2, id: 'a', lastLogTerm: 2, lastLogIndex: 1 }), true);`,
+      },
+    ],
+    hints: [
+      "Reject immediately when the request's term is below the voter's term.",
+      "Within the same term the voter may only support who it already supported.",
+      "Compare last log term first; only when those match does the index decide.",
+    ],
+    reference: `function grantVote(voter, request) {
+  if (request.term < voter.term) return false;
+
+  // One vote per term -- unless it is the same candidate asking again.
+  if (request.term === voter.term && voter.votedFor !== null && voter.votedFor !== request.id) {
+    return false;
+  }
+
+  // Log freshness. Without this a candidate missing committed entries could
+  // win and overwrite them.
+  const upToDate =
+    request.lastLogTerm > voter.lastLogTerm ||
+    (request.lastLogTerm === voter.lastLogTerm && request.lastLogIndex >= voter.lastLogIndex);
+  return upToDate;
+}
+`,
+  },
 };

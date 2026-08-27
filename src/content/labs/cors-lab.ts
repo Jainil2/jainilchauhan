@@ -81,4 +81,81 @@ app.use((req, res, next) => {
       href: "https://fetch.spec.whatwg.org/#http-cors-protocol",
     },
   ],
+  challenge: {
+    prompt:
+      "Implement the browser's CORS preflight decision. Given a request and a server policy, decide whether the browser lets the response through. Note what CORS is not: the request often reaches the server anyway, so CORS protects the reader of the response, never the server.",
+    entry: "corsDecision",
+    starter: `/**
+ * @param {{origin: string, method: string, headers: string[], credentials: boolean}} request
+ * @param {{origins: string[], methods: string[], headers: string[], allowCredentials: boolean}} policy
+ *   policy.origins may contain '*'.
+ * @returns {{allowed: boolean, reason: string}} reason is 'ok' when allowed,
+ *   otherwise one of 'origin', 'method', 'headers' or 'credentials'.
+ *   Check in that order.
+ */
+function corsDecision(request, policy) {
+  // A wildcard origin cannot be combined with credentials -- that pairing is
+  // forbidden precisely because it would expose every user's session.
+}
+`,
+    tests: [
+      {
+        name: "an allowed origin and method",
+        body: `assertEquals(solution({ origin: 'https://a.com', method: 'GET', headers: [], credentials: false }, { origins: ['https://a.com'], methods: ['GET'], headers: [], allowCredentials: false }), { allowed: true, reason: 'ok' });`,
+      },
+      {
+        name: "a disallowed origin",
+        body: `assertEquals(solution({ origin: 'https://evil.com', method: 'GET', headers: [], credentials: false }, { origins: ['https://a.com'], methods: ['GET'], headers: [], allowCredentials: false }).reason, 'origin');`,
+      },
+      {
+        name: "a wildcard origin allows anyone",
+        body: `assertEquals(solution({ origin: 'https://x.com', method: 'GET', headers: [], credentials: false }, { origins: ['*'], methods: ['GET'], headers: [], allowCredentials: false }).allowed, true);`,
+      },
+      {
+        name: "a disallowed method",
+        body: `assertEquals(solution({ origin: 'https://a.com', method: 'DELETE', headers: [], credentials: false }, { origins: ['https://a.com'], methods: ['GET'], headers: [], allowCredentials: false }).reason, 'method');`,
+      },
+      {
+        name: "an unlisted request header",
+        body: `assertEquals(solution({ origin: 'https://a.com', method: 'GET', headers: ['x-token'], credentials: false }, { origins: ['https://a.com'], methods: ['GET'], headers: [], allowCredentials: false }).reason, 'headers');`,
+      },
+      {
+        name: "wildcard plus credentials is forbidden",
+        body: `assertEquals(solution({ origin: 'https://a.com', method: 'GET', headers: [], credentials: true }, { origins: ['*'], methods: ['GET'], headers: [], allowCredentials: true }).reason, 'credentials');`,
+      },
+      {
+        name: "credentials without server opt-in",
+        body: `assertEquals(solution({ origin: 'https://a.com', method: 'GET', headers: [], credentials: true }, { origins: ['https://a.com'], methods: ['GET'], headers: [], allowCredentials: false }).reason, 'credentials');`,
+      },
+      {
+        name: "credentials with an exact origin are fine",
+        body: `assertEquals(solution({ origin: 'https://a.com', method: 'GET', headers: [], credentials: true }, { origins: ['https://a.com'], methods: ['GET'], headers: [], allowCredentials: true }).allowed, true);`,
+      },
+    ],
+    hints: [
+      "Check origin, then method, then headers, then credentials, returning the first failure.",
+      "Header matching should be case-insensitive; lower-case both sides before comparing.",
+      "Credentials fail when the server did not opt in, or when the policy origin is a wildcard.",
+    ],
+    reference: `function corsDecision(request, policy) {
+  const deny = (reason) => ({ allowed: false, reason });
+  const wildcard = policy.origins.includes('*');
+
+  if (!wildcard && !policy.origins.includes(request.origin)) return deny('origin');
+  if (!policy.methods.includes(request.method)) return deny('method');
+
+  const allowedHeaders = policy.headers.map((h) => h.toLowerCase());
+  for (const header of request.headers) {
+    if (!allowedHeaders.includes(header.toLowerCase())) return deny('headers');
+  }
+
+  if (request.credentials) {
+    // A wildcard with credentials would hand any site the user's session, so
+    // the spec forbids the combination outright.
+    if (!policy.allowCredentials || wildcard) return deny('credentials');
+  }
+  return { allowed: true, reason: 'ok' };
+}
+`,
+  },
 };

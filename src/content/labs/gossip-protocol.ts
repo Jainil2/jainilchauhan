@@ -86,4 +86,80 @@ function onGossip(msg: { heartbeats: Map<string, number> }) {
       href: "https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/",
     },
   ],
+  challenge: {
+    prompt:
+      "Count the rounds an epidemic takes to reach every node. Each infected node contacts its listed peers each round, so the spread is exponential and the round count grows logarithmically with the cluster — which is why gossip scales where broadcast does not.",
+    entry: "roundsToSpread",
+    starter: `/**
+ * @param {number[][]} peers - peers[i] is who node i contacts each round.
+ * @param {number} start - the first node to know.
+ * @returns {number} rounds until every node knows, or -1 if some never do.
+ *   Zero rounds when there is only the starting node to inform.
+ */
+function roundsToSpread(peers, start) {
+  // Every currently-informed node spreads in the same round, so a round is one
+  // whole layer -- this is breadth-first search counting layers.
+}
+`,
+    tests: [
+      {
+        name: "one node needs no rounds",
+        body: `assertEquals(solution([[]], 0), 0);`,
+      },
+      {
+        name: "a direct peer takes one round",
+        body: `assertEquals(solution([[1], []], 0), 1);`,
+      },
+      {
+        name: "a chain takes one round per hop",
+        body: `assertEquals(solution([[1], [2], []], 0), 2);`,
+      },
+      {
+        name: "fanout spreads in parallel",
+        body: `assertEquals(solution([[1, 2], [], []], 0), 1);`,
+      },
+      {
+        name: "unreachable nodes never learn",
+        body: `assertEquals(solution([[1], [], []], 0), -1);`,
+      },
+      {
+        name: "doubling reaches many nodes quickly",
+        body: `var n = 64;
+var peers = [];
+for (var i = 0; i < n; i++) peers.push(i * 2 + 1 < n ? [i * 2 + 1, i * 2 + 2].filter(function (x) { return x < n; }) : []);
+assert(solution(peers, 0) <= 6, 'expected logarithmic spread');`,
+      },
+    ],
+    hints: [
+      "Track who knows, and process the newly informed as one whole layer per round.",
+      "Stop as soon as everyone knows; if a layer comes up empty first, some nodes are unreachable.",
+      "Starting alone with everyone already informed is zero rounds, not one.",
+    ],
+    reference: `function roundsToSpread(peers, start) {
+  const n = peers.length;
+  const knows = new Array(n).fill(false);
+  knows[start] = true;
+  let informed = 1;
+  let frontier = [start];
+  let rounds = 0;
+
+  while (informed < n) {
+    const next = [];
+    // One round infects an entire layer at once.
+    for (const node of frontier) {
+      for (const peer of peers[node]) {
+        if (knows[peer]) continue;
+        knows[peer] = true;
+        informed++;
+        next.push(peer);
+      }
+    }
+    if (next.length === 0) return -1; // nobody new: the rest are unreachable
+    frontier = next;
+    rounds++;
+  }
+  return rounds;
+}
+`,
+  },
 };

@@ -82,4 +82,73 @@ export function nextId(nodeId: bigint): bigint {
       href: "https://github.com/sony/sonyflake",
     },
   ],
+  challenge: {
+    prompt:
+      "Unpack a Snowflake ID into its timestamp, node and sequence. The catch is that JavaScript's bitwise operators truncate to 32 bits, so the shifts every other language uses silently corrupt these IDs — you have to use arithmetic instead.",
+    entry: "decode",
+    starter: `/**
+ * Layout: timestamp * 2**22 + node * 2**12 + sequence.
+ * 12 bits of sequence, 10 bits of node.
+ *
+ * @param {number} id
+ * @returns {{timestamp: number, node: number, sequence: number}}
+ */
+function decode(id) {
+  // Do NOT use >> or &. They coerce to 32 bits, and these IDs are larger.
+  // Division and remainder are the only safe tools here.
+}
+`,
+    tests: [
+      {
+        name: "decodes a small id",
+        body: `assertEquals(solution(0), { timestamp: 0, node: 0, sequence: 0 });`,
+      },
+      {
+        name: "reads the sequence",
+        body: `assertEquals(solution(7), { timestamp: 0, node: 0, sequence: 7 });`,
+      },
+      {
+        name: "reads the node",
+        body: `assertEquals(solution(5 * 4096), { timestamp: 0, node: 5, sequence: 0 });`,
+      },
+      {
+        name: "reads a timestamp beyond 32 bits",
+        body: `assertEquals(solution(1000 * 4194304 + 5 * 4096 + 7), { timestamp: 1000, node: 5, sequence: 7 });`,
+      },
+      {
+        name: "a large id does not overflow",
+        body: `var id = 1700000 * 4194304 + 900 * 4096 + 4000;
+assertEquals(solution(id), { timestamp: 1700000, node: 900, sequence: 4000 });`,
+      },
+      {
+        name: "sequence wraps within its 12 bits",
+        body: `assertEquals(solution(4095).sequence, 4095);
+assertEquals(solution(4096).sequence, 0);`,
+      },
+      {
+        name: "node stays within its 10 bits",
+        body: `assertEquals(solution(1023 * 4096).node, 1023);
+assertEquals(solution(1024 * 4096).node, 0);`,
+      },
+    ],
+    hints: [
+      "Sequence is the remainder after dividing by 4096.",
+      "Node is the whole part of id divided by 4096, then taken modulo 1024.",
+      "Timestamp is the whole part of id divided by 4194304, which is 2 to the 22nd.",
+    ],
+    reference: `function decode(id) {
+  const SEQUENCE_BITS = 4096; // 2**12
+  const NODE_BITS = 1024; // 2**10
+  const TIMESTAMP_SHIFT = 4194304; // 2**22
+
+  // Arithmetic, not bit twiddling: >> and & coerce their operands to 32-bit
+  // integers, which silently destroys any id above about 4.29 billion.
+  return {
+    timestamp: Math.floor(id / TIMESTAMP_SHIFT),
+    node: Math.floor(id / SEQUENCE_BITS) % NODE_BITS,
+    sequence: id % SEQUENCE_BITS,
+  };
+}
+`,
+  },
 };
