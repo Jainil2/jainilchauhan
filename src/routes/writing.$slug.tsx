@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { isPlatform } from "@/lib/site";
 import { ArrowLeft, Clock, ExternalLink } from "lucide-react";
 
 /* ─── Static writing data ──────────────────────────────────────────────────── */
@@ -63,6 +64,10 @@ const writingData: Record<
 /* ─── Route ─────────────────────────────────────────────────────────────────── */
 
 export const Route = createFileRoute("/writing/$slug")({
+  // Portfolio-only — see the note in projects.$slug.tsx.
+  beforeLoad: () => {
+    if (isPlatform) throw notFound();
+  },
   head: ({ params }) => {
     const post = writingData[params.slug];
     return {

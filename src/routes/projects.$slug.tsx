@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { isPlatform } from "@/lib/site";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 
 /* ─── Static project data ──────────────────────────────────────────────────── */
@@ -76,6 +77,12 @@ const projectData: Record<
 /* ─── Route ─────────────────────────────────────────────────────────────────── */
 
 export const Route = createFileRoute("/projects/$slug")({
+  // Portfolio-only. The route tree is shared by both Workers, so without this
+  // the platform domain would serve Jainil's project pages — duplicate content
+  // Google would have to pick a winner for, on the wrong product.
+  beforeLoad: () => {
+    if (isPlatform) throw notFound();
+  },
   head: ({ params }) => {
     const p = projectData[params.slug];
     return {

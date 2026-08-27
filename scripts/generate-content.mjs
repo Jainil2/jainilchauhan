@@ -13,7 +13,19 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const labsDir = join(repoRoot, "src", "content", "labs");
-const SITE = process.env.SITE_URL || "https://jainilchauhan.com";
+// Both Workers build from this repo and both write public/sitemap.xml, so the
+// URL must follow the build. Shipping a delta sitemap full of jainilchauhan.com
+// URLs would be a silent, launch-day SEO bug, so warn loudly instead.
+const isDeltaBuild = process.env.VITE_SITE === "delta";
+const SITE =
+  process.env.SITE_URL || (isDeltaBuild ? "https://delta.invalid" : "https://jainilchauhan.com");
+
+if (isDeltaBuild && !process.env.SITE_URL) {
+  console.warn(
+    "[content] WARNING: delta build with no SITE_URL — sitemap.xml uses a placeholder host.\n" +
+      "          Set SITE_URL=https://<domain> before deploying the delta Worker.",
+  );
+}
 
 const SUMMARY_FIELDS = ["slug", "title", "category", "difficulty", "readingTimeMin", "blurb"];
 

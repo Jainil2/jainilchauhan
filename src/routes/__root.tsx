@@ -8,6 +8,7 @@ import { useWebVitals } from "@/lib/useWebVitals";
 import { useBuildStatus } from "@/lib/useBuildStatus";
 import { useHydrateControlPlane } from "@/lib/useControlPlane";
 import { themeBootScript } from "@/lib/useTheme";
+import { isPortfolio } from "@/lib/site";
 
 import appCss from "../styles.css?url";
 
@@ -34,57 +35,49 @@ function NotFoundComponent() {
   );
 }
 
+/*
+ * Root defaults only. Individual routes override title and description; these
+ * are what a page inherits when it sets none.
+ *
+ * Previously this list repeated `description`, `og:description`, and
+ * `twitter:description` with leftover scaffolding copy ("Portfolio Powerhouse
+ * transforms your resume..."). Later entries win, so that generic text was the
+ * live meta description for the whole site.
+ */
+const DEFAULT_META = isPortfolio
+  ? {
+      title: "Jainil Chauhan",
+      description:
+        "Jainil Chauhan — Software Engineer building low-latency, high-trust distributed systems. Backend, OAuth/OIDC, AWS, and cloud cost optimization.",
+      social:
+        "Backend & distributed systems engineer. Building low-latency, high-trust systems that scale quietly.",
+      image: "/og-image.png",
+    }
+  : {
+      title: "Delta — you already know most of this",
+      description:
+        "Learn AI systems from what you already understand. An LLM KV-cache is an LRU cache; continuous batching is a queue and a scheduler. Interactive labs with challenges you actually run.",
+      social:
+        "Learn AI systems from the CS you already know. Interactive labs, real challenges, and only ever three next steps.",
+      image: "/og-image.png",
+    };
+
 export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Jainil Chauhan" },
-      {
-        name: "description",
-        content:
-          "Jainil Chauhan — Software Engineer building low-latency, high-trust distributed systems. Backend, OAuth/OIDC, AWS, and cloud cost optimization.",
-      },
-      { name: "author", content: "Jainil Chauhan" },
-      { property: "og:title", content: "Jainil Chauhan" },
-      {
-        property: "og:description",
-        content:
-          "Backend & distributed systems engineer. Building low-latency, high-trust systems that scale quietly.",
-      },
+      { title: DEFAULT_META.title },
+      { name: "description", content: DEFAULT_META.description },
+      ...(isPortfolio ? [{ name: "author", content: "Jainil Chauhan" }] : []),
+      { property: "og:title", content: DEFAULT_META.title },
+      { property: "og:description", content: DEFAULT_META.social },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: DEFAULT_META.image },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Jainil Chauhan" },
-      {
-        name: "twitter:description",
-        content:
-          "Backend & distributed systems engineer. Building low-latency, high-trust systems that scale quietly.",
-      },
-      {
-        name: "description",
-        content:
-          "Portfolio Powerhouse transforms your resume into a professional, high-quality personal portfolio website.",
-      },
-      {
-        property: "og:description",
-        content:
-          "Portfolio Powerhouse transforms your resume into a professional, high-quality personal portfolio website.",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "Portfolio Powerhouse transforms your resume into a professional, high-quality personal portfolio website.",
-      },
-      {
-        property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e2b91672-f1c0-4144-8aae-0ab0de3cbbe9/id-preview-fd5ced91--8b5c5000-fb28-41ed-ab20-99a167c4a45e.lovable.app-1777095623015.png",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e2b91672-f1c0-4144-8aae-0ab0de3cbbe9/id-preview-fd5ced91--8b5c5000-fb28-41ed-ab20-99a167c4a45e.lovable.app-1777095623015.png",
-      },
+      { name: "twitter:title", content: DEFAULT_META.title },
+      { name: "twitter:description", content: DEFAULT_META.social },
+      { name: "twitter:image", content: DEFAULT_META.image },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -127,10 +120,22 @@ function RootComponent() {
   return (
     <>
       <Outlet />
-      <PortfolioHUD />
-      <TerminalShell />
-      <MobileShellFab />
-      <ChaosOverlay />
+      {/*
+       * All portfolio chrome. The HUD, chaos overlay, and FAB are personality
+       * that competes with the material on a learning site. The terminal goes
+       * too: its command set is a bio shell (whoami, cat about.md, resume, cd
+       * between portfolio sections) with lab listing as one `ls` command, so it
+       * is not the lab navigation the platform needs. Platform navigation is
+       * the bridge map in Phase 4; until then /lab's category filters carry it.
+       */}
+      {isPortfolio && (
+        <>
+          <PortfolioHUD />
+          <MobileShellFab />
+          <ChaosOverlay />
+          <TerminalShell />
+        </>
+      )}
     </>
   );
 }

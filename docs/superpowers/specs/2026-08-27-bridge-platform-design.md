@@ -10,28 +10,28 @@ The goal is a standalone learning platform that earns organic search traffic, is
 
 ## The wedge
 
-Every learning platform manufactures FOMO. roadmap.sh is a wall of things you don't know. NeetCode is 150 problems staring at you. ByteByteGo is a firehose. That anxiety *is* their engagement model.
+Every learning platform manufactures FOMO. roadmap.sh is a wall of things you don't know. NeetCode is 150 problems staring at you. ByteByteGo is a firehose. That anxiety _is_ their engagement model.
 
 This one inverts it: **you already know more than you think; here are the next three things, and only three.**
 
 That fuses with the old↔new bridge. For a backend engineer anxious about AI, an LLM **KV-cache is an LRU cache**, continuous batching is a queue plus a scheduler, RAG retrieval is an inverted index plus ANN search. The framing converts "I'm behind on AI" into "I already know 70% of this."
 
-Confidence comes from passing tests on a thing you were scared of. So the engine is **implement-it-yourself**: solve a challenge, tests pass, and *that is your placement* — no quiz. The bridge map is the navigation layer over what you have actually proven.
+Confidence comes from passing tests on a thing you were scared of. So the engine is **implement-it-yourself**: solve a challenge, tests pass, and _that is your placement_ — no quiz. The bridge map is the navigation layer over what you have actually proven.
 
 ## Decisions
 
-| Decision | Choice |
-|---|---|
-| Success metric | Traffic first; GitHub stars deferred to year two |
-| Identity | Separate brand + domain; placeholder until launch |
-| Launch audience | Backend/infra engineers crossing into AI. "Everyone" is the *value*, not the v1 target |
-| Core mechanic | Implement-it-yourself challenges; placement and bridge map derive from the solved set |
-| AI scope | AI systems/infra first; ML fundamentals later |
-| Challenge runtime | JavaScript in a Web Worker. Python via Pyodide only when fundamentals land |
-| Accounts | localStorage only; data shaped so accounts drop in later |
-| Migration | `/lab/*` moves to the new domain; 301 from `jainilchauhan.com/lab/*` |
-| Repo topology | One repo, two Cloudflare Worker environments |
-| v1 shape | ~20 existing labs get challenges, ~15 new AI-systems labs, bridge map between them |
+| Decision          | Choice                                                                                 |
+| ----------------- | -------------------------------------------------------------------------------------- |
+| Success metric    | Traffic first; GitHub stars deferred to year two                                       |
+| Identity          | Separate brand + domain; placeholder until launch                                      |
+| Launch audience   | Backend/infra engineers crossing into AI. "Everyone" is the _value_, not the v1 target |
+| Core mechanic     | Implement-it-yourself challenges; placement and bridge map derive from the solved set  |
+| AI scope          | AI systems/infra first; ML fundamentals later                                          |
+| Challenge runtime | JavaScript in a Web Worker. Python via Pyodide only when fundamentals land             |
+| Accounts          | localStorage only; data shaped so accounts drop in later                               |
+| Migration         | `/lab/*` moves to the new domain; 301 from `jainilchauhan.com/lab/*`                   |
+| Repo topology     | One repo, two Cloudflare Worker environments                                           |
+| v1 shape          | ~20 existing labs get challenges, ~15 new AI-systems labs, bridge map between them     |
 
 ## Product rules
 
@@ -88,7 +88,15 @@ bridgesFrom?: { slug: string; sameness: string; delta: string }[]
 
 ### Deployment
 
-One repo, two wrangler environments sharing `src/`. `PortfolioHUD`, `ChaosOverlay`, and `MobileShellFab` stay portfolio-only — they read as personality there and as noise on a learning site. `TerminalShell` and `CommandPalette` carry over; ⌘K search across labs is real navigation. The design system is shared unchanged.
+One repo, two wrangler environments sharing `src/`, selected by `VITE_SITE` at build time and read through `src/lib/site.ts`. Because the constant folds at build time, each build dead-code-eliminates the other product.
+
+All portfolio chrome stays portfolio-only: `PortfolioHUD`, `ChaosOverlay`, `MobileShellFab`, **and `TerminalShell`**. The terminal was initially planned to carry over, but its command set is a bio shell — `whoami`, `cat about.md`, `resume`, `cd` between portfolio sections — with lab listing as a single `ls /lab`. That is portfolio personality, not lab navigation, so shipping it on the platform would be noise. Platform navigation is the Phase 4 bridge map; until then `/lab`'s category filters carry it, which is adequate for 93 labs.
+
+`/projects/$slug` and `/writing/$slug` throw `notFound()` on the platform build. The route tree is shared, so without that guard the platform domain would serve the portfolio's pages — duplicate content Google would have to pick a winner for, on the wrong product.
+
+`scripts/generate-content.mjs` derives the sitemap host from the build target and warns when a delta build has no `SITE_URL`, since both builds write the same `public/sitemap.xml`.
+
+The design system is shared unchanged.
 
 ## Phases
 
@@ -105,23 +113,23 @@ This sums to ~260 hrs against ~250. If it runs long the cut line is Phase 3 — 
 
 ### Phase 3 labs and their bridges
 
-| AI lab | Bridges from |
-|---|---|
-| Tokenization / BPE | `trie`, `huffman-coding` |
-| Embeddings & vector space | `sparse-matrix`, `hash-table` |
-| ANN search / HNSW | `skip-list`, `quadtree` |
-| Vector index: recall vs latency | `btree-index`, `bloom-filter` |
-| KV cache (LLM inference) | `lru-cache` |
-| Continuous batching | `message-queue`, `backpressure` |
-| Attention as a lookup table | `hash-table`, `sparse-matrix` |
-| Speculative decoding | `branch-and-bound` |
-| Quantization | `bitset`, `huffman-coding` |
-| RAG retrieval pipeline | `btree-index`, `bloom-filter` |
-| Reranking | `heap-priority-queue`, `quickselect` |
-| Semantic cache | `lru-cache`, `consistent-hashing` |
-| Agent loop & tool use | `topological-sort`, `circuit-breaker` |
-| Prompt injection & trust boundaries | `jwt-anatomy`, `cors-lab` |
-| Inference cost & latency budgets | `rate-limiter`, `load-balancer` |
+| AI lab                              | Bridges from                          |
+| ----------------------------------- | ------------------------------------- |
+| Tokenization / BPE                  | `trie`, `huffman-coding`              |
+| Embeddings & vector space           | `sparse-matrix`, `hash-table`         |
+| ANN search / HNSW                   | `skip-list`, `quadtree`               |
+| Vector index: recall vs latency     | `btree-index`, `bloom-filter`         |
+| KV cache (LLM inference)            | `lru-cache`                           |
+| Continuous batching                 | `message-queue`, `backpressure`       |
+| Attention as a lookup table         | `hash-table`, `sparse-matrix`         |
+| Speculative decoding                | `branch-and-bound`                    |
+| Quantization                        | `bitset`, `huffman-coding`            |
+| RAG retrieval pipeline              | `btree-index`, `bloom-filter`         |
+| Reranking                           | `heap-priority-queue`, `quickselect`  |
+| Semantic cache                      | `lru-cache`, `consistent-hashing`     |
+| Agent loop & tool use               | `topological-sort`, `circuit-breaker` |
+| Prompt injection & trust boundaries | `jwt-anatomy`, `cors-lab`             |
+| Inference cost & latency budgets    | `rate-limiter`, `load-balancer`       |
 
 ## Out of scope for v1
 
