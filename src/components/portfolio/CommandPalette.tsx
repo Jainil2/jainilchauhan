@@ -27,10 +27,14 @@ import {
   Beaker,
   TerminalSquare,
   Activity,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 import { useSimulationStore } from "@/lib/useSimulationStore";
 import { labRegistry } from "@/lib/labRegistry";
 import { useControlPlane, type EnvMode } from "@/lib/useControlPlane";
+import { useTheme, type ThemeChoice } from "@/lib/useTheme";
 
 type Action = () => void;
 
@@ -58,6 +62,7 @@ export function CommandPalette() {
   const env = useControlPlane((s) => s.env);
   const setEnv = useControlPlane((s) => s.setEnv);
   const navigate = useNavigate();
+  const { choice: themeChoice, setChoice: setThemeChoice } = useTheme();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
