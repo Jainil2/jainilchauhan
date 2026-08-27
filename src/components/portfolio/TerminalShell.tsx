@@ -62,6 +62,11 @@ export function TerminalShell() {
   const status = useControlPlane((s) => s.status);
   const vitals = useControlPlane((s) => s.vitals);
   const { killNode, restoreNode, drainTokens, replenishTokens } = useSimulationStore();
+  const {
+    choice: themeChoice,
+    resolved: resolvedTheme,
+    setChoice: setThemeChoice,
+  } = useTheme();
 
   const labSlugs = useMemo(() => labRegistry.map((l) => l.slug), []);
 
