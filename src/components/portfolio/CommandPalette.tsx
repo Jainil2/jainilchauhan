@@ -199,6 +199,23 @@ export function CommandPalette() {
           <CommandSeparator />
 
           <CommandGroup heading="Settings">
+            {(["light", "dark", "system"] as ThemeChoice[]).map((mode) => {
+              const Icon = mode === "dark" ? Moon : mode === "light" ? Sun : Monitor;
+              return (
+                <CommandItem
+                  key={mode}
+                  onSelect={() => {
+                    setThemeChoice(mode);
+                    setOpen(false);
+                  }}
+                >
+                  <Icon className="size-4" /> Theme: {mode}
+                  <span className="ml-auto font-mono text-xs text-muted-foreground">
+                    {themeChoice === mode ? "ACTIVE" : "switch"}
+                  </span>
+                </CommandItem>
+              );
+            })}
             <CommandItem
               onSelect={() => {
                 setSimulationsEnabled(!simulationsEnabled);
