@@ -70,4 +70,91 @@ function kruskal(n: number, edges: { a: number; b: number; w: number }[]) {
       href: "https://scikit-learn.org/stable/modules/clustering.html#hierarchical-clustering",
     },
   ],
+  challenge: {
+    prompt:
+      "Pick the edges of a minimum spanning tree by sorting every edge and taking each one that joins two separate components. Where Prim grows one tree, Kruskal merges a forest — and union-find is what makes the 'would this close a cycle' test cheap.",
+    entry: "mstEdges",
+    starter: `/**
+ * @param {number} n - nodes 0..n-1.
+ * @param {Array<[number, number, number]>} edges - [u, v, weight], undirected.
+ * @returns {number[]} indices of the chosen edges, ascending. Break weight ties
+ *   by the lower original index.
+ */
+function mstEdges(n, edges) {
+  // Sort by weight, then take an edge only when its endpoints are still in
+  // different components.
+}
+`,
+    tests: [
+      {
+        name: "skips the expensive edge of a triangle",
+        body: `assertEquals(solution(3, [[0, 1, 1], [1, 2, 2], [0, 2, 5]]), [0, 1]);`,
+      },
+      {
+        name: "a chain keeps everything",
+        body: `assertEquals(solution(3, [[0, 1, 4], [1, 2, 6]]), [0, 1]);`,
+      },
+      {
+        name: "ties break toward the earlier edge",
+        body: `assertEquals(solution(2, [[0, 1, 3], [0, 1, 3]]), [0]);`,
+      },
+      {
+        name: "a cheaper later edge wins",
+        body: `assertEquals(solution(2, [[0, 1, 9], [0, 1, 1]]), [1]);`,
+      },
+      {
+        name: "a disconnected graph yields a forest",
+        body: `assertEquals(solution(4, [[0, 1, 1], [2, 3, 1]]), [0, 1]);`,
+      },
+      {
+        name: "no edges",
+        body: `assertEquals(solution(2, []), []);`,
+      },
+      {
+        name: "skips self loops",
+        body: `assertEquals(solution(2, [[0, 0, 1], [0, 1, 2]]), [1]);`,
+      },
+      {
+        name: "selects exactly n-1 edges on a connected graph",
+        body: `var edges = [];
+for (var i = 0; i < 5000; i++) edges.push([i, i + 1, (i % 7) + 1]);
+for (var j = 0; j < 5000; j++) edges.push([0, j + 1, 50]);
+assertEquals(solution(5001, edges).length, 5000);`,
+      },
+    ],
+    hints: [
+      "Sort indices, not the edges themselves, so you can report original positions.",
+      "Sort by weight and use the index as the tie-break to make the result deterministic.",
+      "Union-find with path compression answers 'already connected?' in near-constant time.",
+    ],
+    reference: `function mstEdges(n, edges) {
+  const order = edges.map((_, i) => i);
+  // Index as the tie-break keeps the choice deterministic.
+  order.sort((a, b) => edges[a][2] - edges[b][2] || a - b);
+
+  const parent = Array.from({ length: n }, (_, i) => i);
+  const find = (x) => {
+    let root = x;
+    while (parent[root] !== root) root = parent[root];
+    while (parent[x] !== root) {
+      const next = parent[x];
+      parent[x] = root;
+      x = next;
+    }
+    return root;
+  };
+
+  const chosen = [];
+  for (const i of order) {
+    const [u, v] = edges[i];
+    const ru = find(u);
+    const rv = find(v);
+    if (ru === rv) continue; // would close a cycle (a self loop lands here too)
+    parent[ru] = rv;
+    chosen.push(i);
+  }
+  return chosen.sort((a, b) => a - b);
+}
+`,
+  },
 };

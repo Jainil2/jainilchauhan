@@ -84,4 +84,71 @@ function dfs(start: string, adj: Map<string, string[]>) {
       href: "https://cp-algorithms.com/graph/breadth-first-search.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Return the order breadth-first search visits nodes from a source. BFS explores by distance, which is why it finds the fewest-hops path on an unweighted graph while depth-first search does not.",
+    entry: "bfsOrder",
+    starter: `/**
+ * @param {number[][]} adj - adjacency list; neighbours already ascending.
+ * @param {number} start
+ * @returns {number[]} nodes in the order BFS first reaches them.
+ */
+function bfsOrder(adj, start) {
+  // Mark a node as seen when you ENQUEUE it, not when you dequeue it, or it can
+  // enter the queue twice.
+}
+`,
+    tests: [
+      {
+        name: "visits by distance",
+        body: `assertEquals(solution([[1, 2], [3], [3], []], 0), [0, 1, 2, 3]);`,
+      },
+      {
+        name: "does not revisit on a cycle",
+        body: `assertEquals(solution([[1], [2], [0]], 0), [0, 1, 2]);`,
+      },
+      {
+        name: "unreachable nodes are omitted",
+        body: `assertEquals(solution([[1], [], []], 0), [0, 1]);`,
+      },
+      {
+        name: "a lone node visits only itself",
+        body: `assertEquals(solution([[], []], 1), [1]);`,
+      },
+      {
+        name: "neighbour order is respected",
+        body: `assertEquals(solution([[2, 1], [], []], 0), [0, 2, 1]);`,
+      },
+      {
+        name: "handles a long chain without recursion",
+        body: `var adj = [];
+for (var i = 0; i < 50000; i++) adj.push([i + 1]);
+adj.push([]);
+assertEquals(solution(adj, 0).length, 50001);`,
+      },
+    ],
+    hints: [
+      "Use a queue and a seen set, both seeded with the start node.",
+      "Read the queue with an index cursor rather than shift(), which is O(n) each call.",
+      "Only enqueue a neighbour the first time you see it.",
+    ],
+    reference: `function bfsOrder(adj, start) {
+  const seen = new Array(adj.length).fill(false);
+  const order = [];
+  const queue = [start];
+  seen[start] = true; // marked on enqueue, so it cannot be queued twice
+  // A cursor instead of shift(): shift() is O(n) and would make this quadratic.
+  for (let head = 0; head < queue.length; head++) {
+    const node = queue[head];
+    order.push(node);
+    for (const next of adj[node]) {
+      if (seen[next]) continue;
+      seen[next] = true;
+      queue.push(next);
+    }
+  }
+  return order;
+}
+`,
+  },
 };

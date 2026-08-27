@@ -73,4 +73,89 @@ function components(adj: Map<string, string[]>): Map<string, number> {
     },
     { label: "Stripe Radar — network-level fraud signals", href: "https://stripe.com/radar" },
   ],
+  challenge: {
+    prompt:
+      "Group the nodes of an undirected graph into connected components. Return each component as a sorted list, the components themselves ordered by their smallest member, so the answer is canonical rather than dependent on traversal order.",
+    entry: "components",
+    starter: `/**
+ * @param {number} n - nodes 0..n-1.
+ * @param {Array<[number, number]>} edges - undirected.
+ * @returns {number[][]} components, each ascending, ordered by first element.
+ */
+function components(n, edges) {
+  // Every node belongs to exactly one component, including isolated ones.
+}
+`,
+    tests: [
+      {
+        name: "one component",
+        body: `assertEquals(solution(3, [[0, 1], [1, 2]]), [[0, 1, 2]]);`,
+      },
+      {
+        name: "two components",
+        body: `assertEquals(solution(4, [[0, 1], [2, 3]]), [[0, 1], [2, 3]]);`,
+      },
+      {
+        name: "isolated nodes are their own components",
+        body: `assertEquals(solution(3, [[0, 1]]), [[0, 1], [2]]);`,
+      },
+      {
+        name: "no edges",
+        body: `assertEquals(solution(3, []), [[0], [1], [2]]);`,
+      },
+      {
+        name: "no nodes",
+        body: `assertEquals(solution(0, []), []);`,
+      },
+      {
+        name: "a cycle is still one component",
+        body: `assertEquals(solution(3, [[0, 1], [1, 2], [2, 0]]), [[0, 1, 2]]);`,
+      },
+      {
+        name: "output order does not depend on edge order",
+        body: `assertEquals(solution(4, [[2, 3], [0, 1]]), [[0, 1], [2, 3]]);`,
+      },
+      {
+        name: "handles a long chain",
+        body: `var edges = [];
+for (var i = 0; i < 50000; i++) edges.push([i, i + 1]);
+var cs = solution(50001, edges);
+assertEquals(cs.length, 1);
+assertEquals(cs[0].length, 50001);`,
+      },
+    ],
+    hints: [
+      "Build an adjacency list first, then sweep every node that has not been assigned yet.",
+      "From each unseen node, collect everything reachable with an iterative BFS or DFS.",
+      "Sorting each component and starting the sweep at node 0 upwards makes the output canonical without a final sort.",
+    ],
+    reference: `function components(n, edges) {
+  const adj = Array.from({ length: n }, () => []);
+  for (const [u, v] of edges) {
+    adj[u].push(v);
+    adj[v].push(u);
+  }
+  const seen = new Array(n).fill(false);
+  const out = [];
+  // Sweeping 0..n-1 means components come out ordered by smallest member.
+  for (let start = 0; start < n; start++) {
+    if (seen[start]) continue;
+    const group = [];
+    const stack = [start];
+    seen[start] = true;
+    while (stack.length) {
+      const node = stack.pop();
+      group.push(node);
+      for (const next of adj[node]) {
+        if (seen[next]) continue;
+        seen[next] = true;
+        stack.push(next);
+      }
+    }
+    out.push(group.sort((a, b) => a - b));
+  }
+  return out;
+}
+`,
+  },
 };

@@ -77,4 +77,83 @@ function bellmanFord(n: number, edges: Edge[], src: number) {
       href: "https://cp-algorithms.com/graph/bellman_ford.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Compute shortest distances when edges may be negative, and report when no answer exists. Relax every edge n-1 times; if an nth pass still improves something, a negative cycle is draining the path and there is no shortest distance at all.",
+    entry: "bellmanFord",
+    starter: `/**
+ * @param {number} n - nodes 0..n-1.
+ * @param {Array<[number, number, number]>} edges - [u, v, weight], directed.
+ * @param {number} source
+ * @returns {(number|null)[]|null} distances (null per unreachable node), or null
+ *   overall when a negative cycle is reachable from the source.
+ */
+function bellmanFord(n, edges, source) {
+  // n-1 rounds is enough for any real shortest path, because one cannot contain
+  // more than n-1 edges. An improvement after that means a negative cycle.
+}
+`,
+    tests: [
+      {
+        name: "handles positive weights",
+        body: `assertEquals(solution(3, [[0, 1, 1], [1, 2, 2]], 0), [0, 1, 3]);`,
+      },
+      {
+        name: "handles a negative edge",
+        body: `assertEquals(solution(3, [[0, 1, 4], [0, 2, 5], [2, 1, -3]], 0), [0, 2, 5]);`,
+      },
+      {
+        name: "detects a negative cycle",
+        body: `assertEquals(solution(3, [[0, 1, 1], [1, 2, -1], [2, 1, -1]], 0), null);`,
+      },
+      {
+        name: "unreachable nodes are null",
+        body: `assertEquals(solution(3, [[0, 1, 1]], 0), [0, 1, null]);`,
+      },
+      {
+        name: "an unreachable negative cycle is not an error",
+        body: `assertEquals(solution(4, [[0, 1, 1], [2, 3, -1], [3, 2, -1]], 0), [0, 1, null, null]);`,
+      },
+      {
+        name: "the source starts at zero",
+        body: `assertEquals(solution(2, [], 0), [0, null]);`,
+      },
+      {
+        name: "handles a chain needing many rounds",
+        body: `var edges = [];
+for (var i = 0; i < 300; i++) edges.push([i, i + 1, 1]);
+var d = solution(301, edges, 0);
+assertEquals(d[300], 300);`,
+      },
+    ],
+    hints: [
+      "Relax every edge in each of n-1 rounds: if dist[u] + w beats dist[v], take it.",
+      "Never relax from a node still at Infinity, or the arithmetic produces nonsense.",
+      "Do one extra round afterwards. Any further improvement proves a reachable negative cycle.",
+    ],
+    reference: `function bellmanFord(n, edges, source) {
+  const dist = new Array(n).fill(Infinity);
+  dist[source] = 0;
+
+  for (let round = 0; round < n - 1; round++) {
+    let changed = false;
+    for (const [u, v, w] of edges) {
+      // Relaxing from an unreachable node would invent a distance.
+      if (dist[u] === Infinity) continue;
+      if (dist[u] + w < dist[v]) {
+        dist[v] = dist[u] + w;
+        changed = true;
+      }
+    }
+    if (!changed) break; // settled early
+  }
+
+  // One more pass: any improvement now can only come from a negative cycle.
+  for (const [u, v, w] of edges) {
+    if (dist[u] !== Infinity && dist[u] + w < dist[v]) return null;
+  }
+  return dist.map((d) => (d === Infinity ? null : d));
+}
+`,
+  },
 };

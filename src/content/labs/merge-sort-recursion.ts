@@ -73,4 +73,77 @@ export function mergeSort(xs: number[]): number[] {
       href: "https://lucene.apache.org/core/9_9_0/core/org/apache/lucene/index/MergePolicy.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Merge two sorted arrays into one. This is the step every merge sort is built from, and the reason merge sort is stable: when two values tie, the one from the left array goes first.",
+    entry: "merge",
+    starter: `/**
+ * @param {number[]} a - sorted ascending.
+ * @param {number[]} b - sorted ascending.
+ * @returns {number[]} all values from both, ascending.
+ */
+function merge(a, b) {
+  // Walk both with one index each, always taking the smaller head.
+  // On a tie take from 'a' first, which is what makes merge sort stable.
+}
+`,
+    tests: [
+      {
+        name: "interleaves two runs",
+        body: `assertEquals(solution([1, 3], [2, 4]), [1, 2, 3, 4]);`,
+      },
+      {
+        name: "appends the remainder of the longer array",
+        body: `assertEquals(solution([1], [2, 3, 4]), [1, 2, 3, 4]);`,
+      },
+      {
+        name: "one side empty",
+        body: `assertEquals(solution([], [1, 2]), [1, 2]);`,
+      },
+      {
+        name: "both empty",
+        body: `assertEquals(solution([], []), []);`,
+      },
+      {
+        name: "keeps duplicates",
+        body: `assertEquals(solution([1, 1], [1]), [1, 1, 1]);`,
+      },
+      {
+        name: "fully disjoint ranges",
+        body: `assertEquals(solution([5, 6], [1, 2]), [1, 2, 5, 6]);`,
+      },
+      {
+        name: "negatives",
+        body: `assertEquals(solution([-3, 1], [-5, 0]), [-5, -3, 0, 1]);`,
+      },
+      {
+        name: "linear on large inputs",
+        body: `var a = [], b = [];
+for (var i = 0; i < 100000; i++) { a.push(i * 2); b.push(i * 2 + 1); }
+var out = solution(a, b);
+assertEquals(out.length, 200000);
+assertEquals(out[0], 0);
+assertEquals(out[199999], 199999);`,
+      },
+    ],
+    hints: [
+      "Two cursors, one per array, and a loop that runs while both still have values.",
+      "Use a <= comparison when taking from the first array, so ties preserve the left-hand order.",
+      "When the loop ends, one array still has a tail — append whatever is left of it.",
+    ],
+    reference: `function merge(a, b) {
+  const out = [];
+  let i = 0;
+  let j = 0;
+  while (i < a.length && j < b.length) {
+    // <= not <: on a tie the left value goes first, which is stability.
+    if (a[i] <= b[j]) out.push(a[i++]);
+    else out.push(b[j++]);
+  }
+  while (i < a.length) out.push(a[i++]);
+  while (j < b.length) out.push(b[j++]);
+  return out;
+}
+`,
+  },
 };

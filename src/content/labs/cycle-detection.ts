@@ -80,4 +80,93 @@ function hasCycle(adj: Map<string, string[]>): string[] | null {
       href: "https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlock-detection.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Detect a cycle in a directed graph. The trick is that seeing a node again is not enough — it must be a node still on the current path. Three colours distinguish 'not visited', 'on the stack', and 'finished'.",
+    entry: "hasCycle",
+    starter: `/**
+ * @param {number} n - nodes 0..n-1.
+ * @param {Array<[number, number]>} edges - directed, u to v.
+ * @returns {boolean} true when a directed cycle exists.
+ */
+function hasCycle(n, edges) {
+  // Revisiting a FINISHED node is fine -- that is just a diamond. Only an edge
+  // back into a node still on the current path is a cycle.
+}
+`,
+    tests: [
+      {
+        name: "a simple cycle",
+        body: `assertEquals(solution(2, [[0, 1], [1, 0]]), true);`,
+      },
+      {
+        name: "a chain has no cycle",
+        body: `assertEquals(solution(3, [[0, 1], [1, 2]]), false);`,
+      },
+      {
+        name: "a diamond is not a cycle",
+        body: `assertEquals(solution(4, [[0, 1], [0, 2], [1, 3], [2, 3]]), false);`,
+      },
+      {
+        name: "a self loop is a cycle",
+        body: `assertEquals(solution(1, [[0, 0]]), true);`,
+      },
+      {
+        name: "no edges",
+        body: `assertEquals(solution(3, []), false);`,
+      },
+      {
+        name: "finds a cycle in a disconnected part",
+        body: `assertEquals(solution(4, [[0, 1], [2, 3], [3, 2]]), true);`,
+      },
+      {
+        name: "a long chain is not a cycle",
+        body: `var edges = [];
+for (var i = 0; i < 50000; i++) edges.push([i, i + 1]);
+assertEquals(solution(50001, edges), false);`,
+      },
+      {
+        name: "detects a cycle closed at the far end",
+        body: `var edges = [];
+for (var i = 0; i < 50000; i++) edges.push([i, i + 1]);
+edges.push([50000, 0]);
+assertEquals(solution(50001, edges), true);`,
+      },
+    ],
+    hints: [
+      "Keep a state per node: 0 unvisited, 1 on the current path, 2 finished.",
+      "An edge to a node in state 1 is a back edge, which means a cycle. An edge to state 2 is harmless.",
+      "Recursion overflows on long chains — use an explicit stack and mark a node finished when you pop it.",
+    ],
+    reference: `function hasCycle(n, edges) {
+  const adj = Array.from({ length: n }, () => []);
+  for (const [u, v] of edges) adj[u].push(v);
+
+  const state = new Array(n).fill(0); // 0 unvisited, 1 on path, 2 done
+  for (let start = 0; start < n; start++) {
+    if (state[start] !== 0) continue;
+    // Iterative DFS: a recursive one blows the stack on a 50k chain.
+    const stack = [[start, 0]];
+    state[start] = 1;
+    while (stack.length) {
+      const frame = stack[stack.length - 1];
+      const [node, i] = frame;
+      if (i < adj[node].length) {
+        frame[1]++;
+        const next = adj[node][i];
+        if (state[next] === 1) return true; // back edge into the live path
+        if (state[next] === 0) {
+          state[next] = 1;
+          stack.push([next, 0]);
+        }
+      } else {
+        state[node] = 2; // finished: safe to revisit later
+        stack.pop();
+      }
+    }
+  }
+  return false;
+}
+`,
+  },
 };

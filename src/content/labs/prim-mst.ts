@@ -71,4 +71,112 @@ function prim(n: number, adj: [number, number][][]): number {
       href: "https://ieeexplore.ieee.org/document/6773228",
     },
   ],
+  challenge: {
+    prompt:
+      "Compute the total weight of a minimum spanning tree by growing one tree outward, always taking the cheapest edge that reaches somewhere new. Prim is Dijkstra with a different comparison: edge weight instead of accumulated distance.",
+    entry: "mstWeight",
+    starter: `/**
+ * @param {number} n - nodes 0..n-1.
+ * @param {Array<[number, number, number]>} edges - [u, v, weight], undirected.
+ * @returns {number|null} total MST weight, or null when the graph is disconnected.
+ */
+function mstWeight(n, edges) {
+  // Grow ONE tree. At every step take the cheapest edge with exactly one
+  // endpoint already inside it.
+}
+`,
+    tests: [
+      {
+        name: "a triangle drops its most expensive edge",
+        body: `assertEquals(solution(3, [[0, 1, 1], [1, 2, 2], [0, 2, 5]]), 3);`,
+      },
+      {
+        name: "a chain keeps every edge",
+        body: `assertEquals(solution(3, [[0, 1, 4], [1, 2, 6]]), 10);`,
+      },
+      {
+        name: "a disconnected graph has no spanning tree",
+        body: `assertEquals(solution(3, [[0, 1, 1]]), null);`,
+      },
+      {
+        name: "a single node weighs nothing",
+        body: `assertEquals(solution(1, []), 0);`,
+      },
+      {
+        name: "parallel edges take the cheaper",
+        body: `assertEquals(solution(2, [[0, 1, 7], [0, 1, 2]]), 2);`,
+      },
+      {
+        name: "ignores a self loop",
+        body: `assertEquals(solution(2, [[0, 0, 9], [0, 1, 3]]), 3);`,
+      },
+      {
+        name: "handles a larger graph",
+        body: `var edges = [];
+for (var i = 0; i < 20000; i++) edges.push([i, i + 1, 2]);
+assertEquals(solution(20001, edges), 40000);`,
+      },
+    ],
+    hints: [
+      "Track the cheapest known edge reaching each node that is not yet in the tree.",
+      "A min-heap of [weight, node] gives the next node to absorb; skip entries for nodes already absorbed.",
+      "If you absorb fewer than n nodes, the graph was disconnected.",
+    ],
+    reference: `function mstWeight(n, edges) {
+  const adj = Array.from({ length: n }, () => []);
+  for (const [u, v, w] of edges) {
+    if (u === v) continue; // a self loop can never join two components
+    adj[u].push([v, w]);
+    adj[v].push([u, w]);
+  }
+
+  const inTree = new Array(n).fill(false);
+  const heap = [[0, 0]]; // [weight, node]
+  const up = (i) => {
+    while (i > 0) {
+      const p = (i - 1) >> 1;
+      if (heap[p][0] <= heap[i][0]) break;
+      [heap[p], heap[i]] = [heap[i], heap[p]];
+      i = p;
+    }
+  };
+  const pop = () => {
+    const top = heap[0];
+    const last = heap.pop();
+    if (heap.length) {
+      heap[0] = last;
+      let i = 0;
+      for (;;) {
+        const l = 2 * i + 1;
+        const r = l + 1;
+        let small = i;
+        if (l < heap.length && heap[l][0] < heap[small][0]) small = l;
+        if (r < heap.length && heap[r][0] < heap[small][0]) small = r;
+        if (small === i) break;
+        [heap[small], heap[i]] = [heap[i], heap[small]];
+        i = small;
+      }
+    }
+    return top;
+  };
+
+  let total = 0;
+  let absorbed = 0;
+  while (heap.length) {
+    const [w, node] = pop();
+    if (inTree[node]) continue; // stale entry
+    inTree[node] = true;
+    total += w;
+    absorbed++;
+    for (const [next, weight] of adj[node]) {
+      if (!inTree[next]) {
+        heap.push([weight, next]);
+        up(heap.length - 1);
+      }
+    }
+  }
+  return absorbed === n ? total : null;
+}
+`,
+  },
 };

@@ -75,4 +75,81 @@ def floyd_warshall(dist):
       href: "https://dl.acm.org/doi/10.1145/367766.368168",
     },
   ],
+  challenge: {
+    prompt:
+      "Compute shortest distances between every pair of nodes. The loop order is the whole algorithm: the intermediate node k must be the outermost loop, because the invariant is 'best path using only nodes up to k'.",
+    entry: "allPairs",
+    starter: `/**
+ * @param {number} n - nodes 0..n-1.
+ * @param {Array<[number, number, number]>} edges - [u, v, weight], directed.
+ * @returns {(number|null)[][]} matrix of distances; null where no path exists.
+ *   Distance from a node to itself is 0.
+ */
+function allPairs(n, edges) {
+  // k must be the OUTER loop. Putting i or j outside computes something that
+  // looks similar and is wrong.
+}
+`,
+    tests: [
+      {
+        name: "direct edges",
+        body: `assertEquals(solution(2, [[0, 1, 5]]), [[0, 5], [null, 0]]);`,
+      },
+      {
+        name: "routes through an intermediate node",
+        body: `assertEquals(solution(3, [[0, 1, 1], [1, 2, 1]])[0][2], 2);`,
+      },
+      {
+        name: "prefers the cheaper of two routes",
+        body: `assertEquals(solution(3, [[0, 2, 10], [0, 1, 1], [1, 2, 1]])[0][2], 2);`,
+      },
+      {
+        name: "self distance is zero",
+        body: `assertEquals(solution(2, [])[1][1], 0);`,
+      },
+      {
+        name: "unreachable pairs are null",
+        body: `assertEquals(solution(2, [])[0][1], null);`,
+      },
+      {
+        name: "handles negative edges without a negative cycle",
+        body: `assertEquals(solution(3, [[0, 1, 4], [1, 2, -2]])[0][2], 2);`,
+      },
+      {
+        name: "parallel edges take the cheapest",
+        body: `assertEquals(solution(2, [[0, 1, 9], [0, 1, 3]])[0][1], 3);`,
+      },
+      {
+        name: "cubic but correct on a modest graph",
+        body: `var n = 60;
+var edges = [];
+for (var i = 0; i < n - 1; i++) edges.push([i, i + 1, 1]);
+assertEquals(solution(n, edges)[0][n - 1], n - 1);`,
+      },
+    ],
+    hints: [
+      "Start from a matrix of Infinity, zero on the diagonal, then lay in the edges taking the minimum for parallel ones.",
+      "Three nested loops with k outermost, then i, then j.",
+      "Skip the update when either half of the route is still Infinity.",
+    ],
+    reference: `function allPairs(n, edges) {
+  const dist = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (_, j) => (i === j ? 0 : Infinity)),
+  );
+  for (const [u, v, w] of edges) dist[u][v] = Math.min(dist[u][v], w);
+
+  // k outermost: the invariant is 'shortest path using intermediates < k'.
+  for (let k = 0; k < n; k++) {
+    for (let i = 0; i < n; i++) {
+      if (dist[i][k] === Infinity) continue; // nothing to route through
+      for (let j = 0; j < n; j++) {
+        const through = dist[i][k] + dist[k][j];
+        if (through < dist[i][j]) dist[i][j] = through;
+      }
+    }
+  }
+  return dist.map((row) => row.map((d) => (d === Infinity ? null : d)));
+}
+`,
+  },
 };

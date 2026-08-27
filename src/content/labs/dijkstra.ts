@@ -76,4 +76,110 @@ export const lab: LabMeta = {
       href: "https://cp-algorithms.com/graph/dijkstra_sparse.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Compute shortest distances from a source over non-negative weights. The greedy step only works because weights cannot be negative: once a node is settled, nothing later can improve it.",
+    entry: "shortestDistances",
+    starter: `/**
+ * @param {number} n - nodes 0..n-1.
+ * @param {Array<[number, number, number]>} edges - [u, v, weight], directed, weight >= 0.
+ * @param {number} source
+ * @returns {(number|null)[]} distance per node; null when unreachable.
+ */
+function shortestDistances(n, edges, source) {
+  // Always expand the closest unsettled node. Skip a queue entry whose recorded
+  // distance is already worse than the best you know.
+}
+`,
+    tests: [
+      {
+        name: "follows a chain",
+        body: `assertEquals(solution(3, [[0, 1, 1], [1, 2, 2]], 0), [0, 1, 3]);`,
+      },
+      {
+        name: "prefers the cheaper route",
+        body: `assertEquals(solution(3, [[0, 1, 10], [0, 2, 1], [2, 1, 1]], 0), [0, 2, 1]);`,
+      },
+      {
+        name: "unreachable nodes are null",
+        body: `assertEquals(solution(3, [[0, 1, 1]], 0), [0, 1, null]);`,
+      },
+      {
+        name: "the source is at distance zero",
+        body: `assertEquals(solution(2, [], 1), [null, 0]);`,
+      },
+      {
+        name: "zero-weight edges are fine",
+        body: `assertEquals(solution(2, [[0, 1, 0]], 0), [0, 0]);`,
+      },
+      {
+        name: "parallel edges take the cheapest",
+        body: `assertEquals(solution(2, [[0, 1, 5], [0, 1, 2]], 0), [0, 2]);`,
+      },
+      {
+        name: "handles a long weighted chain",
+        body: `var edges = [];
+for (var i = 0; i < 50000; i++) edges.push([i, i + 1, 2]);
+var d = solution(50001, edges, 0);
+assertEquals(d[50000], 100000);`,
+      },
+    ],
+    hints: [
+      "Keep tentative distances in an array, starting at Infinity except the source.",
+      "A binary heap of [distance, node] gives you the closest unsettled node in log n.",
+      "JavaScript heaps have no decrease-key, so push duplicates and ignore any entry whose distance is stale.",
+    ],
+    reference: `function shortestDistances(n, edges, source) {
+  const adj = Array.from({ length: n }, () => []);
+  for (const [u, v, w] of edges) adj[u].push([v, w]);
+
+  const dist = new Array(n).fill(Infinity);
+  dist[source] = 0;
+
+  const heap = [[0, source]];
+  const up = (i) => {
+    while (i > 0) {
+      const p = (i - 1) >> 1;
+      if (heap[p][0] <= heap[i][0]) break;
+      [heap[p], heap[i]] = [heap[i], heap[p]];
+      i = p;
+    }
+  };
+  const pop = () => {
+    const top = heap[0];
+    const last = heap.pop();
+    if (heap.length) {
+      heap[0] = last;
+      let i = 0;
+      for (;;) {
+        const l = 2 * i + 1;
+        const r = l + 1;
+        let small = i;
+        if (l < heap.length && heap[l][0] < heap[small][0]) small = l;
+        if (r < heap.length && heap[r][0] < heap[small][0]) small = r;
+        if (small === i) break;
+        [heap[small], heap[i]] = [heap[i], heap[small]];
+        i = small;
+      }
+    }
+    return top;
+  };
+
+  while (heap.length) {
+    const [d, node] = pop();
+    // Stale entry: we already found a better route to this node.
+    if (d > dist[node]) continue;
+    for (const [next, w] of adj[node]) {
+      const candidate = d + w;
+      if (candidate < dist[next]) {
+        dist[next] = candidate;
+        heap.push([candidate, next]);
+        up(heap.length - 1);
+      }
+    }
+  }
+  return dist.map((d) => (d === Infinity ? null : d));
+}
+`,
+  },
 };

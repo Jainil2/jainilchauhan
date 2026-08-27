@@ -75,4 +75,65 @@ const connected = matrix[idx.get("api")!][idx.get("db")!] === 1;`,
       href: "https://neo4j.com/docs/getting-started/get-started-with-neo4j/graph-database/",
     },
   ],
+  challenge: {
+    prompt:
+      "Turn an edge list into an adjacency list. The representation you choose decides what is cheap: adjacency lists make 'who are my neighbours' O(degree), which is what every traversal actually asks.",
+    entry: "toAdjacency",
+    starter: `/**
+ * @param {number} n - nodes 0..n-1.
+ * @param {Array<[number, number]>} edges
+ * @param {boolean} directed - when false, record each edge in both directions.
+ * @returns {number[][]} neighbours per node, each ascending.
+ */
+function toAdjacency(n, edges, directed) {
+  // Every node gets a list, including isolated ones.
+}
+`,
+    tests: [
+      {
+        name: "directed edges go one way",
+        body: `assertEquals(solution(3, [[0, 1]], true), [[1], [], []]);`,
+      },
+      {
+        name: "undirected edges go both ways",
+        body: `assertEquals(solution(3, [[0, 1]], false), [[1], [0], []]);`,
+      },
+      {
+        name: "neighbours come back ascending",
+        body: `assertEquals(solution(4, [[0, 3], [0, 1]], true), [[1, 3], [], [], []]);`,
+      },
+      {
+        name: "isolated nodes still get a list",
+        body: `assertEquals(solution(2, [], false), [[], []]);`,
+      },
+      {
+        name: "self loop on an undirected graph",
+        body: `assertEquals(solution(2, [[0, 0]], false), [[0, 0], []]);`,
+      },
+      {
+        name: "handles a dense-ish graph",
+        body: `var edges = [];
+for (var i = 0; i < 999; i++) edges.push([i, i + 1]);
+var adj = solution(1000, edges, false);
+assertEquals(adj[0], [1]);
+assertEquals(adj[500], [499, 501]);`,
+      },
+    ],
+    hints: [
+      "Create n empty arrays up front so isolated nodes are represented, not missing.",
+      "For an undirected edge push u into v's list as well as v into u's.",
+      "Sort each list at the end rather than trying to insert in order.",
+    ],
+    reference: `function toAdjacency(n, edges, directed) {
+  const adj = Array.from({ length: n }, () => []);
+  for (const [u, v] of edges) {
+    adj[u].push(v);
+    // An undirected edge is simply two directed ones.
+    if (!directed) adj[v].push(u);
+  }
+  for (const list of adj) list.sort((a, b) => a - b);
+  return adj;
+}
+`,
+  },
 };

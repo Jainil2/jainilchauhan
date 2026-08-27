@@ -79,4 +79,74 @@ function minCapacity(canServe: (c: number) => boolean, hiBound: number) {
       href: "https://cp-algorithms.com/num_methods/binary_search.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Find the first position where a target could be inserted and keep the array sorted — the lower bound. This is the primitive underneath range scans and index seeks, and it is harder than plain binary search because it must return a position even when the target is absent.",
+    entry: "lowerBound",
+    starter: `/**
+ * @param {number[]} sorted - ascending, may contain duplicates.
+ * @param {number} target
+ * @returns {number} the first index whose value is >= target, or sorted.length.
+ */
+function lowerBound(sorted, target) {
+  // Narrow a half-open window [lo, hi). Never return early on a match: an
+  // earlier equal value may still be to the left.
+}
+`,
+    tests: [
+      {
+        name: "finds an exact match",
+        body: `assertEquals(solution([1, 3, 5], 3), 1);`,
+      },
+      {
+        name: "returns the insertion point when absent",
+        body: `assertEquals(solution([1, 3, 5], 4), 2);`,
+      },
+      {
+        name: "target below everything",
+        body: `assertEquals(solution([1, 3, 5], 0), 0);`,
+      },
+      {
+        name: "target above everything returns the length",
+        body: `assertEquals(solution([1, 3, 5], 9), 3);`,
+      },
+      {
+        name: "returns the FIRST of several duplicates",
+        body: `assertEquals(solution([1, 2, 2, 2, 3], 2), 1);`,
+      },
+      {
+        name: "empty array",
+        body: `assertEquals(solution([], 5), 0);`,
+      },
+      {
+        name: "single element, both sides",
+        body: `assertEquals(solution([5], 5), 0);
+assertEquals(solution([5], 6), 1);`,
+      },
+      {
+        name: "logarithmic on a large array",
+        body: `var xs = [];
+for (var i = 0; i < 1000000; i++) xs.push(i * 2);
+assertEquals(solution(xs, 999999), 500000);
+assertEquals(solution(xs, 1000000), 500000);`,
+      },
+    ],
+    hints: [
+      "Track a half-open window: lo starts at 0, hi starts at sorted.length.",
+      "When sorted[mid] < target the answer is strictly right, so lo = mid + 1; otherwise hi = mid.",
+      "Stop when lo equals hi — that shared value is the answer, and it needs no special case for a missing target.",
+    ],
+    reference: `function lowerBound(sorted, target) {
+  let lo = 0;
+  let hi = sorted.length; // half-open: hi is a valid answer
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    // Never return early on equality; an equal value may exist further left.
+    if (sorted[mid] < target) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo;
+}
+`,
+  },
 };

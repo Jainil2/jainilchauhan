@@ -75,4 +75,83 @@ find("user:1") === find("user:2"); // true -> same cluster`,
       href: "https://spark.apache.org/docs/latest/graphx-programming-guide.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Find the first edge that closes a cycle as you add edges one at a time. Union-find answers 'are these already connected' before you join them, which is exactly the test Kruskal uses to skip an edge.",
+    entry: "firstCycleEdge",
+    starter: `/**
+ * @param {number} n - nodes 0..n-1.
+ * @param {Array<[number, number]>} edges - undirected, added in order.
+ * @returns {number} index of the first edge whose endpoints were already
+ *   connected, or -1 when the edges form a forest.
+ */
+function firstCycleEdge(n, edges) {
+  // Before joining two nodes, ask whether they already share a root.
+}
+`,
+    tests: [
+      {
+        name: "a triangle closes on the third edge",
+        body: `assertEquals(solution(3, [[0, 1], [1, 2], [2, 0]]), 2);`,
+      },
+      {
+        name: "a tree closes nothing",
+        body: `assertEquals(solution(3, [[0, 1], [1, 2]]), -1);`,
+      },
+      {
+        name: "a duplicate edge closes a cycle",
+        body: `assertEquals(solution(2, [[0, 1], [0, 1]]), 1);`,
+      },
+      {
+        name: "a self loop closes immediately",
+        body: `assertEquals(solution(2, [[0, 0]]), 0);`,
+      },
+      {
+        name: "no edges",
+        body: `assertEquals(solution(3, []), -1);`,
+      },
+      {
+        name: "ignores separate components",
+        body: `assertEquals(solution(4, [[0, 1], [2, 3]]), -1);`,
+      },
+      {
+        name: "reports the FIRST closing edge",
+        body: `assertEquals(solution(4, [[0, 1], [1, 2], [0, 2], [2, 3], [1, 3]]), 2);`,
+      },
+      {
+        name: "fast on a long chain",
+        body: `var edges = [];
+for (var i = 0; i < 100000; i++) edges.push([i, i + 1]);
+assertEquals(solution(100001, edges), -1);`,
+      },
+    ],
+    hints: [
+      "Start with every node as its own root and find roots with path compression.",
+      "For each edge, compare the two roots. Equal roots mean the edge would close a cycle.",
+      "Return the edge's index the moment that happens; otherwise union the two sets and continue.",
+    ],
+    reference: `function firstCycleEdge(n, edges) {
+  const parent = Array.from({ length: n }, (_, i) => i);
+  const find = (x) => {
+    let root = x;
+    while (parent[root] !== root) root = parent[root];
+    while (parent[x] !== root) {
+      const next = parent[x];
+      parent[x] = root;
+      x = next;
+    }
+    return root;
+  };
+  for (let i = 0; i < edges.length; i++) {
+    const [u, v] = edges[i];
+    const ru = find(u);
+    const rv = find(v);
+    // Already connected, so this edge creates a cycle.
+    if (ru === rv) return i;
+    parent[ru] = rv;
+  }
+  return -1;
+}
+`,
+  },
 };

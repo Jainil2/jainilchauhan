@@ -79,4 +79,115 @@ def tarjan(adj):
     },
     { label: "LLVM — CallGraph SCC passes", href: "https://llvm.org/docs/Passes.html" },
   ],
+  challenge: {
+    prompt:
+      "Find the strongly connected components of a directed graph — the groups where every node can reach every other. Kosaraju does it in two passes: order by finish time, then explore the reversed graph in that order.",
+    entry: "sccs",
+    starter: `/**
+ * @param {number} n - nodes 0..n-1.
+ * @param {Array<[number, number]>} edges - directed.
+ * @returns {number[][]} components, each ascending, ordered by first element.
+ */
+function sccs(n, edges) {
+  // Pass one: record nodes by finish time on the original graph.
+  // Pass two: walk the REVERSED graph in reverse finish order.
+}
+`,
+    tests: [
+      {
+        name: "a two-cycle is one component",
+        body: `assertEquals(solution(2, [[0, 1], [1, 0]]), [[0, 1]]);`,
+      },
+      {
+        name: "a chain has no shared components",
+        body: `assertEquals(solution(3, [[0, 1], [1, 2]]), [[0], [1], [2]]);`,
+      },
+      {
+        name: "isolated nodes are their own components",
+        body: `assertEquals(solution(2, []), [[0], [1]]);`,
+      },
+      {
+        name: "a triangle is one component",
+        body: `assertEquals(solution(3, [[0, 1], [1, 2], [2, 0]]), [[0, 1, 2]]);`,
+      },
+      {
+        name: "separates a cycle from its tail",
+        body: `assertEquals(solution(3, [[0, 1], [1, 0], [1, 2]]), [[0, 1], [2]]);`,
+      },
+      {
+        name: "a self loop is its own component",
+        body: `assertEquals(solution(1, [[0, 0]]), [[0]]);`,
+      },
+      {
+        name: "handles two separate cycles",
+        body: `assertEquals(solution(4, [[0, 1], [1, 0], [2, 3], [3, 2]]), [[0, 1], [2, 3]]);`,
+      },
+      {
+        name: "survives a long chain without recursing",
+        body: `var edges = [];
+for (var i = 0; i < 50000; i++) edges.push([i, i + 1]);
+assertEquals(solution(50001, edges).length, 50001);`,
+      },
+    ],
+    hints: [
+      "Build both the graph and its reverse up front.",
+      "The first pass is a DFS that appends a node to an order list when it finishes, not when it starts.",
+      "The second pass walks that order backwards; everything reachable in the reversed graph from an unvisited node is one component.",
+    ],
+    reference: `function sccs(n, edges) {
+  const adj = Array.from({ length: n }, () => []);
+  const rev = Array.from({ length: n }, () => []);
+  for (const [u, v] of edges) {
+    adj[u].push(v);
+    rev[v].push(u);
+  }
+
+  // Pass one: finish order. Iterative, because 50k-deep recursion overflows.
+  const seen = new Array(n).fill(false);
+  const order = [];
+  for (let start = 0; start < n; start++) {
+    if (seen[start]) continue;
+    const stack = [[start, 0]];
+    seen[start] = true;
+    while (stack.length) {
+      const frame = stack[stack.length - 1];
+      const [node, i] = frame;
+      if (i < adj[node].length) {
+        frame[1]++;
+        const next = adj[node][i];
+        if (!seen[next]) {
+          seen[next] = true;
+          stack.push([next, 0]);
+        }
+      } else {
+        order.push(node); // finished
+        stack.pop();
+      }
+    }
+  }
+
+  // Pass two: reversed graph, in reverse finish order.
+  const done = new Array(n).fill(false);
+  const out = [];
+  for (let i = order.length - 1; i >= 0; i--) {
+    const root = order[i];
+    if (done[root]) continue;
+    const group = [];
+    const stack = [root];
+    done[root] = true;
+    while (stack.length) {
+      const node = stack.pop();
+      group.push(node);
+      for (const next of rev[node]) {
+        if (done[next]) continue;
+        done[next] = true;
+        stack.push(next);
+      }
+    }
+    out.push(group.sort((a, b) => a - b));
+  }
+  return out.sort((a, b) => a[0] - b[0]);
+}
+`,
+  },
 };

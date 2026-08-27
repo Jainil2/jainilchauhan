@@ -72,4 +72,92 @@ def pagerank(out_links, d=0.85, iters=30):
       href: "https://neo4j.com/docs/graph-data-science/current/algorithms/page-rank/",
     },
   ],
+  challenge: {
+    prompt:
+      "Compute PageRank scores by repeatedly redistributing weight along links. The damping factor models a reader who sometimes stops following links and jumps somewhere random, which is also what keeps dangling pages from swallowing all the weight.",
+    entry: "pagerank",
+    starter: `/**
+ * @param {number} n - pages 0..n-1.
+ * @param {Array<[number, number]>} edges - [from, to] links.
+ * @param {number} damping - probability of following a link, e.g. 0.85.
+ * @param {number} iterations - how many rounds to run.
+ * @returns {number[]} scores, summing to 1.
+ */
+function pagerank(n, edges, damping, iterations) {
+  // Every page starts at 1/n. A page with NO outgoing links must spread its
+  // score across everyone, or weight leaks away every round.
+}
+`,
+    tests: [
+      {
+        name: "scores always sum to one",
+        body: `var s = solution(3, [[0, 1], [1, 2], [2, 0]], 0.85, 20);
+var total = 0;
+for (var i = 0; i < s.length; i++) total += s[i];
+assert(Math.abs(total - 1) < 1e-9, 'sum was ' + total);`,
+      },
+      {
+        name: "a symmetric cycle is uniform",
+        body: `var s = solution(3, [[0, 1], [1, 2], [2, 0]], 0.85, 50);
+assert(Math.abs(s[0] - s[1]) < 1e-9 && Math.abs(s[1] - s[2]) < 1e-9, 'not uniform');`,
+      },
+      {
+        name: "a page with more inbound links scores higher",
+        body: `var s = solution(3, [[0, 2], [1, 2]], 0.85, 50);
+assert(s[2] > s[0] && s[2] > s[1], 'hub did not win');`,
+      },
+      {
+        name: "no links leaves everything uniform",
+        body: `var s = solution(4, [], 0.85, 10);
+for (var i = 0; i < 4; i++) assert(Math.abs(s[i] - 0.25) < 1e-9, 'not uniform');`,
+      },
+      {
+        name: "dangling pages do not leak weight",
+        body: `var s = solution(2, [[0, 1]], 0.85, 100);
+var total = s[0] + s[1];
+assert(Math.abs(total - 1) < 1e-9, 'weight leaked: ' + total);`,
+      },
+      {
+        name: "zero iterations leaves the starting distribution",
+        body: `var s = solution(4, [[0, 1]], 0.85, 0);
+for (var i = 0; i < 4; i++) assert(Math.abs(s[i] - 0.25) < 1e-9, 'start was not uniform');`,
+      },
+      {
+        name: "a single page holds all the weight",
+        body: `var s = solution(1, [], 0.85, 5);
+assert(Math.abs(s[0] - 1) < 1e-9, 'expected 1');`,
+      },
+    ],
+    hints: [
+      "Start every page at 1/n and build a fresh score array each round rather than updating in place.",
+      "Each round begins with the teleport term (1 - damping) / n for every page.",
+      "Collect the score of every dangling page and spread it evenly, or the totals shrink each round.",
+    ],
+    reference: `function pagerank(n, edges, damping, iterations) {
+  const out = Array.from({ length: n }, () => []);
+  for (const [from, to] of edges) out[from].push(to);
+
+  let score = new Array(n).fill(1 / n);
+  for (let round = 0; round < iterations; round++) {
+    // Teleport term first: this is the random jump, and it is what keeps the
+    // distribution from collapsing.
+    const next = new Array(n).fill((1 - damping) / n);
+
+    // A page with no outgoing links would otherwise destroy its own weight.
+    let dangling = 0;
+    for (let v = 0; v < n; v++) if (out[v].length === 0) dangling += score[v];
+    const spread = (damping * dangling) / n;
+    for (let v = 0; v < n; v++) next[v] += spread;
+
+    for (let v = 0; v < n; v++) {
+      if (out[v].length === 0) continue;
+      const share = (damping * score[v]) / out[v].length;
+      for (const target of out[v]) next[target] += share;
+    }
+    score = next;
+  }
+  return score;
+}
+`,
+  },
 };

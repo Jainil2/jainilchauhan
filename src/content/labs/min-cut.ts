@@ -69,4 +69,101 @@ function minCut(residual: Map<string, Map<string, number>>, s: string) {
       href: "https://cp-algorithms.com/graph/edmonds_karp.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Find which side of the minimum cut each node falls on. Once flow is maximal, the source side is exactly the set still reachable in the residual graph — and the edges leaving it are the bottleneck. That equivalence is the max-flow min-cut theorem, made concrete.",
+    entry: "sourceSide",
+    starter: `/**
+ * @param {number[][]} capacity - capacity[u][v].
+ * @param {number} source
+ * @param {number} sink
+ * @returns {number[]} nodes on the source side of a minimum cut, ascending.
+ */
+function sourceSide(capacity, source, sink) {
+  // Push flow until no augmenting path remains, then report what is still
+  // reachable from the source through leftover capacity.
+}
+`,
+    tests: [
+      {
+        name: "a saturated pipe cuts the two apart",
+        body: `assertEquals(solution([[0, 5], [0, 0]], 0, 1), [0]);`,
+      },
+      {
+        name: "the cut lands at the narrow link",
+        body: `assertEquals(solution([[0, 5, 0], [0, 0, 3], [0, 0, 0]], 0, 2), [0, 1]);`,
+      },
+      {
+        name: "an unreachable sink leaves everything on the source side",
+        body: `assertEquals(solution([[0, 0, 0], [0, 0, 0], [0, 0, 0]], 0, 2), [0]);`,
+      },
+      {
+        name: "the sink is never on the source side",
+        body: `var c = [[0, 3, 3, 0], [0, 0, 0, 3], [0, 0, 0, 3], [0, 0, 0, 0]];
+var side = solution(c, 0, 3);
+assert(side.indexOf(3) === -1, 'sink leaked onto the source side');`,
+      },
+      {
+        name: "the source is always included",
+        body: `var c = [[0, 1], [0, 0]];
+assert(solution(c, 0, 1).indexOf(0) !== -1, 'source missing');`,
+      },
+      {
+        name: "cut capacity equals the maximum flow",
+        body: `var c = [[0, 3, 3, 0, 0], [0, 0, 1, 3, 0], [0, 0, 0, 0, 3], [0, 0, 0, 0, 4], [0, 0, 0, 0, 0]];
+var side = solution(c, 0, 4);
+var inSide = {};
+for (var i = 0; i < side.length; i++) inSide[side[i]] = true;
+var cut = 0;
+for (var u = 0; u < 5; u++) for (var v = 0; v < 5; v++) if (inSide[u] && !inSide[v]) cut += c[u][v];
+assertEquals(cut, 6);`,
+      },
+    ],
+    hints: [
+      "Run max flow first, keeping the residual matrix afterwards.",
+      "Then do one plain BFS from the source over edges whose residual capacity is still above zero.",
+      "Whatever that BFS reaches is the source side; the sink cannot be among it unless no path ever existed.",
+    ],
+    reference: `function sourceSide(capacity, source, sink) {
+  // Same trap as max flow: source === sink makes the augmenting loop spin.
+  if (source === sink) return [source];
+  const n = capacity.length;
+  const residual = capacity.map((row) => row.slice());
+
+  const bfsParents = () => {
+    const parent = new Array(n).fill(-1);
+    parent[source] = source;
+    const queue = [source];
+    for (let head = 0; head < queue.length; head++) {
+      const u = queue[head];
+      for (let v = 0; v < n; v++) {
+        if (parent[v] !== -1 || residual[u][v] <= 0) continue;
+        parent[v] = u;
+        queue.push(v);
+      }
+    }
+    return parent;
+  };
+
+  for (;;) {
+    const parent = bfsParents();
+    if (parent[sink] === -1) break;
+    let bottleneck = Infinity;
+    for (let v = sink; v !== source; v = parent[v]) {
+      bottleneck = Math.min(bottleneck, residual[parent[v]][v]);
+    }
+    for (let v = sink; v !== source; v = parent[v]) {
+      residual[parent[v]][v] -= bottleneck;
+      residual[v][parent[v]] += bottleneck;
+    }
+  }
+
+  // Max-flow min-cut: at saturation, reachability in the residual graph IS the cut.
+  const parent = bfsParents();
+  const out = [];
+  for (let v = 0; v < n; v++) if (parent[v] !== -1) out.push(v);
+  return out;
+}
+`,
+  },
 };

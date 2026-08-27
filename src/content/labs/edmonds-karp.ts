@@ -85,4 +85,106 @@ def edmonds_karp(cap, s, t):
       href: "https://www.usenix.org/conference/osdi16/technical-sessions/presentation/gog",
     },
   ],
+  challenge: {
+    prompt:
+      "Report the bottleneck of each augmenting path Edmonds-Karp uses, in order. Choosing the SHORTEST augmenting path each round, via BFS, is what bounds the algorithm at O(V*E squared) instead of depending on the capacity values.",
+    entry: "augmentingPaths",
+    starter: `/**
+ * BFS must scan neighbours in ascending index order so the result is deterministic.
+ *
+ * @param {number[][]} capacity - capacity[u][v].
+ * @param {number} source
+ * @param {number} sink
+ * @returns {number[]} the bottleneck pushed on each augmenting path, in order.
+ */
+function augmentingPaths(capacity, source, sink) {
+  // One entry per BFS round. Stop when BFS can no longer reach the sink.
+}
+`,
+    tests: [
+      {
+        name: "a single pipe takes one round",
+        body: `assertEquals(solution([[0, 5], [0, 0]], 0, 1), [5]);`,
+      },
+      {
+        name: "the bottleneck is the narrowest link",
+        body: `assertEquals(solution([[0, 5, 0], [0, 0, 3], [0, 0, 0]], 0, 2), [3]);`,
+      },
+      {
+        name: "two disjoint routes take two rounds",
+        body: `var c = [[0, 3, 3, 0], [0, 0, 0, 3], [0, 0, 0, 3], [0, 0, 0, 0]];
+assertEquals(solution(c, 0, 3), [3, 3]);`,
+      },
+      {
+        name: "no path means no rounds",
+        body: `assertEquals(solution([[0, 0], [0, 0]], 0, 1), []);`,
+      },
+      {
+        name: "shortest paths are chosen first",
+        body: `// 0->3 direct (1 edge, cap 5), and 0->1->2->3 (3 edges, cap 2).
+// BFS must take the direct route first, so the order is [5, 2] and not [2, 5].
+var c = [
+  [0, 2, 0, 5],
+  [0, 0, 2, 0],
+  [0, 0, 0, 2],
+  [0, 0, 0, 0],
+];
+assertEquals(solution(c, 0, 3), [5, 2]);`,
+      },
+      {
+        name: "the bottlenecks sum to the maximum flow",
+        body: `var c = [[0, 3, 3, 0, 0], [0, 0, 1, 3, 0], [0, 0, 0, 0, 3], [0, 0, 0, 0, 4], [0, 0, 0, 0, 0]];
+var paths = solution(c, 0, 4);
+var total = 0;
+for (var i = 0; i < paths.length; i++) total += paths[i];
+assertEquals(total, 6);`,
+      },
+      {
+        name: "every bottleneck is positive",
+        body: `var c = [[0, 4, 2, 0], [0, 0, 1, 3], [0, 0, 0, 4], [0, 0, 0, 0]];
+var paths = solution(c, 0, 3);
+for (var i = 0; i < paths.length; i++) assert(paths[i] > 0, 'zero bottleneck recorded');`,
+      },
+    ],
+    hints: [
+      "This is max flow, but recording the bottleneck of each round instead of only the total.",
+      "Scanning v from 0 upwards inside the BFS keeps the path choice deterministic.",
+      "BFS guarantees the fewest-edges path, which is the only difference between this and generic Ford-Fulkerson.",
+    ],
+    reference: `function augmentingPaths(capacity, source, sink) {
+  // With source === sink, BFS reaches the sink instantly and the bottleneck
+  // loop never runs, so the outer loop would spin forever.
+  if (source === sink) return [];
+  const n = capacity.length;
+  const residual = capacity.map((row) => row.slice());
+  const out = [];
+
+  for (;;) {
+    const parent = new Array(n).fill(-1);
+    parent[source] = source;
+    const queue = [source];
+    for (let head = 0; head < queue.length && parent[sink] === -1; head++) {
+      const u = queue[head];
+      // Ascending v keeps the chosen path deterministic.
+      for (let v = 0; v < n; v++) {
+        if (parent[v] !== -1 || residual[u][v] <= 0) continue;
+        parent[v] = u;
+        queue.push(v);
+      }
+    }
+    if (parent[sink] === -1) return out;
+
+    let bottleneck = Infinity;
+    for (let v = sink; v !== source; v = parent[v]) {
+      bottleneck = Math.min(bottleneck, residual[parent[v]][v]);
+    }
+    for (let v = sink; v !== source; v = parent[v]) {
+      residual[parent[v]][v] -= bottleneck;
+      residual[v][parent[v]] += bottleneck;
+    }
+    out.push(bottleneck);
+  }
+}
+`,
+  },
 };

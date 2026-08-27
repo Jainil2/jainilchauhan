@@ -71,4 +71,82 @@ const byPrice = [...items].sort((a, b) => a.price - b.price); // stable since ES
       href: "https://doc.rust-lang.org/std/primitive.slice.html#method.sort_unstable",
     },
   ],
+  challenge: {
+    prompt:
+      "Implement insertion sort and report how much work it did. It is quadratic in the worst case but nearly linear on almost-sorted data, which is why real sorts fall back to it for small or tidy runs instead of recursing further.",
+    entry: "insertionSort",
+    starter: `/**
+ * @param {number[]} xs - values. Sort a copy, not the caller's array.
+ * @returns {{sorted: number[], shifts: number}} the sorted values, and how many
+ *   times a value was moved one position to the right.
+ */
+function insertionSort(xs) {
+  // Grow a sorted prefix. Each new value slides left past everything larger
+  // than it; count each of those slides.
+}
+`,
+    tests: [
+      {
+        name: "sorts unordered input",
+        body: `assertEquals(solution([3, 1, 2]).sorted, [1, 2, 3]);`,
+      },
+      {
+        name: "already sorted input needs no shifts",
+        body: `assertEquals(solution([1, 2, 3]).shifts, 0);`,
+      },
+      {
+        name: "reverse sorted is the worst case",
+        body: `var r = solution([3, 2, 1]);
+assertEquals(r.sorted, [1, 2, 3]);
+assertEquals(r.shifts, 3);`,
+      },
+      {
+        name: "equal values are not shifted past each other",
+        body: `assertEquals(solution([1, 1, 1]).shifts, 0);`,
+      },
+      {
+        name: "empty",
+        body: `assertEquals(solution([]), { sorted: [], shifts: 0 });`,
+      },
+      {
+        name: "single element",
+        body: `assertEquals(solution([9]), { sorted: [9], shifts: 0 });`,
+      },
+      {
+        name: "does not mutate the caller's array",
+        body: `var xs = [2, 1];
+solution(xs);
+assertEquals(xs, [2, 1]);`,
+      },
+      {
+        name: "nearly sorted data is nearly free",
+        body: `var xs = [];
+for (var i = 0; i < 2000; i++) xs.push(i);
+var t = xs[500]; xs[500] = xs[501]; xs[501] = t;
+assertEquals(solution(xs).shifts, 1);`,
+      },
+    ],
+    hints: [
+      "Copy the input first, then treat everything left of index i as already sorted.",
+      "Hold the current value aside, then shift larger values right one at a time until you find its slot.",
+      "Stop shifting at the first value that is less than or equal to the one you are placing — that keeps it stable and makes sorted input free.",
+    ],
+    reference: `function insertionSort(xs) {
+  const sorted = xs.slice();
+  let shifts = 0;
+  for (let i = 1; i < sorted.length; i++) {
+    const value = sorted[i];
+    let j = i - 1;
+    // Stop at the first value <= this one: stable, and free on sorted input.
+    while (j >= 0 && sorted[j] > value) {
+      sorted[j + 1] = sorted[j];
+      shifts++;
+      j--;
+    }
+    sorted[j + 1] = value;
+  }
+  return { sorted, shifts };
+}
+`,
+  },
 };

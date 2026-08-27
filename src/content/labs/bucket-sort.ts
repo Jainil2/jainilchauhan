@@ -70,4 +70,78 @@ export function bucketSort(xs: number[], bucketCount = 16): number[] {
       href: "https://spark.apache.org/docs/latest/sql-performance-tuning.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Sort values that are roughly uniform across a range by scattering them into buckets, sorting each small bucket, then concatenating. Linear when the distribution cooperates, and quadratic when everything lands in one bucket — which is the whole lesson.",
+    entry: "bucketSort",
+    starter: `/**
+ * @param {number[]} xs - values in [0, 1).
+ * @param {number} bucketCount - how many buckets to scatter into. At least 1.
+ * @returns {number[]} a new sorted array, ascending.
+ */
+function bucketSort(xs, bucketCount) {
+  // Bucket index comes from the value's position in the range. Sort each
+  // bucket on its own, then join them in order.
+}
+`,
+    tests: [
+      {
+        name: "sorts fractions",
+        body: `assertEquals(solution([0.5, 0.1, 0.9], 3), [0.1, 0.5, 0.9]);`,
+      },
+      {
+        name: "handles values landing in one bucket",
+        body: `assertEquals(solution([0.11, 0.12, 0.1], 2), [0.1, 0.11, 0.12]);`,
+      },
+      {
+        name: "zero sorts first",
+        body: `assertEquals(solution([0.5, 0], 2), [0, 0.5]);`,
+      },
+      {
+        name: "duplicates",
+        body: `assertEquals(solution([0.3, 0.3], 4), [0.3, 0.3]);`,
+      },
+      {
+        name: "empty",
+        body: `assertEquals(solution([], 4), []);`,
+      },
+      {
+        name: "single bucket still sorts",
+        body: `assertEquals(solution([0.9, 0.1], 1), [0.1, 0.9]);`,
+      },
+      {
+        name: "values near the top of the range do not overflow the buckets",
+        body: `assertEquals(solution([0.999, 0.001], 10), [0.001, 0.999]);`,
+      },
+      {
+        name: "handles a large uniform input",
+        body: `var xs = [];
+for (var i = 0; i < 50000; i++) xs.push(((i * 7919) % 100000) / 100000);
+var out = solution(xs, 500);
+for (var j = 1; j < out.length; j++) if (out[j - 1] > out[j]) throw new Error('not sorted at ' + j);`,
+      },
+    ],
+    hints: [
+      "Bucket index is Math.floor(value * bucketCount), which spreads [0,1) evenly.",
+      "Clamp the index to bucketCount - 1 so a value at the very top of the range does not fall off the end.",
+      "Sort each bucket numerically — the default sort compares strings, so 10 would come before 9.",
+    ],
+    reference: `function bucketSort(xs, bucketCount) {
+  const n = Math.max(1, bucketCount);
+  const buckets = Array.from({ length: n }, () => []);
+  for (const v of xs) {
+    // Clamp: a value of exactly 1 would otherwise index one past the end.
+    const i = Math.min(n - 1, Math.floor(v * n));
+    buckets[i].push(v);
+  }
+  const out = [];
+  for (const bucket of buckets) {
+    // Numeric comparator: the default sort would order these as strings.
+    bucket.sort((a, b) => a - b);
+    for (const v of bucket) out.push(v);
+  }
+  return out;
+}
+`,
+  },
 };

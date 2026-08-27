@@ -75,4 +75,87 @@ def find_run(a, lo):
       href: "https://v8.dev/blog/array-sort",
     },
   ],
+  challenge: {
+    prompt:
+      "Find the natural runs in an array — the already-ordered stretches Timsort exploits instead of ignoring. Ascending runs are taken as they are; strictly descending runs are reversed in place. Real data is full of these, which is why Timsort beats a textbook merge sort on it.",
+    entry: "findRuns",
+    starter: `/**
+ * @param {number[]} xs
+ * @returns {number[][]} consecutive runs covering xs in order. A descending run
+ *   is reversed so every returned run is ascending. Runs of one are allowed.
+ */
+function findRuns(xs) {
+  // At each position decide the direction from the next element, extend the run
+  // while it holds, and reverse it if it was descending.
+}
+`,
+    tests: [
+      {
+        name: "one ascending run",
+        body: `assertEquals(solution([1, 2, 3]), [[1, 2, 3]]);`,
+      },
+      {
+        name: "a descending run comes back reversed",
+        body: `assertEquals(solution([3, 2, 1]), [[1, 2, 3]]);`,
+      },
+      {
+        name: "splits at a direction change",
+        body: `assertEquals(solution([1, 2, 3, 2, 1]), [[1, 2, 3], [1, 2]]);`,
+      },
+      {
+        name: "equal values continue an ascending run",
+        body: `assertEquals(solution([1, 1, 2]), [[1, 1, 2]]);`,
+      },
+      {
+        name: "equal values end a descending run",
+        body: `assertEquals(solution([3, 2, 2]), [[2, 3], [2]]);`,
+      },
+      {
+        name: "single element",
+        body: `assertEquals(solution([5]), [[5]]);`,
+      },
+      {
+        name: "empty input",
+        body: `assertEquals(solution([]), []);`,
+      },
+      {
+        name: "runs cover the input exactly once",
+        body: `var xs = [5, 1, 4, 4, 2, 9, 8];
+var runs = solution(xs);
+var total = 0;
+for (var i = 0; i < runs.length; i++) total += runs[i].length;
+assertEquals(total, xs.length);`,
+      },
+      {
+        name: "already sorted input is a single run",
+        body: `var xs = [];
+for (var i = 0; i < 100000; i++) xs.push(i);
+assertEquals(solution(xs).length, 1);`,
+      },
+    ],
+    hints: [
+      "Start each run at index i and look at xs[i+1] to decide whether it ascends or descends.",
+      "Ascending extends while the next value is greater than or equal; descending extends only while strictly less.",
+      "Reverse a descending run before pushing it, so every run you return is ascending.",
+    ],
+    reference: `function findRuns(xs) {
+  const runs = [];
+  let i = 0;
+  while (i < xs.length) {
+    let j = i + 1;
+    if (j < xs.length && xs[j] < xs[i]) {
+      // Strictly descending only. Allowing equals here would make the reverse
+      // unstable, which is exactly what Timsort must avoid.
+      while (j < xs.length && xs[j] < xs[j - 1]) j++;
+      runs.push(xs.slice(i, j).reverse());
+    } else {
+      while (j < xs.length && xs[j] >= xs[j - 1]) j++;
+      runs.push(xs.slice(i, j));
+    }
+    i = j;
+  }
+  return runs;
+}
+`,
+  },
 };

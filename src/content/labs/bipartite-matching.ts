@@ -79,4 +79,84 @@ function maxMatching(left: number, adj: number[][]) {
       href: "https://www.nrmp.org/intro-to-the-match/how-matching-algorithm-works/",
     },
   ],
+  challenge: {
+    prompt:
+      "Find the largest set of pairings between two groups where nobody is matched twice. The augmenting-path idea is the same one behind max flow: when a candidate is taken, ask whether its current partner can move elsewhere.",
+    entry: "maxMatching",
+    starter: `/**
+ * @param {number} left - nodes on the left, 0..left-1.
+ * @param {number} right - nodes on the right, 0..right-1.
+ * @param {Array<[number, number]>} edges - [leftNode, rightNode] pairs.
+ * @returns {number} the size of a maximum matching.
+ */
+function maxMatching(left, right, edges) {
+  // For each left node, try to claim a partner. If a candidate is taken, ask
+  // its current owner to find a different one -- recursively.
+}
+`,
+    tests: [
+      {
+        name: "a perfect pairing",
+        body: `assertEquals(solution(2, 2, [[0, 0], [1, 1]]), 2);`,
+      },
+      {
+        name: "contention allows only one",
+        body: `assertEquals(solution(2, 1, [[0, 0], [1, 0]]), 1);`,
+      },
+      {
+        name: "reassignment finds a bigger matching",
+        body: `assertEquals(solution(2, 2, [[0, 0], [1, 0], [0, 1]]), 2);`,
+      },
+      {
+        name: "no edges",
+        body: `assertEquals(solution(2, 2, []), 0);`,
+      },
+      {
+        name: "extra candidates do not help beyond the left size",
+        body: `assertEquals(solution(1, 3, [[0, 0], [0, 1], [0, 2]]), 1);`,
+      },
+      {
+        name: "a longer augmenting chain",
+        body: `assertEquals(solution(3, 3, [[0, 0], [1, 0], [1, 1], [2, 1], [2, 2]]), 3);`,
+      },
+      {
+        name: "handles a moderately large instance",
+        body: `var edges = [];
+for (var i = 0; i < 500; i++) { edges.push([i, i]); edges.push([i, (i + 1) % 500]); }
+assertEquals(solution(500, 500, edges), 500);`,
+      },
+    ],
+    hints: [
+      "Keep an array recording which left node currently owns each right node, or -1.",
+      "Try each left node in turn with a depth-first search over its candidates, using a per-attempt visited set.",
+      "If a candidate is owned, recurse on the owner; if the owner can move, take the candidate.",
+    ],
+    reference: `function maxMatching(left, right, edges) {
+  const adj = Array.from({ length: left }, () => []);
+  for (const [l, r] of edges) adj[l].push(r);
+
+  const ownerOf = new Array(right).fill(-1);
+  let total = 0;
+
+  const tryClaim = (l, seen) => {
+    for (const r of adj[l]) {
+      if (seen[r]) continue;
+      seen[r] = true;
+      // Free, or the current owner can be rehoused.
+      if (ownerOf[r] === -1 || tryClaim(ownerOf[r], seen)) {
+        ownerOf[r] = l;
+        return true;
+      }
+    }
+    return false;
+  };
+
+  for (let l = 0; l < left; l++) {
+    // A fresh visited set per attempt: it guards this search, not the matching.
+    if (tryClaim(l, new Array(right).fill(false))) total++;
+  }
+  return total;
+}
+`,
+  },
 };

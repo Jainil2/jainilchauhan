@@ -66,4 +66,75 @@ export function radixSort(xs: Uint32Array): Uint32Array {
       href: "https://lucene.apache.org/core/9_9_0/core/org/apache/lucene/util/RadixSelector.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Sort non-negative integers digit by digit, least significant first, using a stable counting pass per digit. Stability is not a nicety here — it is what makes the whole algorithm work, because each pass must preserve the ordering the previous passes established.",
+    entry: "radixSort",
+    starter: `/**
+ * @param {number[]} xs - non-negative integers.
+ * @returns {number[]} a new sorted array, ascending.
+ */
+function radixSort(xs) {
+  // One stable pass per digit position, starting from the ones column.
+  // If a pass is not stable, earlier digits are scrambled and the result is wrong.
+}
+`,
+    tests: [
+      {
+        name: "sorts multi-digit numbers",
+        body: `assertEquals(solution([170, 45, 75, 90, 2]), [2, 45, 75, 90, 170]);`,
+      },
+      {
+        name: "single digits",
+        body: `assertEquals(solution([3, 1, 2]), [1, 2, 3]);`,
+      },
+      {
+        name: "mixed digit widths",
+        body: `assertEquals(solution([1, 100, 10]), [1, 10, 100]);`,
+      },
+      {
+        name: "duplicates",
+        body: `assertEquals(solution([5, 5, 1]), [1, 5, 5]);`,
+      },
+      {
+        name: "includes zero",
+        body: `assertEquals(solution([10, 0, 5]), [0, 5, 10]);`,
+      },
+      {
+        name: "empty",
+        body: `assertEquals(solution([]), []);`,
+      },
+      {
+        name: "single element",
+        body: `assertEquals(solution([42]), [42]);`,
+      },
+      {
+        name: "handles a wide range",
+        body: `var xs = [];
+for (var i = 0; i < 50000; i++) xs.push((i * 7919) % 999983);
+var out = solution(xs);
+for (var j = 1; j < out.length; j++) if (out[j - 1] > out[j]) throw new Error('not sorted at ' + j);`,
+      },
+    ],
+    hints: [
+      "Find the maximum to know how many digit positions you must process.",
+      "For each position, bucket by (value / place) mod 10, appending so buckets stay stable.",
+      "Concatenate the ten buckets in order to form the input for the next pass.",
+    ],
+    reference: `function radixSort(xs) {
+  if (xs.length === 0) return [];
+  let current = xs.slice();
+  const max = Math.max(...current);
+
+  for (let place = 1; Math.floor(max / place) > 0; place *= 10) {
+    const buckets = Array.from({ length: 10 }, () => []);
+    // push() appends, which is what keeps this pass stable -- equal digits
+    // retain the order the previous pass gave them.
+    for (const v of current) buckets[Math.floor(v / place) % 10].push(v);
+    current = [].concat(...buckets);
+  }
+  return current;
+}
+`,
+  },
 };
