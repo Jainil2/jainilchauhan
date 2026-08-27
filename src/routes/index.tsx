@@ -96,24 +96,24 @@ function Index() {
       <CommandPalette />
       <main>
         <Hero />
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-4">
           <InfrastructureMap />
         </div>
-        <SectionDivider label="about.md" />
+        <SectionDivider label="About" />
         <About />
-        <SectionDivider label="skills/" />
+        <SectionDivider label="Skills" />
         <Skills />
-        <SectionDivider label="git log" />
+        <SectionDivider label="Experience" />
         <Experience />
-        <SectionDivider label="projects/" />
+        <SectionDivider label="Projects" />
         <Projects />
-        <SectionDivider label="now.txt" />
+        <SectionDivider label="Now" />
         <Now />
-        <SectionDivider label="education.json" />
+        <SectionDivider label="Education" />
         <Education />
-        <SectionDivider label="writing/" />
+        <SectionDivider label="Writing" />
         <Writing />
-        <SectionDivider label="contact --start" />
+        <SectionDivider label="Contact" />
         <Contact />
       </main>
       <Footer />

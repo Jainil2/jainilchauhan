@@ -16,19 +16,19 @@ export function Hero() {
   return (
     <section
       id="top"
-      className="relative mx-auto flex min-h-[80vh] max-w-6xl flex-col justify-center px-4 pt-28 pb-16 sm:px-6"
+      className="relative mx-auto max-w-6xl px-4 pt-32 pb-20 sm:px-6"
     >
-      <div className="grid items-center gap-12 lg:grid-cols-[1.5fr_1fr]">
+      <div className="grid items-start gap-10 lg:grid-cols-[1.6fr_1fr]">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             Software Engineer · Backend &amp; Distributed Systems
           </p>
 
-          <h1 className="mt-5 text-5xl font-semibold leading-tight tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+          <h1 className="mt-4 text-[2.75rem] font-semibold leading-[1.05] tracking-[-0.02em] text-foreground sm:text-6xl">
             Jainil Chauhan
           </h1>
 
-          <p className="mt-6 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
+          <p className="mt-5 max-w-xl text-pretty text-[1.0625rem] leading-[1.7] text-muted-foreground">
             I build{" "}
             <span className="text-foreground">
               low-latency, high-trust systems that scale quietly
@@ -38,7 +38,7 @@ export function Hero() {
           </p>
 
           <div
-            className="mt-7 inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-3 py-1.5 text-xs text-muted-foreground"
+            className="mt-6 inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-3 py-1.5 text-xs text-muted-foreground"
             title="Days since I joined Tech Holding"
           >
             <span className="size-1.5 rounded-full bg-foreground" />
@@ -83,7 +83,7 @@ export function Hero() {
           </p>
         </div>
 
-        <aside className="rounded-lg border border-border bg-card p-6 text-sm">
+        <aside className="rounded-xl border border-border bg-card p-6 text-sm shadow-[0_1px_2px_rgba(0,0,0,0.04)] lg:mt-2">
           <p className="border-b border-border pb-3 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             At a glance
           </p>
