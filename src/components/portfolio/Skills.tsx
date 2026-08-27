@@ -1,4 +1,5 @@
 import { SectionHeading } from "./SectionHeading";
+import { BrandIcon } from "@/components/brand/BrandIcon";
 
 const groups: { title: string; items: string[] }[] = [
   { title: "Languages", items: ["Python", "JavaScript", "TypeScript", "SQL"] },
