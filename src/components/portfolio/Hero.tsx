@@ -16,9 +16,9 @@ export function Hero() {
   return (
     <section
       id="top"
-      className="relative mx-auto flex min-h-[80vh] max-w-6xl flex-col justify-center px-4 pt-28 pb-16 sm:px-6"
+      className="relative mx-auto max-w-6xl px-4 pt-32 pb-20 sm:px-6"
     >
-      <div className="grid items-center gap-12 lg:grid-cols-[1.5fr_1fr]">
+      <div className="grid items-start gap-10 lg:grid-cols-[1.6fr_1fr]">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             Software Engineer · Backend &amp; Distributed Systems
