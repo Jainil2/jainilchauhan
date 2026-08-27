@@ -394,4 +394,29 @@ export const labComponents: Record<string, LazyExoticComponent<ComponentType>> =
       default: m.TopologicalSortLab,
     })),
   ),
+  "kv-cache": lazy(() =>
+    import("@/components/system-design/AiInferenceLabs").then((m) => ({
+      default: m.KVCacheLab,
+    })),
+  ),
+  "continuous-batching": lazy(() =>
+    import("@/components/system-design/AiInferenceLabs").then((m) => ({
+      default: m.ContinuousBatchingLab,
+    })),
+  ),
+  "speculative-decoding": lazy(() =>
+    import("@/components/system-design/AiInferenceLabs").then((m) => ({
+      default: m.SpeculativeDecodingLab,
+    })),
+  ),
+  "inference-cost": lazy(() =>
+    import("@/components/system-design/AiInferenceLabs").then((m) => ({
+      default: m.InferenceCostLab,
+    })),
+  ),
+  quantization: lazy(() =>
+    import("@/components/system-design/AiInferenceLabs").then((m) => ({
+      default: m.QuantizationLab,
+    })),
+  ),
 };

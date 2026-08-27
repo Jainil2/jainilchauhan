@@ -5,6 +5,8 @@ import { loadLab } from "@/content/labs";
 import { GameCard } from "@/components/system-design/GameCard";
 import { LabContent } from "@/components/system-design/LabContent";
 import { labComponents } from "@/components/system-design/registry";
+import { BridgeCard } from "@/components/bridge/BridgeCard";
+import { UnlocksCard } from "@/components/bridge/UnlocksCard";
 import { ChallengePanel } from "@/components/challenge/ChallengePanel";
 import { KnowledgeControls } from "@/components/challenge/KnowledgeControls";
 import { useLabProgress } from "@/lib/useLabProgress";
@@ -109,6 +111,8 @@ function LabDetail() {
           </div>
         </div>
 
+        <BridgeCard slug={slug} />
+
         <div id="lab-surface">
           <GameCard title={lab.title} caption={lab.caption} whereUsed={lab.whereUsed}>
             <Suspense
@@ -131,6 +135,8 @@ function LabDetail() {
         {lab.challenge && <ChallengePanel slug={slug} challenge={lab.challenge} />}
 
         <LabContent lab={lab} />
+
+        <UnlocksCard slug={slug} />
       </div>
     </div>
   );

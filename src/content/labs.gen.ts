@@ -198,6 +198,14 @@ export const labSummaries: LabSummary[] = [
     "blurb": "Add/remove nodes and remap only ~K/N keys."
   },
   {
+    "slug": "continuous-batching",
+    "title": "Continuous Batching",
+    "category": "AI Systems",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 5,
+    "blurb": "A work queue with a scheduler, where the workers are GPU batch slots."
+  },
+  {
     "slug": "cors-lab",
     "title": "CORS",
     "category": "Security",
@@ -398,6 +406,14 @@ export const labSummaries: LabSummary[] = [
     "blurb": "Probabilistic cardinality estimation."
   },
   {
+    "slug": "inference-cost",
+    "title": "Inference Cost & Latency Budgets",
+    "category": "AI Systems",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 5,
+    "blurb": "A token bucket where the tokens cost money and the refill is a GPU."
+  },
+  {
     "slug": "interval-scheduling",
     "title": "Interval Scheduling",
     "category": "Algorithms",
@@ -428,6 +444,14 @@ export const labSummaries: LabSummary[] = [
     "difficulty": "Intermediate",
     "readingTimeMin": 4,
     "blurb": "Build an MST by sorting edges and skipping cycles."
+  },
+  {
+    "slug": "kv-cache",
+    "title": "KV Cache",
+    "category": "AI Systems",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 5,
+    "blurb": "The LRU cache that decides which conversations stay on the GPU."
   },
   {
     "slug": "levenshtein",
@@ -582,6 +606,14 @@ export const labSummaries: LabSummary[] = [
     "blurb": "2D spatial partitioning."
   },
   {
+    "slug": "quantization",
+    "title": "Quantization",
+    "category": "AI Systems",
+    "difficulty": "Advanced",
+    "readingTimeMin": 5,
+    "blurb": "Packing weights into fewer bits, the way a bitset packs flags."
+  },
+  {
     "slug": "queue",
     "title": "Queue",
     "category": "Data Structures",
@@ -686,6 +718,14 @@ export const labSummaries: LabSummary[] = [
     "blurb": "Store only non-zero cells instead of the full grid."
   },
   {
+    "slug": "speculative-decoding",
+    "title": "Speculative Decoding",
+    "category": "AI Systems",
+    "difficulty": "Advanced",
+    "readingTimeMin": 5,
+    "blurb": "Guess ahead cheaply, verify in bulk, keep the prefix that survives."
+  },
+  {
     "slug": "stack",
     "title": "Stack",
     "category": "Data Structures",
@@ -756,5 +796,66 @@ export const labSummaries: LabSummary[] = [
     "difficulty": "Advanced",
     "readingTimeMin": 5,
     "blurb": "The end of the password."
+  }
+];
+
+/** Every declared bridge, flattened. Source of truth for both directions. */
+export interface BridgeEdge {
+  /** The lab that declares the bridge — the newer idea. */
+  to: string;
+  /** The prerequisite it is a small delta from. */
+  from: string;
+  sameness: string;
+  delta: string;
+}
+
+export const bridgeEdges: BridgeEdge[] = [
+  {
+    "to": "continuous-batching",
+    "from": "message-queue",
+    "sameness": "It IS a work queue with a fixed pool of workers. Requests arrive, wait for a slot, occupy it for a while, and free it. The batch slots are the consumers and the scheduler decides who gets one next.",
+    "delta": "A slot is not held for one message but for hundreds of sequential decode steps, and every occupied slot advances by one token in lockstep each step. So the unit of work is a step across the whole batch, not a message."
+  },
+  {
+    "to": "continuous-batching",
+    "from": "backpressure",
+    "sameness": "The admission decision is the same one you implemented: a bounded pool, an arrival rate that may exceed it, and a policy for what happens to the excess.",
+    "delta": "Rejecting is rarely acceptable here, so the excess queues and the pressure surfaces as time-to-first-token instead of dropped work. KV cache memory, not slot count, is usually the real bound."
+  },
+  {
+    "to": "inference-cost",
+    "from": "rate-limiter",
+    "sameness": "It is the token bucket you implemented, with the units changed. A budget refills over time, each request draws from it, and exceeding the rate means queueing or rejection.",
+    "delta": "The tokens are literally the model's tokens, priced differently for input and output, so the bucket is denominated in money as well as in requests per second."
+  },
+  {
+    "to": "inference-cost",
+    "from": "load-balancer",
+    "sameness": "Capacity planning is the same arithmetic: concurrency divided by service time gives throughput, and offered load above that queues.",
+    "delta": "Service time is not roughly constant. It scales with the number of output tokens, so two requests to the same endpoint can differ by a factor of fifty and capacity is a moving target."
+  },
+  {
+    "to": "kv-cache",
+    "from": "lru-cache",
+    "sameness": "It IS an LRU cache. Keys are sequences, values are their attention tensors, and the eviction policy is the same recency ordering you implemented — the least recently touched conversation is the one that goes.",
+    "delta": "The budget is GPU memory rather than entry count, so entries have wildly different sizes. And an eviction is not a miss you refetch — it is a recompute of every token in that sequence, which is why it shows up as a latency spike rather than an error."
+  },
+  {
+    "to": "quantization",
+    "from": "bitset",
+    "sameness": "It is the same packing you implemented: values that do not need a full machine word share one, and reading a value means an offset plus a mask. Memory falls geometrically with the bits per value.",
+    "delta": "The packed values are approximations rather than exact booleans, so packing now costs accuracy. You also need a scale factor per group to map the small integer range back onto real weights."
+  },
+  {
+    "to": "quantization",
+    "from": "huffman-coding",
+    "sameness": "Both spend bits in proportion to how much they matter. Huffman gives frequent symbols shorter codes; quantisation gives each weight group only as many levels as its range justifies.",
+    "delta": "Quantisation is lossy and fixed-width, so it is chosen for predictable memory and fast decode rather than for optimal compression."
+  },
+  {
+    "to": "speculative-decoding",
+    "from": "branch-and-bound",
+    "sameness": "It is the same speculate-then-prune shape you implemented: explore a candidate path cheaply, evaluate it against something authoritative, and discard everything after the point it stops holding up.",
+    "delta": "The cheap explorer is a small language model rather than a bound function, and verification is exact rather than a heuristic — a rejected token costs wasted GPU time but never a wrong answer."
   }
 ];

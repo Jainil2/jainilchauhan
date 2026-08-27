@@ -72,6 +72,14 @@ function main() {
         errors.push(`${lab.slug}: bridgesFrom "${b.slug}" does not exist`);
       }
       if (b.slug === lab.slug) errors.push(`${lab.slug}: bridges to itself`);
+      if (!b.sameness) errors.push(`${lab.slug}: bridge from "${b.slug}" has no sameness`);
+      if (!b.delta) errors.push(`${lab.slug}: bridge from "${b.slug}" has no delta`);
+    }
+    // An AI lab without a bridge is just an AI lab, which is the thing every
+    // other site already has. The category is only worth anything if every
+    // entry says what it is a small delta from.
+    if (lab.category === "AI Systems" && !lab.bridgesFrom?.length) {
+      errors.push(`${lab.slug}: an AI Systems lab must declare bridgesFrom`);
     }
     for (const t of lab.challenge?.tests ?? []) {
       if (!t.name || !t.body) errors.push(`${lab.slug}: challenge test missing name/body`);
@@ -111,7 +119,28 @@ function main() {
     `export interface LabSummary {\n` +
     `  slug: string;\n  title: string;\n  category: LabCategory;\n` +
     `  difficulty: Difficulty;\n  readingTimeMin: number;\n  blurb: string;\n}\n\n` +
-    `export const labSummaries: LabSummary[] = ${JSON.stringify(summaries, null, 2)};\n`;
+    `export const labSummaries: LabSummary[] = ${JSON.stringify(summaries, null, 2)};\n\n` +
+    // The reverse view ("this unlocks X") needs every lab's bridges at once,
+    // and that data lives in the full lab files which are lazily loaded. Emit
+    // the graph here so it stays derived from one source and cannot desync.
+    // Only a handful of labs carry bridges, so this stays small.
+    `/** Every declared bridge, flattened. Source of truth for both directions. */\n` +
+    `export interface BridgeEdge {\n` +
+    `  /** The lab that declares the bridge — the newer idea. */\n  to: string;\n` +
+    `  /** The prerequisite it is a small delta from. */\n  from: string;\n` +
+    `  sameness: string;\n  delta: string;\n}\n\n` +
+    `export const bridgeEdges: BridgeEdge[] = ${JSON.stringify(
+      labs.flatMap((lab) =>
+        (lab.bridgesFrom ?? []).map((b) => ({
+          to: lab.slug,
+          from: b.slug,
+          sameness: b.sameness,
+          delta: b.delta,
+        })),
+      ),
+      null,
+      2,
+    )};\n`;
 
   writeFileSync(join(repoRoot, "src", "content", "labs.gen.ts"), gen, "utf8");
 
