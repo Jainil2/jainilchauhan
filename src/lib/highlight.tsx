@@ -111,35 +111,28 @@ export function highlight(src: string, lang: string): ReactNode[] {
     } else tokens.push({ t: m[5], k: "txt" });
   }
 
-  return tokens.map((tok, i) => {
-    if (tok.k === "kw")
-      return (
-        <span key={i} className="text-cyan-accent">
-          {tok.t}
-        </span>
-      );
-    if (tok.k === "str")
-      return (
-        <span key={i} className="text-terminal">
-          {tok.t}
-        </span>
-      );
-    if (tok.k === "num")
-      return (
-        <span key={i} className="text-amber-300">
-          {tok.t}
-        </span>
-      );
-    if (tok.k === "com")
-      return (
-        <span key={i} className="text-muted-foreground italic">
-          {tok.t}
-        </span>
-      );
-    return (
-      <span key={i} className="text-foreground">
-        {tok.t}
-      </span>
-    );
-  });
+  // Second pass: an identifier immediately followed by "(" is a call. Cheap,
+  // and it is most of what makes unfamiliar code skimmable. Text is never
+  // altered here — only a token's kind — so byte fidelity is preserved.
+  for (let i = 0; i < tokens.length; i++) {
+    if (tokens[i].k !== "txt" || !/^[A-Za-z_]/.test(tokens[i].t)) continue;
+    let j = i + 1;
+    while (j < tokens.length && /^\s+$/.test(tokens[j].t)) j++;
+    if (j < tokens.length && tokens[j].t === "(") tokens[i].k = "fn";
+  }
+
+  const CLASS: Record<string, string> = {
+    kw: "text-code-kw",
+    str: "text-code-str",
+    num: "text-code-num",
+    com: "text-code-com italic",
+    fn: "text-code-fn",
+    txt: "text-code-punct",
+  };
+
+  return tokens.map((tok, i) => (
+    <span key={i} className={CLASS[tok.k]}>
+      {tok.t}
+    </span>
+  ));
 }

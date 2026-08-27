@@ -64,6 +64,10 @@ Keeping metadata free of React imports is what makes Node build scripts possible
 
 **JavaScript only, no transpile step** — types live in the JSDoc signature, which removes any need for `esbuild-wasm` or `sucrase` in the browser. If TypeScript is ever demanded, add `esbuild-wasm` behind a lazy import; do not build for it now.
 
+**Syntax colour is a deliberate exception to the black/white/grey rule.** Everywhere else on both sites, colour means "brand logo". Inside code it is functional: it is how you tell a string from a keyword while writing a solution under time pressure. Scoped to `<code>` surfaces and the challenge editor, defined as `--code-*` tokens in `styles.css` with separate light and dark values. Nothing else may use them.
+
+**Editor layer invariant.** The editor lays a transparent `<textarea>` over a highlighted `<pre><code>`. Those three elements must agree exactly on font, size, line-height, letter-spacing, ligatures, tab-size and white-space, and the textarea and `<pre>` must agree on padding and border. Any divergence moves the glyphs out from under the caret. Typography therefore lives in one inline `TYPE` object applied to every layer — inline because Tailwind Preflight styles `code` directly with `var(--font-mono)`, which this project aliases to Manrope, and that rule beats a class on the parent. Verify with `node scripts/check-editor-metrics.mjs`; unit tests cannot see this class of bug.
+
 `src/lib/challenge/runner.ts` builds a Blob-URL Worker holding the visitor's code plus a small assert harness, and calls `worker.terminate()` on a 3s timeout so an infinite loop cannot hang the tab. CodeMirror 6 loads lazily on the challenge panel only.
 
 ### Progress and placement

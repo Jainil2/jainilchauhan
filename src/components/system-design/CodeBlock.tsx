@@ -38,8 +38,14 @@ export function CodeBlock({ code, language = "ts" }: CodeBlockProps) {
           {copied ? "copied" : "copy"}
         </button>
       </div>
+      {/*
+       * font-code is repeated on <code>. Preflight styles `code` directly with
+       * var(--font-mono), which this project aliases to Manrope, so the class on
+       * the <pre> alone left every snippet on all 93 labs in a proportional
+       * sans-serif.
+       */}
       <pre className="overflow-x-auto px-4 py-3 font-code text-xs leading-relaxed">
-        <code>{highlight(code, language)}</code>
+        <code className="font-code">{highlight(code, language)}</code>
       </pre>
     </div>
   );
