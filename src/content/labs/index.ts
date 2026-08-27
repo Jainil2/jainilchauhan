@@ -15,7 +15,9 @@ export type { LabSummary } from "../labs.gen";
  * `labSummaries`. Only a lab detail page pays for the full text, and only for
  * the one lab being read.
  */
-const loaders = import.meta.glob<{ lab: LabMeta }>(["./*.ts", "!./index.ts"]);
+// Test files excluded explicitly: a stray `*.test.ts` in here would otherwise
+// be loaded as if it were a lab, and 404 on a slug nobody can reach.
+const loaders = import.meta.glob<{ lab: LabMeta }>(["./*.ts", "!./index.ts", "!./*.test.ts"]);
 
 const bySlug = new Map<string, () => Promise<{ lab: LabMeta }>>();
 for (const [path, load] of Object.entries(loaders)) {

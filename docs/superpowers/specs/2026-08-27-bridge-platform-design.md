@@ -1,6 +1,6 @@
 # Bridge — learning platform design
 
-Status: approved 2026-08-27. Phase 0 in progress.
+Status: approved 2026-08-27. Phases 0 and 1 shipped; Phase 2 next.
 
 ## Why
 

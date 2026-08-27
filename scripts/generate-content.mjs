@@ -43,7 +43,7 @@ function loadLab(file) {
 
 function main() {
   const files = readdirSync(labsDir)
-    .filter((f) => f.endsWith(".ts") && f !== "index.ts")
+    .filter((f) => f.endsWith(".ts") && f !== "index.ts" && !f.endsWith(".test.ts"))
     .sort();
 
   const labs = [];
@@ -76,8 +76,22 @@ function main() {
     for (const t of lab.challenge?.tests ?? []) {
       if (!t.name || !t.body) errors.push(`${lab.slug}: challenge test missing name/body`);
     }
-    if (lab.challenge && lab.challenge.tests.length === 0) {
-      errors.push(`${lab.slug}: challenge has no tests`);
+    if (lab.challenge) {
+      const c = lab.challenge;
+      if (!c.tests?.length) errors.push(`${lab.slug}: challenge has no tests`);
+      if (!c.prompt) errors.push(`${lab.slug}: challenge has no prompt`);
+      if (!c.reference) errors.push(`${lab.slug}: challenge has no reference solution`);
+      // Without `entry` the harness has no idea which function the tests mean,
+      // so every submission would fail for a reason the visitor cannot see.
+      if (!c.entry) errors.push(`${lab.slug}: challenge is missing "entry"`);
+      else if (!c.starter?.includes(c.entry)) {
+        errors.push(`${lab.slug}: starter does not define the entry function "${c.entry}"`);
+      }
+      // The reference has to satisfy the same contract, or "show me the answer"
+      // hands over code that cannot pass.
+      if (c.entry && c.reference && !c.reference.includes(c.entry)) {
+        errors.push(`${lab.slug}: reference does not define the entry function "${c.entry}"`);
+      }
     }
   }
 

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { ArrowLeft, Beaker, CheckCircle2, Clock, Gauge } from "lucide-react";
 import { LAB_CATEGORIES, labSummaries, type LabCategory } from "@/content/labs";
-import { useLabProgress } from "@/lib/useLabProgress";
+import { useKnowledge } from "@/lib/useKnowledge";
 
 export const Route = createFileRoute("/lab")({
   head: () => ({
@@ -32,10 +32,8 @@ const DIFF_COLOR: Record<string, string> = {
 
 function LabIndex() {
   const { pathname } = useLocation();
-  const { isCompleted, completed, hydrated, reset } = useLabProgress();
+  const { isPlaced, placedCount, hydrated, reset } = useKnowledge();
   const [filter, setFilter] = useState<LabCategory | "All">("All");
-
-  const completedCount = hydrated ? completed.size : 0;
 
   const grouped = useMemo(() => {
     const list =
@@ -67,15 +65,19 @@ function LabIndex() {
             <Beaker className="size-6 text-terminal" />
             <h1 className="text-3xl font-semibold tracking-tight">Lab</h1>
           </div>
+          {/*
+           * Counts up, never toward a total. "12 / 93" is a wall of things you
+           * have not done on the first page anyone lands on — the exact FOMO
+           * this product exists to remove.
+           */}
           <div className="flex items-center gap-3 font-mono text-xs text-muted-foreground">
-            <span>
-              Progress:{" "}
-              <span className="text-terminal">
-                {completedCount}/{labSummaries.length}
-              </span>{" "}
-              completed
-            </span>
-            {completedCount > 0 && (
+            {placedCount > 0 && (
+              <span>
+                <span className="text-terminal">{placedCount}</span>{" "}
+                {placedCount === 1 ? "lab" : "labs"} under your belt
+              </span>
+            )}
+            {placedCount > 0 && (
               <button
                 onClick={reset}
                 className="rounded border border-border px-2 py-0.5 hover:text-foreground"
@@ -128,7 +130,7 @@ function LabIndex() {
               )}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {group.labs.map((lab) => {
-                  const done = hydrated && isCompleted(lab.slug);
+                  const done = hydrated && isPlaced(lab.slug);
                   return (
                     <Link
                       key={lab.slug}

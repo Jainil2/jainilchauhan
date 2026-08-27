@@ -5,6 +5,8 @@ import { loadLab } from "@/content/labs";
 import { GameCard } from "@/components/system-design/GameCard";
 import { LabContent } from "@/components/system-design/LabContent";
 import { labComponents } from "@/components/system-design/registry";
+import { ChallengePanel } from "@/components/challenge/ChallengePanel";
+import { KnowledgeControls } from "@/components/challenge/KnowledgeControls";
 import { useLabProgress } from "@/lib/useLabProgress";
 
 export const Route = createFileRoute("/lab/$slug")({
@@ -102,6 +104,9 @@ function LabDetail() {
               <Clock className="mr-1 inline size-3" /> ~{lab.readingTimeMin} min read
             </span>
           </div>
+          <div className="mt-4">
+            <KnowledgeControls slug={slug} />
+          </div>
         </div>
 
         <div id="lab-surface">
@@ -117,6 +122,13 @@ function LabDetail() {
             </Suspense>
           </GameCard>
         </div>
+
+        {/*
+         * Between the demo and the prose on purpose. Buried under six collapsed
+         * sections, the one mechanic the product is built on is the thing
+         * nobody scrolls to. The prose stays below and fully crawlable.
+         */}
+        {lab.challenge && <ChallengePanel slug={slug} challenge={lab.challenge} />}
 
         <LabContent lab={lab} />
       </div>

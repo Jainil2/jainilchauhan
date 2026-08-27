@@ -92,4 +92,75 @@ export const lab: LabMeta = {
       href: "https://github.com/bitcoin/bips/blob/master/bip-0037.mediawiki",
     },
   ],
+  challenge: {
+    prompt:
+      "Build a Bloom filter's two operations over a fixed bit array. Insert every item, then answer membership for each query: false means definitely absent, true means probably present. A RAG pipeline runs this before touching the vector store, to skip a network hop for documents it certainly does not have.",
+    entry: "bloom",
+    starter: `/**
+ * @param {number} bits - size of the bit array.
+ * @param {(s: string) => number[]} hashes - returns one index per hash function,
+ *                                           already reduced into [0, bits).
+ * @param {string[]} inserts - items to add.
+ * @param {string[]} queries - items to test.
+ * @returns {boolean[]} one answer per query, in order.
+ */
+function bloom(bits, hashes, inserts, queries) {
+  // Insert: set every bit the hashes point at.
+  // Query: true only if EVERY bit the hashes point at is already set.
+}
+`,
+    tests: [
+      {
+        name: "reports an inserted item as present",
+        body: `var h = function (s) { return [s.length % 8, (s.charCodeAt(0) || 0) % 8]; };
+assertEquals(solution(8, h, ["ab"], ["ab"]), [true]);`,
+      },
+      {
+        name: "reports a definitely-absent item as absent",
+        body: `var h = function (s) { return [s.length % 16, (s.charCodeAt(0) || 0) % 16]; };
+assertEquals(solution(16, h, ["ab"], ["zzzzzzz"]), [false]);`,
+      },
+      {
+        name: "never produces a false negative",
+        body: `var h = function (s) { return [s.length % 32, s.charCodeAt(0) % 32, (s.charCodeAt(1) || 0) % 32]; };
+var items = ["alpha", "beta", "gamma", "delta", "epsilon"];
+var out = solution(32, h, items, items);
+assertEquals(out, [true, true, true, true, true]);`,
+      },
+      {
+        name: "requires ALL bits set, not just one",
+        body: `// "a" sets bit 1 only. "bb" needs bits 2 and 1 — bit 2 is still clear.
+var h = function (s) { return s === "a" ? [1] : [2, 1]; };
+assertEquals(solution(8, h, ["a"], ["bb"]), [false]);`,
+      },
+      {
+        name: "an empty filter reports everything absent",
+        body: `var h = function (s) { return [s.length % 8]; };
+assertEquals(solution(8, h, [], ["a", "b"]), [false, false]);`,
+      },
+      {
+        name: "accepts a false positive when bits collide",
+        body: `// Distinct items, identical bits: the filter cannot tell them apart.
+var h = function () { return [0, 1]; };
+assertEquals(solution(8, h, ["x"], ["y"]), [true]);`,
+      },
+    ],
+    hints: [
+      "One pass to insert, one pass to query. The bit array can just be an array of booleans.",
+      "For each insert, loop over `hashes(item)` and set every index it returns.",
+      "For a query, `every()` is the operation you want — a single clear bit proves absence.",
+    ],
+    reference: `function bloom(bits, hashes, inserts, queries) {
+  const array = new Array(bits).fill(false);
+
+  for (const item of inserts) {
+    for (const index of hashes(item)) array[index] = true;
+  }
+
+  // One clear bit is proof of absence. All bits set is only evidence of
+  // presence — which is why a Bloom filter can say "maybe" but never "no" wrongly.
+  return queries.map((q) => hashes(q).every((index) => array[index]));
+}
+`,
+  },
 };

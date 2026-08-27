@@ -82,4 +82,72 @@ export const lab: LabMeta = {
         "Cached responses are evicted in recency order once the disk cache hits its size budget.",
     },
   ],
+  challenge: {
+    prompt:
+      "Build the eviction half of an LRU cache. Given the order keys were touched (oldest first) and a capacity, return the keys that survive — still oldest-first. This is the exact logic an LLM inference server runs to decide which sequences keep their KV-cache when GPU memory runs short.",
+    entry: "evict",
+    starter: `/**
+ * @param {string[]} touched - keys in the order they were last used, oldest first.
+ *                             A repeated key means it was touched again.
+ * @param {number} capacity - how many keys may survive.
+ * @returns {string[]} surviving keys, oldest-first.
+ */
+function evict(touched, capacity) {
+  // Two things to get right:
+  //   1. a key touched twice is only as old as its LAST touch
+  //   2. keep the most recent \`capacity\` keys, but return them oldest-first
+}
+`,
+    tests: [
+      {
+        name: "keeps everything when under capacity",
+        body: `assertEquals(solution(["a", "b"], 5), ["a", "b"]);`,
+      },
+      {
+        name: "drops the least recently used key",
+        body: `assertEquals(solution(["a", "b", "c"], 2), ["b", "c"]);`,
+      },
+      {
+        name: "a repeated key is as recent as its last touch",
+        body: `assertEquals(solution(["a", "b", "a", "c"], 2), ["a", "c"]);`,
+      },
+      {
+        name: "does not keep duplicates of the same key",
+        body: `assertEquals(solution(["a", "a", "a"], 2), ["a"]);`,
+      },
+      {
+        name: "handles an empty history",
+        body: `assertEquals(solution([], 3), []);`,
+      },
+      {
+        name: "evicts everything at zero capacity",
+        body: `assertEquals(solution(["a", "b"], 0), []);`,
+      },
+      {
+        name: "stays fast on a long history",
+        body: `var many = [];
+for (var i = 0; i < 20000; i++) many.push("k" + (i % 5000));
+var out = solution(many, 100);
+assertEquals(out.length, 100);
+assertEquals(out[99], "k4999");`,
+      },
+    ],
+    hints: [
+      "Walk the list once and remember the position of each key's last appearance. A Map keeps insertion order for you.",
+      "Re-inserting a key into a Map does not move it to the end — you have to delete it first, then set it again.",
+      "Once the Map holds one entry per key in last-touched order, the survivors are simply the final `capacity` entries.",
+    ],
+    reference: `function evict(touched, capacity) {
+  // A Map preserves insertion order, so deleting-then-setting moves a key to
+  // the most-recent end. That is the whole trick behind an LRU list.
+  const recency = new Map();
+  for (const key of touched) {
+    recency.delete(key);
+    recency.set(key, true);
+  }
+  const keys = [...recency.keys()];
+  return capacity <= 0 ? [] : keys.slice(Math.max(0, keys.length - capacity));
+}
+`,
+  },
 };

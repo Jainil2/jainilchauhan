@@ -89,4 +89,74 @@ export const lab: LabMeta = {
       href: "https://datatracker.ietf.org/doc/html/rfc6585#section-4",
     },
   ],
+  challenge: {
+    prompt:
+      "Implement a token bucket. Given a bucket size, a refill rate in tokens per second, and a list of request timestamps in milliseconds, return which requests are allowed. The same maths caps spend on a per-tenant LLM budget — swap tokens-per-second for dollars-per-minute and nothing else changes.",
+    entry: "allow",
+    starter: `/**
+ * @param {number} capacity - bucket size, and the starting number of tokens.
+ * @param {number} refillPerSec - tokens added per second, fractional between requests.
+ * @param {number[]} timesMs - request timestamps in ms, ascending. Each costs 1 token.
+ * @returns {boolean[]} one verdict per request, in order.
+ */
+function allow(capacity, refillPerSec, timesMs) {
+  // The bucket starts full. Between two requests it gains
+  // elapsedSeconds * refillPerSec tokens, but never goes above capacity.
+}
+`,
+    tests: [
+      {
+        name: "a full bucket absorbs a burst up to capacity",
+        body: `assertEquals(solution(3, 1, [0, 0, 0]), [true, true, true]);`,
+      },
+      {
+        name: "rejects once the bucket is empty",
+        body: `assertEquals(solution(3, 1, [0, 0, 0, 0]), [true, true, true, false]);`,
+      },
+      {
+        name: "refills over time",
+        body: `assertEquals(solution(1, 1, [0, 500, 1000]), [true, false, true]);`,
+      },
+      {
+        name: "fractional refill accumulates across gaps",
+        body: `// Two 250ms gaps at 2/sec are half a token each; together they buy one.
+assertEquals(solution(2, 2, [0, 0, 250, 500]), [true, true, false, true]);`,
+      },
+      {
+        name: "never refills above capacity",
+        body: `// Idle for 10s at 10/sec would be 100 tokens; the bucket still holds 2.
+assertEquals(solution(2, 10, [0, 0, 10000, 10000, 10000]), [true, true, true, true, false]);`,
+      },
+      {
+        name: "handles no requests",
+        body: `assertEquals(solution(5, 1, []), []);`,
+      },
+      {
+        name: "a zero-capacity bucket allows nothing",
+        body: `assertEquals(solution(0, 5, [0, 1000]), [false, false]);`,
+      },
+    ],
+    hints: [
+      "Track two things between requests: how many tokens are left, and when you last looked.",
+      "Tokens gained = (now - lastChecked) / 1000 * refillPerSec. Cap the result at `capacity`.",
+      "Only subtract a token when the request is allowed — a rejected request costs nothing.",
+    ],
+    reference: `function allow(capacity, refillPerSec, timesMs) {
+  let tokens = capacity;
+  let last = timesMs.length ? timesMs[0] : 0;
+
+  return timesMs.map((now) => {
+    // Refill for the time that passed, then clamp — a bucket left alone for an
+    // hour is still just full, which is what stops long idles becoming bursts.
+    tokens = Math.min(capacity, tokens + ((now - last) / 1000) * refillPerSec);
+    last = now;
+    if (tokens >= 1) {
+      tokens -= 1;
+      return true;
+    }
+    return false;
+  });
+}
+`,
+  },
 };

@@ -27,6 +27,12 @@ export interface ChallengeTest {
 export interface Challenge {
   /** What to build, one or two sentences. */
   prompt: string;
+  /**
+   * Name of the function in `starter` that the tests exercise. The harness
+   * binds it to `solution`, so every test body can call `solution(...)` without
+   * caring what the author named it. Required — `prebuild` fails without it.
+   */
+  entry: string;
   /** JSDoc + stub seeded into the editor. JavaScript — there is no transpile step. */
   starter: string;
   tests: ChallengeTest[];
