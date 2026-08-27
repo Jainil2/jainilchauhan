@@ -74,4 +74,67 @@ func push(dst []int, v int) []int {
       href: "https://docs.python.org/3/faq/design.html#how-are-lists-implemented-in-cpython",
     },
   ],
+  challenge: {
+    prompt:
+      "Report how a growable array's capacity evolves. Starting from an initial capacity, append n items, doubling capacity whenever it fills. Return the capacity after each append. This is why append is amortized O(1) — and why a KV-cache allocator grows in blocks rather than per token.",
+    entry: "capacities",
+    starter: `/**
+ * @param {number} initial - starting capacity. Always at least 1.
+ * @param {number} appends - how many items are appended.
+ * @returns {number[]} capacity after each append, one entry per append.
+ */
+function capacities(initial, appends) {
+  // Grow only when the array is already full, and grow by doubling.
+}
+`,
+    tests: [
+      {
+        name: "no growth while there is room",
+        body: `assertEquals(solution(4, 3), [4, 4, 4]);`,
+      },
+      {
+        name: "doubles exactly when full",
+        body: `assertEquals(solution(2, 4), [2, 2, 4, 4]);`,
+      },
+      {
+        name: "doubles repeatedly",
+        body: `assertEquals(solution(1, 5), [1, 2, 4, 4, 8]);`,
+      },
+      {
+        name: "no appends means no entries",
+        body: `assertEquals(solution(8, 0), []);`,
+      },
+      {
+        name: "capacity never shrinks",
+        body: `var out = solution(1, 20);
+for (var i = 1; i < out.length; i++) assert(out[i] >= out[i - 1], 'capacity shrank');`,
+      },
+      {
+        name: "growth is logarithmic, not linear",
+        body: `var out = solution(1, 1024);
+var grows = 0;
+for (var i = 1; i < out.length; i++) if (out[i] !== out[i - 1]) grows++;
+assert(grows <= 12, 'too many reallocations: ' + grows);`,
+      },
+    ],
+    hints: [
+      "Track two numbers as you go: the current length and the current capacity.",
+      "Check for growth before writing the item — if length equals capacity, double it first.",
+      "Record the capacity after each append, so the array you return has exactly `appends` entries.",
+    ],
+    reference: `function capacities(initial, appends) {
+  let capacity = Math.max(1, initial);
+  let length = 0;
+  const out = [];
+  for (let i = 0; i < appends; i++) {
+    // Grow first, then write. A resize is O(n), but it happens rarely enough
+    // that the cost spread over every append is constant.
+    if (length === capacity) capacity *= 2;
+    length++;
+    out.push(capacity);
+  }
+  return out;
+}
+`,
+  },
 };

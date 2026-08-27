@@ -83,4 +83,79 @@ function rebalance(n: AVL): AVL {
       href: "https://eprint.iacr.org/2016/994",
     },
   ],
+  challenge: {
+    prompt:
+      "Decide which rotation an AVL insert needs. Given the balance factor of the unbalanced node and of the child on its heavy side, return 'LL', 'LR', 'RL', 'RR', or 'none'. Getting this decision right is the whole of AVL rebalancing; the pointer work that follows is mechanical.",
+    entry: "rotationFor",
+    starter: `/**
+ * Balance factor = height(left) - height(right).
+ *
+ * @param {number} balance - balance factor of the unbalanced node.
+ * @param {number} childBalance - balance factor of its child on the heavy side.
+ * @returns {'LL'|'LR'|'RL'|'RR'|'none'}
+ */
+function rotationFor(balance, childBalance) {
+  // A node is unbalanced only once its balance factor passes +1 or -1.
+  // Left-heavy is positive; right-heavy is negative.
+  // The child decides whether the case is straight or zig-zag.
+}
+`,
+    tests: [
+      {
+        name: "balanced needs nothing",
+        body: `assertEquals(solution(0, 0), 'none');`,
+      },
+      {
+        name: "tilted but still legal",
+        body: `assertEquals(solution(1, 0), 'none');`,
+      },
+      {
+        name: "right tilt still legal",
+        body: `assertEquals(solution(-1, 0), 'none');`,
+      },
+      {
+        name: "left-left is a single rotation",
+        body: `assertEquals(solution(2, 1), 'LL');`,
+      },
+      {
+        name: "left-right is a zig-zag",
+        body: `assertEquals(solution(2, -1), 'LR');`,
+      },
+      {
+        name: "right-right is a single rotation",
+        body: `assertEquals(solution(-2, -1), 'RR');`,
+      },
+      {
+        name: "right-left is a zig-zag",
+        body: `assertEquals(solution(-2, 1), 'RL');`,
+      },
+      {
+        name: "a balanced child after insertion counts as straight",
+        body: `assertEquals(solution(2, 0), 'LL');
+assertEquals(solution(-2, 0), 'RR');`,
+      },
+      {
+        name: "deeper imbalance is handled the same way",
+        body: `assertEquals(solution(3, 1), 'LL');
+assertEquals(solution(-3, 1), 'RL');`,
+      },
+    ],
+    hints: [
+      "Nothing is needed while the balance factor is between -1 and 1 inclusive.",
+      "Balance greater than 1 means left-heavy, so the first letter is L; less than -1 means R.",
+      "The second letter comes from the child: on the left side a negative child balance means the zig-zag LR, and on the right a positive child balance means RL.",
+    ],
+    reference: `function rotationFor(balance, childBalance) {
+  if (balance > 1) {
+    // Left-heavy. A child leaning right makes it a zig-zag.
+    return childBalance < 0 ? 'LR' : 'LL';
+  }
+  if (balance < -1) {
+    // Right-heavy. A child leaning left makes it a zig-zag.
+    return childBalance > 0 ? 'RL' : 'RR';
+  }
+  return 'none';
+}
+`,
+  },
 };

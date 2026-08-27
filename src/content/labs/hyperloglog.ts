@@ -83,4 +83,92 @@ export function estimate() {
       href: "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-cardinality-aggregation.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Build the register array a HyperLogLog keeps. The leading bits of each hash pick a bucket; the rest gives a rank, the position of its first 1 bit. Each bucket stores the largest rank it has seen. A few kilobytes of registers then estimates the cardinality of a stream far too large to store.",
+    entry: "registers",
+    starter: `/**
+ * @param {number[]} hashes - unsigned 32-bit hash values.
+ * @param {number} bits - how many leading bits select the bucket.
+ * @returns {number[]} the register array, length 2**bits, zero where unseen.
+ *   A register holds the largest rank observed: the 1-based position of the
+ *   first 1 bit in the remaining 32 - bits bits.
+ */
+function registers(hashes, bits) {
+  // Take the bucket from the top bits, then find the first set bit in what is
+  // left. Keep only the maximum rank per bucket.
+}
+`,
+    tests: [
+      {
+        name: "an empty stream leaves every register at zero",
+        body: `assertEquals(solution([], 2), [0, 0, 0, 0]);`,
+      },
+      {
+        name: "register array has the right size",
+        body: `assertEquals(solution([], 3).length, 8);`,
+      },
+      {
+        name: "top bits choose the bucket",
+        body: `var h = (1 << 30) >>> 0;
+var out = solution([h], 2);
+assertEquals(out[1] > 0, true);
+assertEquals(out[0], 0);`,
+      },
+      {
+        name: "a leading 1 in the remainder gives rank 1",
+        body: `var h = ((1 << 29) >>> 0);
+assertEquals(solution([h], 2)[0], 1);`,
+      },
+      {
+        name: "more leading zeros give a higher rank",
+        body: `var h = ((1 << 28) >>> 0);
+assertEquals(solution([h], 2)[0], 2);`,
+      },
+      {
+        name: "keeps the maximum, not the latest",
+        body: `var high = ((1 << 28) >>> 0);
+var low = ((1 << 29) >>> 0);
+assertEquals(solution([high, low], 2)[0], 2);`,
+      },
+      {
+        name: "duplicates do not change the registers",
+        body: `var h = ((1 << 28) >>> 0);
+assertEquals(solution([h, h, h], 2), solution([h], 2));`,
+      },
+      {
+        name: "an all-zero remainder gets the maximum rank",
+        body: `// 2 bucket bits leave a 30-bit remainder, so the largest possible rank is 30.
+assertEquals(solution([0], 2)[0], 30);
+assertEquals(solution([0], 4)[0], 28);`,
+      },
+    ],
+    hints: [
+      "The bucket is the value shifted right by 32 - bits, using the unsigned shift operator.",
+      "Mask off the top bits to get the remainder, then scan from its most significant bit downwards for the first 1.",
+      "When the remainder is entirely zero there is no set bit, so the rank is the full width of the remainder.",
+    ],
+    reference: `function registers(hashes, bits) {
+  const size = 1 << bits;
+  const out = new Array(size).fill(0);
+  const width = 32 - bits; // bits left over for the rank
+
+  for (const hash of hashes) {
+    const h = hash >>> 0;
+    const bucket = h >>> width;
+    // Drop the bucket bits; what remains is the rank material.
+    const rest = width === 32 ? h : h & ((1 << width) - 1);
+    let rank = width; // all zeros: the rank is the whole remaining width
+    for (let i = width - 1; i >= 0; i--) {
+      if ((rest >>> i) & 1) {
+        rank = width - i;
+        break;
+      }
+    }
+    if (rank > out[bucket]) out[bucket] = rank;
+  }
+  return out;
+}
+`,
+  },
 };

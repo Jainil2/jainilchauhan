@@ -73,4 +73,70 @@ def window_max(xs, w):
       href: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ForkJoinPool.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Return the maximum of every sliding window of width w, in O(n). The trick is a double-ended queue holding indices in decreasing value order. Sliding-window attention scores the same shape of problem over a context window.",
+    entry: "windowMax",
+    starter: `/**
+ * @param {number[]} xs - the values.
+ * @param {number} w - window width, at least 1.
+ * @returns {number[]} the maximum of each window, left to right.
+ */
+function windowMax(xs, w) {
+  // Keep a deque of INDICES whose values decrease from front to back.
+  // The front is always the maximum of the current window.
+}
+`,
+    tests: [
+      {
+        name: "classic example",
+        body: `assertEquals(solution([1, 3, -1, -3, 5, 3, 6, 7], 3), [3, 3, 5, 5, 6, 7]);`,
+      },
+      {
+        name: "window of one returns the input",
+        body: `assertEquals(solution([4, 2, 9], 1), [4, 2, 9]);`,
+      },
+      {
+        name: "window covering everything",
+        body: `assertEquals(solution([4, 2, 9], 3), [9]);`,
+      },
+      {
+        name: "monotonically decreasing input",
+        body: `assertEquals(solution([5, 4, 3, 2], 2), [5, 4, 3]);`,
+      },
+      {
+        name: "handles negatives",
+        body: `assertEquals(solution([-5, -2, -8, -1], 2), [-2, -2, -1]);`,
+      },
+      {
+        name: "empty input",
+        body: `assertEquals(solution([], 3), []);`,
+      },
+      {
+        name: "linear, not quadratic",
+        body: `var xs = [];
+for (var i = 0; i < 60000; i++) xs.push((i * 7919) % 1000);
+var out = solution(xs, 500);
+assertEquals(out.length, 60000 - 500 + 1);`,
+      },
+    ],
+    hints: [
+      "Store indices rather than values, so you can tell when the front has slid out of the window.",
+      "Before pushing index i, pop from the back while the value there is less than or equal to xs[i] — those can never be a future maximum.",
+      "Drop the front when it is older than i - w + 1, then read the front once the first full window exists.",
+    ],
+    reference: `function windowMax(xs, w) {
+  const out = [];
+  const deque = []; // indices, values decreasing front -> back
+  for (let i = 0; i < xs.length; i++) {
+    // Anything smaller than the incoming value is now unreachable as a max.
+    while (deque.length && xs[deque[deque.length - 1]] <= xs[i]) deque.pop();
+    deque.push(i);
+    if (deque[0] <= i - w) deque.shift(); // front slid out of the window
+    if (i >= w - 1) out.push(xs[deque[0]]);
+  }
+  return out;
+}
+`,
+  },
 };

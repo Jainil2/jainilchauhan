@@ -81,4 +81,76 @@ function levels(root: TreeNode) {
       href: "https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction",
     },
   ],
+  challenge: {
+    prompt:
+      "Return a binary tree's values level by level, top to bottom, left to right. Nodes are { value, left, right } with null for a missing child. Level-order is breadth-first search on a tree, and the queue is what makes it work.",
+    entry: "levelOrder",
+    starter: `/**
+ * @param {{value: any, left: object|null, right: object|null}|null} root
+ * @returns {any[][]} one array per level, top level first.
+ */
+function levelOrder(root) {
+  // Process a whole level before starting the next one. Record how many nodes
+  // are in the queue when the level begins -- that count is the level.
+}
+`,
+    tests: [
+      {
+        name: "a single node",
+        body: `assertEquals(solution({ value: 1, left: null, right: null }), [[1]]);`,
+      },
+      {
+        name: "two full levels",
+        body: `var t = { value: 1, left: { value: 2, left: null, right: null }, right: { value: 3, left: null, right: null } };
+assertEquals(solution(t), [[1], [2, 3]]);`,
+      },
+      {
+        name: "left to right within a level",
+        body: `var leaf = function (v) { return { value: v, left: null, right: null }; };
+var t = { value: 1, left: { value: 2, left: leaf(4), right: leaf(5) }, right: leaf(3) };
+assertEquals(solution(t), [[1], [2, 3], [4, 5]]);`,
+      },
+      {
+        name: "a lopsided tree still levels correctly",
+        body: `var t = { value: 1, left: { value: 2, left: { value: 3, left: null, right: null }, right: null }, right: null };
+assertEquals(solution(t), [[1], [2], [3]]);`,
+      },
+      {
+        name: "an empty tree",
+        body: `assertEquals(solution(null), []);`,
+      },
+      {
+        name: "handles a deep tree without stack overflow",
+        body: `var root = { value: 0, left: null, right: null };
+var cur = root;
+for (var i = 1; i < 10000; i++) { cur.left = { value: i, left: null, right: null }; cur = cur.left; }
+var out = solution(root);
+assertEquals(out.length, 10000);`,
+      },
+    ],
+    hints: [
+      "Use a queue seeded with the root, and loop while the queue has anything in it.",
+      "At the top of each iteration, capture queue.length — that is exactly one level's worth of nodes.",
+      "Only enqueue children that exist, or you will produce levels full of nulls.",
+    ],
+    reference: `function levelOrder(root) {
+  if (!root) return [];
+  const out = [];
+  let queue = [root];
+  while (queue.length) {
+    const level = [];
+    const next = [];
+    // Everything currently queued belongs to this level; children go to 'next'.
+    for (const node of queue) {
+      level.push(node.value);
+      if (node.left) next.push(node.left);
+      if (node.right) next.push(node.right);
+    }
+    out.push(level);
+    queue = next;
+  }
+  return out;
+}
+`,
+  },
 };

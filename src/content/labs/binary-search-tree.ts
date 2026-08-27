@@ -76,4 +76,98 @@ function range(node: BST | undefined, lo: number, hi: number, out: number[] = []
       href: "https://abseil.io/docs/cpp/guides/container",
     },
   ],
+  challenge: {
+    prompt:
+      "Insert values into a binary search tree, then return them in order. The payoff of the BST invariant is that an in-order walk emerges sorted without ever running a sort.",
+    entry: "bstSorted",
+    starter: `/**
+ * @param {number[]} values - inserted left to right. Duplicates are ignored.
+ * @returns {number[]} every stored value, ascending.
+ */
+function bstSorted(values) {
+  // Insert: go left when smaller, right when larger, until you find an empty spot.
+  // Read back: left subtree, then the node, then the right subtree.
+}
+`,
+    tests: [
+      {
+        name: "sorts unordered input",
+        body: `assertEquals(solution([5, 3, 8, 1]), [1, 3, 5, 8]);`,
+      },
+      {
+        name: "already sorted input still works",
+        body: `assertEquals(solution([1, 2, 3]), [1, 2, 3]);`,
+      },
+      {
+        name: "reverse sorted input",
+        body: `assertEquals(solution([3, 2, 1]), [1, 2, 3]);`,
+      },
+      {
+        name: "duplicates are ignored",
+        body: `assertEquals(solution([2, 2, 1]), [1, 2]);`,
+      },
+      {
+        name: "empty input",
+        body: `assertEquals(solution([]), []);`,
+      },
+      {
+        name: "single value",
+        body: `assertEquals(solution([42]), [42]);`,
+      },
+      {
+        name: "handles negatives and zero",
+        body: `assertEquals(solution([0, -5, 3, -1]), [-5, -1, 0, 3]);`,
+      },
+      {
+        name: "a degenerate tree does not overflow the stack",
+        body: `var vs = [];
+for (var i = 0; i < 20000; i++) vs.push(i);
+var out = solution(vs);
+assertEquals(out.length, 20000);
+assertEquals(out[0], 0);`,
+      },
+    ],
+    hints: [
+      "Insert iteratively: walk from the root until the direction you want is null, then hang the node there.",
+      "In-order means recurse left, emit the value, recurse right.",
+      "Sorted input builds a tree that is really a linked list, so a recursive read can blow the stack — walk it with an explicit stack instead.",
+    ],
+    reference: `function bstSorted(values) {
+  let root = null;
+  for (const value of values) {
+    const node = { value, left: null, right: null };
+    if (!root) {
+      root = node;
+      continue;
+    }
+    let cur = root;
+    for (;;) {
+      if (value === cur.value) break; // duplicate: drop it
+      const dir = value < cur.value ? 'left' : 'right';
+      if (!cur[dir]) {
+        cur[dir] = node;
+        break;
+      }
+      cur = cur[dir];
+    }
+  }
+
+  // Iterative in-order. Sorted input degenerates the tree into a chain, so
+  // recursion here would overflow on large inputs.
+  const out = [];
+  const stack = [];
+  let cur = root;
+  while (cur || stack.length) {
+    while (cur) {
+      stack.push(cur);
+      cur = cur.left;
+    }
+    cur = stack.pop();
+    out.push(cur.value);
+    cur = cur.right;
+  }
+  return out;
+}
+`,
+  },
 };

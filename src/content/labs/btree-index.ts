@@ -80,4 +80,76 @@ SELECT * FROM users WHERE email = 'jainil@example.com';
     },
     { label: "SQLite — the query planner", href: "https://www.sqlite.org/queryplanner.html" },
   ],
+  challenge: {
+    prompt:
+      "Split a full B-tree node. Given a node's sorted keys, its maximum capacity, and a new key, return the two halves and the key that gets promoted to the parent. Splitting is the one operation that makes a B-tree grow, and it grows at the root, which is why the tree stays balanced for free.",
+    entry: "splitNode",
+    starter: `/**
+ * @param {number[]} keys - the node's keys, sorted, already at capacity.
+ * @param {number} newKey - the key being inserted.
+ * @returns {{left: number[], promoted: number, right: number[]}}
+ *   The promoted key belongs to neither half.
+ */
+function splitNode(keys, newKey) {
+  // Insert first so the node is momentarily over capacity, then cut at the
+  // middle. The middle key moves up to the parent.
+}
+`,
+    tests: [
+      {
+        name: "splits an odd node",
+        body: `assertEquals(solution([10, 20, 30], 25), { left: [10, 20], promoted: 25, right: [30] });`,
+      },
+      {
+        name: "new key lands at the front",
+        body: `assertEquals(solution([10, 20, 30], 5), { left: [5, 10], promoted: 20, right: [30] });`,
+      },
+      {
+        name: "new key lands at the back",
+        body: `assertEquals(solution([10, 20, 30], 40), { left: [10, 20], promoted: 30, right: [40] });`,
+      },
+      {
+        name: "splits an even node",
+        body: `assertEquals(solution([10, 20], 15), { left: [10], promoted: 15, right: [20] });`,
+      },
+      {
+        name: "the promoted key belongs to neither half",
+        body: `var r = solution([1, 2, 3, 4, 5], 6);
+assert(r.left.indexOf(r.promoted) === -1, 'promoted leaked into left');
+assert(r.right.indexOf(r.promoted) === -1, 'promoted leaked into right');`,
+      },
+      {
+        name: "no key is lost in the split",
+        body: `var r = solution([1, 3, 5, 7], 4);
+var all = r.left.concat([r.promoted], r.right);
+assertEquals(all, [1, 3, 4, 5, 7]);`,
+      },
+      {
+        name: "both halves stay sorted",
+        body: `var r = solution([9, 3, 5, 7].sort(function (a, b) { return a - b; }), 1);
+var sorted = function (xs) { for (var i = 1; i < xs.length; i++) if (xs[i - 1] > xs[i]) return false; return true; };
+assert(sorted(r.left) && sorted(r.right), 'a half came out unsorted');`,
+      },
+    ],
+    hints: [
+      "Insert the new key into a copy of the array at the position that keeps it sorted.",
+      "The split point is the middle index of the combined array, found with a floor division by two.",
+      "Everything before the middle is the left half, everything after is the right, and the middle itself is promoted.",
+    ],
+    reference: `function splitNode(keys, newKey) {
+  const all = keys.slice();
+  let at = 0;
+  while (at < all.length && all[at] < newKey) at++;
+  all.splice(at, 0, newKey);
+
+  // The middle key moves up to the parent and belongs to neither child.
+  const mid = Math.floor(all.length / 2);
+  return {
+    left: all.slice(0, mid),
+    promoted: all[mid],
+    right: all.slice(mid + 1),
+  };
+}
+`,
+  },
 };

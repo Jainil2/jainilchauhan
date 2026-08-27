@@ -73,4 +73,68 @@ function maxWindow(xs: Float64Array, w: number): number[] {
       href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Typed_arrays",
     },
   ],
+  challenge: {
+    prompt:
+      "Rotate an array left by k positions and return a new array. Index arithmetic only — no repeated shifting. Ring buffers all over inference serving do exactly this to reuse a fixed block of memory instead of reallocating.",
+    entry: "rotate",
+    starter: `/**
+ * @param {number[]} xs - the values.
+ * @param {number} k - positions to rotate left. May exceed xs.length.
+ * @returns {number[]} a new rotated array; xs is left untouched.
+ */
+function rotate(xs, k) {
+  // The element that ends up at index i came from index (i + k) in the original.
+}
+`,
+    tests: [
+      {
+        name: "rotates left by one",
+        body: `assertEquals(solution([1, 2, 3, 4], 1), [2, 3, 4, 1]);`,
+      },
+      {
+        name: "rotates by zero",
+        body: `assertEquals(solution([1, 2, 3], 0), [1, 2, 3]);`,
+      },
+      {
+        name: "wraps when k exceeds the length",
+        body: `assertEquals(solution([1, 2, 3], 4), [2, 3, 1]);`,
+      },
+      {
+        name: "k equal to the length is a no-op",
+        body: `assertEquals(solution([1, 2, 3], 3), [1, 2, 3]);`,
+      },
+      {
+        name: "handles an empty array",
+        body: `assertEquals(solution([], 3), []);`,
+      },
+      {
+        name: "does not mutate the input",
+        body: `var xs = [1, 2, 3];
+solution(xs, 2);
+assertEquals(xs, [1, 2, 3]);`,
+      },
+      {
+        name: "stays linear on a large array",
+        body: `var xs = [];
+for (var i = 0; i < 50000; i++) xs.push(i);
+var out = solution(xs, 12345);
+assertEquals(out[0], 12345);
+assertEquals(out.length, 50000);`,
+      },
+    ],
+    hints: [
+      "Rotating by the array's own length changes nothing, so reduce k with the remainder operator first.",
+      "Build the result in one pass: the value at result[i] is xs[(i + k) % xs.length].",
+      "Guard the empty array before taking a remainder — dividing by zero gives NaN.",
+    ],
+    reference: `function rotate(xs, k) {
+  const n = xs.length;
+  if (n === 0) return [];
+  const shift = ((k % n) + n) % n; // tolerate k larger than n, and negatives
+  const out = new Array(n);
+  for (let i = 0; i < n; i++) out[i] = xs[(i + shift) % n];
+  return out;
+}
+`,
+  },
 };

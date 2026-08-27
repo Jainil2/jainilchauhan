@@ -85,4 +85,79 @@ class LSM {
       href: "https://github.com/cockroachdb/pebble",
     },
   ],
+  challenge: {
+    prompt:
+      "Implement the LSM read path. Check the memtable first, then the SSTables from newest to oldest, and stop at the first hit — even when that hit is a tombstone marking a delete. Writes are cheap because nothing is ever updated in place; reads pay for that by searching layers.",
+    entry: "lsmGet",
+    starter: `/**
+ * A tombstone is the exact string '__deleted__' and means the key was removed.
+ *
+ * @param {Record<string, any>} memtable - newest writes, still in memory.
+ * @param {Array<Record<string, any>>} sstables - flushed levels, NEWEST FIRST.
+ * @param {string} key
+ * @returns {any} the value, or null when the key is absent or deleted.
+ */
+function lsmGet(memtable, sstables, key) {
+  // Newest layer wins. The search stops at the first layer that mentions the
+  // key at all -- an older value underneath a tombstone is not a hit.
+}
+`,
+    tests: [
+      {
+        name: "reads from the memtable",
+        body: `assertEquals(solution({ a: 1 }, [], 'a'), 1);`,
+      },
+      {
+        name: "falls through to an sstable",
+        body: `assertEquals(solution({}, [{ a: 2 }], 'a'), 2);`,
+      },
+      {
+        name: "the memtable shadows older layers",
+        body: `assertEquals(solution({ a: 1 }, [{ a: 2 }], 'a'), 1);`,
+      },
+      {
+        name: "newer sstables win over older ones",
+        body: `assertEquals(solution({}, [{ a: 2 }, { a: 3 }], 'a'), 2);`,
+      },
+      {
+        name: "a tombstone hides an older value",
+        body: `assertEquals(solution({ a: '__deleted__' }, [{ a: 5 }], 'a'), null);`,
+      },
+      {
+        name: "a tombstone in an sstable also hides older values",
+        body: `assertEquals(solution({}, [{ a: '__deleted__' }, { a: 5 }], 'a'), null);`,
+      },
+      {
+        name: "a rewrite after a delete is visible again",
+        body: `assertEquals(solution({ a: 9 }, [{ a: '__deleted__' }, { a: 5 }], 'a'), 9);`,
+      },
+      {
+        name: "an unknown key is absent",
+        body: `assertEquals(solution({ a: 1 }, [{ b: 2 }], 'zzz'), null);`,
+      },
+      {
+        name: "falsy values are real values",
+        body: `assertEquals(solution({ a: 0 }, [{ a: 5 }], 'a'), 0);`,
+      },
+    ],
+    hints: [
+      "Test for the key with a presence check, not by looking at the value — a stored 0 or empty string is still a hit.",
+      "Handle the memtable exactly like an sstable, just first in the order.",
+      "As soon as a layer contains the key, you are done: return null if it is a tombstone, otherwise the value.",
+    ],
+    reference: `function lsmGet(memtable, sstables, key) {
+  const TOMBSTONE = '__deleted__';
+  // Newest first: the memtable, then each flushed level in order.
+  const layers = [memtable, ...sstables];
+  for (const layer of layers) {
+    // Presence, not truthiness: 0 and '' are legitimate stored values.
+    if (!Object.prototype.hasOwnProperty.call(layer, key)) continue;
+    const value = layer[key];
+    // The first mention wins, even when it is a delete marker.
+    return value === TOMBSTONE ? null : value;
+  }
+  return null;
+}
+`,
+  },
 };

@@ -88,4 +88,83 @@ export function verify(leaf: string, proof: { hash: string; right: boolean }[], 
       href: "https://developer.bitcoin.org/reference/block_chain.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Compute a Merkle root from a list of leaves. Hash pairwise up the tree, duplicating the last node when a level has an odd count. One root hash certifies a whole dataset, which is how you verify that the model weights you downloaded are the ones that were published.",
+    entry: "merkleRoot",
+    starter: `/**
+ * @param {string[]} leaves - already-hashed leaves.
+ * @param {(a: string, b: string) => string} hash - combines two hashes into one.
+ * @returns {string|null} the root, or null when there are no leaves.
+ */
+function merkleRoot(leaves, hash) {
+  // Combine the level pairwise until one node remains. An odd level pairs its
+  // last node with itself.
+}
+`,
+    tests: [
+      {
+        name: "two leaves make one root",
+        body: `var h = function (a, b) { return '(' + a + b + ')'; };
+assertEquals(solution(['a', 'b'], h), '(ab)');`,
+      },
+      {
+        name: "four leaves build two levels",
+        body: `var h = function (a, b) { return '(' + a + b + ')'; };
+assertEquals(solution(['a', 'b', 'c', 'd'], h), '((ab)(cd))');`,
+      },
+      {
+        name: "an odd level duplicates its last node",
+        body: `var h = function (a, b) { return '(' + a + b + ')'; };
+assertEquals(solution(['a', 'b', 'c'], h), '((ab)(cc))');`,
+      },
+      {
+        name: "a single leaf is its own root",
+        body: `var h = function (a, b) { return '(' + a + b + ')'; };
+assertEquals(solution(['a'], h), 'a');`,
+      },
+      {
+        name: "no leaves means no root",
+        body: `var h = function (a, b) { return a + b; };
+assertEquals(solution([], h), null);`,
+      },
+      {
+        name: "changing one leaf changes the root",
+        body: `var h = function (a, b) { return '(' + a + b + ')'; };
+assert(solution(['a', 'b', 'c', 'd'], h) !== solution(['a', 'b', 'c', 'x'], h), 'root did not change');`,
+      },
+      {
+        name: "order matters",
+        body: `var h = function (a, b) { return '(' + a + b + ')'; };
+assert(solution(['a', 'b'], h) !== solution(['b', 'a'], h), 'root ignored ordering');`,
+      },
+      {
+        name: "handles a large power-of-two tree",
+        body: `var h = function (a, b) { return String((a.length + b.length) % 97) + 'x'; };
+var leaves = [];
+for (var i = 0; i < 1024; i++) leaves.push('leaf' + i);
+assert(typeof solution(leaves, h) === 'string', 'expected a string root');`,
+      },
+    ],
+    hints: [
+      "Return early for the empty case, and note that one leaf is already the root.",
+      "Each pass over a level halves it: step through in twos and hash each pair.",
+      "When the level has an odd length the last node has no partner, so hash it with itself.",
+    ],
+    reference: `function merkleRoot(leaves, hash) {
+  if (leaves.length === 0) return null;
+  let level = leaves.slice();
+  while (level.length > 1) {
+    const next = [];
+    for (let i = 0; i < level.length; i += 2) {
+      // An unpaired last node is hashed with itself, so the level always halves.
+      const right = i + 1 < level.length ? level[i + 1] : level[i];
+      next.push(hash(level[i], right));
+    }
+    level = next;
+  }
+  return level[0];
+}
+`,
+  },
 };

@@ -77,4 +77,76 @@ export class Queue<T> {
       href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Execution_model",
     },
   ],
+  challenge: {
+    prompt:
+      "Build a FIFO queue out of two stacks, and report what each dequeue returns. You may only push and pop the two arrays — no shift, no splice, no indexing. This is how you get amortized O(1) dequeue without shifting every element.",
+    entry: "runQueue",
+    starter: `/**
+ * @param {Array<[string, any]>} ops - operations like ['enqueue', 5] or ['dequeue'].
+ * @returns {any[]} one entry per dequeue, in order. Use null when the queue is empty.
+ */
+function runQueue(ops) {
+  const inbox = [];
+  const outbox = [];
+  // Enqueue pushes onto inbox. Dequeue pops from outbox -- and when outbox is
+  // empty, everything in inbox is poured into it first, which reverses the order.
+}
+`,
+    tests: [
+      {
+        name: "returns items first-in first-out",
+        body: `assertEquals(solution([['enqueue', 1], ['enqueue', 2], ['dequeue'], ['dequeue']]), [1, 2]);`,
+      },
+      {
+        name: "interleaves enqueues and dequeues",
+        body: `assertEquals(solution([['enqueue', 1], ['dequeue'], ['enqueue', 2], ['enqueue', 3], ['dequeue']]), [1, 2]);`,
+      },
+      {
+        name: "dequeuing an empty queue yields null",
+        body: `assertEquals(solution([['dequeue']]), [null]);`,
+      },
+      {
+        name: "drains, refills, and keeps order",
+        body: `assertEquals(solution([['enqueue', 1], ['dequeue'], ['dequeue'], ['enqueue', 2], ['dequeue']]), [1, null, 2]);`,
+      },
+      {
+        name: "no dequeues means no output",
+        body: `assertEquals(solution([['enqueue', 1], ['enqueue', 2]]), []);`,
+      },
+      {
+        name: "handles many operations efficiently",
+        body: `var ops = [];
+for (var i = 0; i < 20000; i++) ops.push(['enqueue', i]);
+for (var j = 0; j < 20000; j++) ops.push(['dequeue']);
+var out = solution(ops);
+assertEquals(out.length, 20000);
+assertEquals(out[0], 0);
+assertEquals(out[19999], 19999);`,
+      },
+    ],
+    hints: [
+      "Enqueue is simple: push onto the inbox and move on.",
+      "Only refill the outbox when it is empty. Refilling every time would destroy the amortized cost.",
+      "Pouring inbox into outbox reverses the order, which is precisely what turns two LIFOs into one FIFO.",
+    ],
+    reference: `function runQueue(ops) {
+  const inbox = [];
+  const outbox = [];
+  const out = [];
+  for (const [op, value] of ops) {
+    if (op === 'enqueue') {
+      inbox.push(value);
+      continue;
+    }
+    // Refill only when empty: each item moves between the stacks exactly once,
+    // which is what makes dequeue amortized O(1).
+    if (outbox.length === 0) {
+      while (inbox.length) outbox.push(inbox.pop());
+    }
+    out.push(outbox.length ? outbox.pop() : null);
+  }
+  return out;
+}
+`,
+  },
 };

@@ -73,4 +73,67 @@ similar = R @ R.T   # cosine-style neighbourhood, touches only non-zeros`,
       href: "https://netflixtechblog.com/netflix-recommendations-beyond-the-5-stars-part-1-55838468f429",
     },
   ],
+  challenge: {
+    prompt:
+      "Multiply a sparse matrix by a dense vector. The matrix arrives as coordinate triples [row, col, value] and every unlisted cell is zero. Work proportional to the non-zeros, not to rows times columns. Recommendation and retrieval systems live on this operation because their matrices are almost entirely empty.",
+    entry: "sparseMatVec",
+    starter: `/**
+ * @param {Array<[number, number, number]>} triples - [row, col, value], only non-zeros.
+ * @param {number[]} vector - dense, indexed by column.
+ * @param {number} rows - height of the matrix.
+ * @returns {number[]} the product, length 'rows'.
+ */
+function sparseMatVec(triples, vector, rows) {
+  // Touch only the non-zero cells. A zero cell contributes nothing, so there is
+  // no reason to visit it.
+}
+`,
+    tests: [
+      {
+        name: "identity-like matrix",
+        body: `assertEquals(solution([[0, 0, 1], [1, 1, 1]], [5, 7], 2), [5, 7]);`,
+      },
+      {
+        name: "sums multiple entries in a row",
+        body: `assertEquals(solution([[0, 0, 2], [0, 1, 3]], [10, 100], 1), [320]);`,
+      },
+      {
+        name: "empty rows produce zero",
+        body: `assertEquals(solution([[2, 0, 4]], [3], 3), [0, 0, 12]);`,
+      },
+      {
+        name: "no non-zeros gives an all-zero result",
+        body: `assertEquals(solution([], [1, 2, 3], 2), [0, 0]);`,
+      },
+      {
+        name: "handles negatives",
+        body: `assertEquals(solution([[0, 0, -2]], [5], 1), [-10]);`,
+      },
+      {
+        name: "cost tracks non-zeros, not the grid",
+        body: `var triples = [];
+for (var i = 0; i < 2000; i++) triples.push([i % 100, i % 50, 1]);
+var v = new Array(50).fill(1);
+var out = solution(triples, v, 100);
+assertEquals(out.length, 100);
+var total = out.reduce(function (a, b) { return a + b; }, 0);
+assertEquals(total, 2000);`,
+      },
+    ],
+    hints: [
+      "Start with a result array of the right length, filled with zeros.",
+      "Each triple contributes value * vector[col] to result[row]. Accumulate, do not assign.",
+      "Nothing needs sorting — order of the triples does not change the sum.",
+    ],
+    reference: `function sparseMatVec(triples, vector, rows) {
+  const out = new Array(rows).fill(0);
+  // One pass over the non-zeros. A dense multiply would be rows * cols;
+  // this is O(nnz), which is the whole point of the representation.
+  for (const [row, col, value] of triples) {
+    out[row] += value * vector[col];
+  }
+  return out;
+}
+`,
+  },
 };

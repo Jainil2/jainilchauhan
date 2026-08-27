@@ -82,4 +82,93 @@ function complete(root: TrieNode, prefix: string): string[] {
       href: "https://blog.google/products/search/how-google-autocomplete-works-search/",
     },
   ],
+  challenge: {
+    prompt:
+      "Build a prefix tree over a word list and return every completion of a prefix, alphabetically, capped at a limit. A tokenizer does the same longest-prefix walk over its vocabulary for every piece of text it encodes.",
+    entry: "autocomplete",
+    starter: `/**
+ * @param {string[]} words - the vocabulary. May contain duplicates.
+ * @param {string} prefix - the typed prefix. An empty prefix matches everything.
+ * @param {number} limit - maximum results.
+ * @returns {string[]} matching words, alphabetical, at most 'limit'.
+ */
+function autocomplete(words, prefix, limit) {
+  // Walk the prefix once. If the walk falls off the tree, there are no matches.
+  // Otherwise collect the words beneath the node you landed on.
+}
+`,
+    tests: [
+      {
+        name: "returns words sharing the prefix",
+        body: `assertEquals(solution(['cat', 'car', 'dog'], 'ca', 10), ['car', 'cat']);`,
+      },
+      {
+        name: "results are alphabetical",
+        body: `assertEquals(solution(['cart', 'car', 'cab'], 'ca', 10), ['cab', 'car', 'cart']);`,
+      },
+      {
+        name: "respects the limit",
+        body: `assertEquals(solution(['ca', 'cab', 'cat', 'car'], 'ca', 2), ['ca', 'cab']);`,
+      },
+      {
+        name: "a word is its own completion",
+        body: `assertEquals(solution(['cat'], 'cat', 10), ['cat']);`,
+      },
+      {
+        name: "unknown prefix returns nothing",
+        body: `assertEquals(solution(['cat', 'car'], 'z', 10), []);`,
+      },
+      {
+        name: "empty prefix matches everything",
+        body: `assertEquals(solution(['b', 'a'], '', 10), ['a', 'b']);`,
+      },
+      {
+        name: "duplicates appear once",
+        body: `assertEquals(solution(['cat', 'cat'], 'c', 10), ['cat']);`,
+      },
+      {
+        name: "scales to a large vocabulary",
+        body: `var words = [];
+for (var i = 0; i < 5000; i++) words.push('w' + i);
+var out = solution(words, 'w1', 5);
+assertEquals(out.length, 5);
+assertEquals(out[0], 'w1');`,
+      },
+    ],
+    hints: [
+      "Each node is a map from character to child node, plus a flag marking the end of a word.",
+      "Walk the prefix character by character. A missing child means no matches at all.",
+      "Collect with a depth-first walk, visiting children in sorted key order so results come out alphabetically.",
+    ],
+    reference: `function autocomplete(words, prefix, limit) {
+  const root = { children: new Map(), end: false };
+  for (const word of words) {
+    let node = root;
+    for (const ch of word) {
+      if (!node.children.has(ch)) node.children.set(ch, { children: new Map(), end: false });
+      node = node.children.get(ch);
+    }
+    node.end = true; // a duplicate word just sets the same flag again
+  }
+
+  let node = root;
+  for (const ch of prefix) {
+    node = node.children.get(ch);
+    if (!node) return []; // the walk fell off the tree
+  }
+
+  const out = [];
+  (function collect(n, built) {
+    if (out.length >= limit) return;
+    if (n.end) out.push(built);
+    // Sorted keys give alphabetical output without a final sort.
+    for (const ch of [...n.children.keys()].sort()) {
+      if (out.length >= limit) return;
+      collect(n.children.get(ch), built + ch);
+    }
+  })(node, prefix);
+  return out;
+}
+`,
+  },
 };

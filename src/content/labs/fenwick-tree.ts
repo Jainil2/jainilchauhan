@@ -73,4 +73,83 @@ export class Fenwick {
       href: "https://doi.org/10.1002/spe.4380240306",
     },
   ],
+  challenge: {
+    prompt:
+      "Maintain running prefix sums under point updates. A Fenwick tree does it with one array and a bit trick: each slot covers a span decided by the lowest set bit of its index.",
+    entry: "fenwick",
+    starter: `/**
+ * @param {number} n - number of slots, indexed 0..n-1.
+ * @param {Array<[string, number, number]>} ops - ['add', i, delta] | ['sum', i] prefix through i inclusive.
+ * @returns {number[]} one entry per 'sum', in order.
+ */
+function fenwick(n, ops) {
+  // Work in 1-based indices internally; the lowest set bit (i & -i) is both the
+  // span a slot covers and the step you take between slots.
+}
+`,
+    tests: [
+      {
+        name: "sum of a single addition",
+        body: `assertEquals(solution(4, [['add', 0, 5], ['sum', 0]]), [5]);`,
+      },
+      {
+        name: "prefix sums accumulate",
+        body: `assertEquals(solution(4, [['add', 0, 1], ['add', 1, 2], ['sum', 1]]), [3]);`,
+      },
+      {
+        name: "a later element is excluded from an earlier prefix",
+        body: `assertEquals(solution(4, [['add', 3, 9], ['sum', 1]]), [0]);`,
+      },
+      {
+        name: "the full prefix covers everything",
+        body: `assertEquals(solution(4, [['add', 0, 1], ['add', 3, 4], ['sum', 3]]), [5]);`,
+      },
+      {
+        name: "repeated additions to one slot",
+        body: `assertEquals(solution(3, [['add', 1, 2], ['add', 1, 3], ['sum', 2]]), [5]);`,
+      },
+      {
+        name: "handles negative deltas",
+        body: `assertEquals(solution(3, [['add', 0, 5], ['add', 1, -2], ['sum', 2]]), [3]);`,
+      },
+      {
+        name: "empty query set",
+        body: `assertEquals(solution(4, [['add', 0, 1]]), []);`,
+      },
+      {
+        name: "logarithmic per operation",
+        body: `var ops = [];
+for (var i = 0; i < 100000; i++) ops.push(['add', i, 1]);
+ops.push(['sum', 99999]);
+var out = solution(100000, ops);
+assertEquals(out, [100000]);`,
+      },
+    ],
+    hints: [
+      "Allocate n+1 slots and translate the caller's 0-based index by adding one.",
+      "To add: walk upward with i += i & -i, adding the delta to every slot you touch.",
+      "To read a prefix: walk downward with i -= i & -i, summing the slots you pass.",
+    ],
+    reference: `function fenwick(n, ops) {
+  const tree = new Array(n + 1).fill(0); // 1-based inside
+  const out = [];
+
+  const add = (i, delta) => {
+    // i & -i isolates the lowest set bit: the span this slot is responsible for.
+    for (let k = i + 1; k <= n; k += k & -k) tree[k] += delta;
+  };
+  const prefix = (i) => {
+    let total = 0;
+    for (let k = i + 1; k > 0; k -= k & -k) total += tree[k];
+    return total;
+  };
+
+  for (const [op, a, b] of ops) {
+    if (op === 'add') add(a, b);
+    else out.push(prefix(a));
+  }
+  return out;
+}
+`,
+  },
 };

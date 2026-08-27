@@ -75,4 +75,84 @@ export class Bitset {
       href: "https://redis.io/docs/latest/develop/data-types/bitmaps/",
     },
   ],
+  challenge: {
+    prompt:
+      "Pack boolean flags into 32-bit integers and support set, clear, test and popcount. Quantization does the same thing to model weights: many small values packed into one machine word so memory and bandwidth drop together.",
+    entry: "bitset",
+    starter: `/**
+ * @param {number} size - number of bits.
+ * @param {Array<[string, number]>} ops - ['set', i] | ['clear', i] | ['test', i] | ['count'].
+ * @returns {Array<boolean|number>} one result per 'test' (boolean) and 'count' (number).
+ */
+function bitset(size, ops) {
+  const words = new Uint32Array(Math.ceil(size / 32));
+  // Bit i lives in word (i >>> 5), at position (i & 31) inside that word.
+}
+`,
+    tests: [
+      {
+        name: "set then test",
+        body: `assertEquals(solution(64, [['set', 5], ['test', 5]]), [true]);`,
+      },
+      {
+        name: "unset bits read false",
+        body: `assertEquals(solution(64, [['test', 7]]), [false]);`,
+      },
+      {
+        name: "clear turns a bit off",
+        body: `assertEquals(solution(64, [['set', 3], ['clear', 3], ['test', 3]]), [false]);`,
+      },
+      {
+        name: "setting twice is idempotent",
+        body: `assertEquals(solution(64, [['set', 9], ['set', 9], ['count']]), [1]);`,
+      },
+      {
+        name: "counts bits across word boundaries",
+        body: `assertEquals(solution(96, [['set', 0], ['set', 31], ['set', 32], ['set', 95], ['count']]), [4]);`,
+      },
+      {
+        name: "bit 31 does not leak into the next word",
+        body: `assertEquals(solution(64, [['set', 31], ['test', 32]]), [false]);`,
+      },
+      {
+        name: "handles a large set",
+        body: `var ops = [];
+for (var i = 0; i < 10000; i += 3) ops.push(['set', i]);
+ops.push(['count']);
+var out = solution(10000, ops);
+assertEquals(out[0], Math.ceil(10000 / 3));`,
+      },
+    ],
+    hints: [
+      "The word index is i >>> 5 (divide by 32) and the position inside it is i & 31 (remainder by 32).",
+      "Set with words[w] |= 1 << b, clear with words[w] &= ~(1 << b), test with (words[w] >>> b) & 1.",
+      "For the count, loop the set bits of each word: n &= n - 1 clears the lowest set bit each time.",
+    ],
+    reference: `function bitset(size, ops) {
+  const words = new Uint32Array(Math.ceil(size / 32));
+  const out = [];
+  for (const [op, i] of ops) {
+    const w = i >>> 5; // which 32-bit word
+    const b = i & 31; // which bit inside it
+    if (op === 'set') words[w] |= 1 << b;
+    else if (op === 'clear') words[w] &= ~(1 << b);
+    else if (op === 'test') out.push(((words[w] >>> b) & 1) === 1);
+    else if (op === 'count') {
+      let total = 0;
+      for (let k = 0; k < words.length; k++) {
+        let n = words[k];
+        // Brian Kernighan: each step clears the lowest set bit, so this loops
+        // once per set bit rather than once per bit.
+        while (n) {
+          n &= n - 1;
+          total++;
+        }
+      }
+      out.push(total);
+    }
+  }
+  return out;
+}
+`,
+  },
 };

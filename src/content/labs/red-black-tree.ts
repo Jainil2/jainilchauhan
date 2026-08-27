@@ -75,4 +75,59 @@ function insertFixup(n: RB, parent: RB, grandparent: RB, uncle?: RB): void {
       href: "https://en.cppreference.com/w/cpp/container/map",
     },
   ],
+  challenge: {
+    prompt:
+      "Classify the fix-up case after a red-black insert. Given the colours around a freshly inserted red node, return 'recolor', 'rotate', or 'none'. A red uncle recolours and pushes the problem up the tree; a black uncle rotates and stops it there.",
+    entry: "fixupCase",
+    starter: `/**
+ * @param {{parent: 'red'|'black'|null, uncle: 'red'|'black'|null, isRoot: boolean}} state
+ *   parent and uncle are null when that node does not exist (treated as black).
+ * @returns {'recolor'|'rotate'|'none'}
+ */
+function fixupCase(state) {
+  // No violation exists unless the new red node has a RED parent.
+  // Given a violation, the uncle's colour decides the remedy.
+}
+`,
+    tests: [
+      {
+        name: "the root needs no fix",
+        body: `assertEquals(solution({ parent: null, uncle: null, isRoot: true }), 'none');`,
+      },
+      {
+        name: "a black parent is already legal",
+        body: `assertEquals(solution({ parent: 'black', uncle: 'red', isRoot: false }), 'none');`,
+      },
+      {
+        name: "red parent and red uncle recolours",
+        body: `assertEquals(solution({ parent: 'red', uncle: 'red', isRoot: false }), 'recolor');`,
+      },
+      {
+        name: "red parent and black uncle rotates",
+        body: `assertEquals(solution({ parent: 'red', uncle: 'black', isRoot: false }), 'rotate');`,
+      },
+      {
+        name: "a missing uncle counts as black",
+        body: `assertEquals(solution({ parent: 'red', uncle: null, isRoot: false }), 'rotate');`,
+      },
+      {
+        name: "root wins even with a red parent recorded",
+        body: `assertEquals(solution({ parent: 'red', uncle: 'red', isRoot: true }), 'none');`,
+      },
+    ],
+    hints: [
+      "Handle the root first and return early — the root is always recoloured black and no fix-up applies.",
+      "Two reds in a row is the only violation. A black or missing parent means there is nothing to do.",
+      "Null means a leaf sentinel, and those are black, so treat a missing uncle exactly like a black one.",
+    ],
+    reference: `function fixupCase(state) {
+  const { parent, uncle, isRoot } = state;
+  if (isRoot) return 'none';
+  // The invariant only breaks when a red node has a red parent.
+  if (parent !== 'red') return 'none';
+  // Missing nodes are the black leaf sentinel, so null behaves as black.
+  return uncle === 'red' ? 'recolor' : 'rotate';
+}
+`,
+  },
 };

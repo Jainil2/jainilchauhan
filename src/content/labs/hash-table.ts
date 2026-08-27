@@ -87,4 +87,82 @@ export class HashMap<V> {
       href: "https://redis.io/docs/latest/develop/data-types/hashes/",
     },
   ],
+  challenge: {
+    prompt:
+      "Build a chained hash table. Given a bucket count and a hash function, run a series of set and get operations and return what each get produced. Collisions share a bucket, so a get has to walk the chain — which is why load factor decides whether lookup stays near O(1).",
+    entry: "hashTable",
+    starter: `/**
+ * @param {number} buckets - number of buckets.
+ * @param {(key: string) => number} hash - already reduced into [0, buckets).
+ * @param {Array<[string, string, any]>} ops - ['set', key, value] | ['get', key].
+ * @returns {any[]} one entry per get: the stored value, or null if absent.
+ */
+function hashTable(buckets, hash, ops) {
+  // Each bucket holds a chain of [key, value] pairs. A set for an existing key
+  // must overwrite it rather than append a second copy.
+}
+`,
+    tests: [
+      {
+        name: "set then get",
+        body: `var h = function (k) { return k.length % 4; };
+assertEquals(solution(4, h, [['set', 'a', 1], ['get', 'a']]), [1]);`,
+      },
+      {
+        name: "missing key returns null",
+        body: `var h = function (k) { return k.length % 4; };
+assertEquals(solution(4, h, [['get', 'nope']]), [null]);`,
+      },
+      {
+        name: "colliding keys stay distinct",
+        body: `var h = function () { return 0; };
+assertEquals(solution(4, h, [['set', 'a', 1], ['set', 'b', 2], ['get', 'a'], ['get', 'b']]), [1, 2]);`,
+      },
+      {
+        name: "setting an existing key overwrites",
+        body: `var h = function () { return 0; };
+assertEquals(solution(4, h, [['set', 'a', 1], ['set', 'a', 9], ['get', 'a']]), [9]);`,
+      },
+      {
+        name: "overwrite does not duplicate the entry",
+        body: `var h = function () { return 0; };
+assertEquals(solution(1, h, [['set', 'a', 1], ['set', 'a', 2], ['set', 'b', 3], ['get', 'a'], ['get', 'b']]), [2, 3]);`,
+      },
+      {
+        name: "stores falsy values faithfully",
+        body: `var h = function () { return 0; };
+assertEquals(solution(2, h, [['set', 'a', 0], ['get', 'a']]), [0]);`,
+      },
+      {
+        name: "single bucket still behaves correctly",
+        body: `var h = function () { return 0; };
+var ops = [];
+for (var i = 0; i < 300; i++) ops.push(['set', 'k' + i, i]);
+ops.push(['get', 'k299'], ['get', 'k0']);
+assertEquals(solution(1, h, ops), [299, 0]);`,
+      },
+    ],
+    hints: [
+      "Make an array of empty arrays up front, one chain per bucket.",
+      "For a set, scan the chain for the key first: if you find it, replace the value in place.",
+      "A stored value can legitimately be 0 or false, so test whether the key was found, not whether the value is truthy.",
+    ],
+    reference: `function hashTable(buckets, hash, ops) {
+  const table = Array.from({ length: buckets }, () => []);
+  const out = [];
+  for (const [op, key, value] of ops) {
+    const chain = table[hash(key)];
+    const at = chain.findIndex((pair) => pair[0] === key);
+    if (op === 'set') {
+      if (at >= 0) chain[at][1] = value;
+      else chain.push([key, value]);
+    } else {
+      // Check the index, not the value: a stored 0 or false is still a hit.
+      out.push(at >= 0 ? chain[at][1] : null);
+    }
+  }
+  return out;
+}
+`,
+  },
 };

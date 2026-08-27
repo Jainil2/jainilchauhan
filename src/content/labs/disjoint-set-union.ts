@@ -82,4 +82,91 @@ export class DSU {
       href: "https://dl.acm.org/doi/10.1145/321879.321884",
     },
   ],
+  challenge: {
+    prompt:
+      "Count the connected components of an undirected graph using union-find. Merge the endpoints of every edge, then count the distinct roots. Union by size plus path compression is what keeps this effectively constant time per operation.",
+    entry: "countComponents",
+    starter: `/**
+ * @param {number} n - nodes, labelled 0..n-1.
+ * @param {Array<[number, number]>} edges - undirected.
+ * @returns {number} how many connected components exist.
+ */
+function countComponents(n, edges) {
+  // Every node starts as its own component. Each edge that joins two different
+  // components reduces the count by one.
+}
+`,
+    tests: [
+      {
+        name: "no edges means every node is alone",
+        body: `assertEquals(solution(4, []), 4);`,
+      },
+      {
+        name: "a chain is one component",
+        body: `assertEquals(solution(3, [[0, 1], [1, 2]]), 1);`,
+      },
+      {
+        name: "two separate groups",
+        body: `assertEquals(solution(4, [[0, 1], [2, 3]]), 2);`,
+      },
+      {
+        name: "a repeated edge changes nothing",
+        body: `assertEquals(solution(2, [[0, 1], [0, 1]]), 1);`,
+      },
+      {
+        name: "a self loop changes nothing",
+        body: `assertEquals(solution(3, [[1, 1]]), 3);`,
+      },
+      {
+        name: "zero nodes",
+        body: `assertEquals(solution(0, []), 0);`,
+      },
+      {
+        name: "a cycle is still one component",
+        body: `assertEquals(solution(3, [[0, 1], [1, 2], [2, 0]]), 1);`,
+      },
+      {
+        name: "stays fast on a long chain",
+        body: `var edges = [];
+for (var i = 0; i < 100000; i++) edges.push([i, i + 1]);
+assertEquals(solution(100001, edges), 1);`,
+      },
+    ],
+    hints: [
+      "Start with parent[i] = i and a component count of n.",
+      "find(x) should flatten as it walks — point each node it passes directly at the root.",
+      "Only decrement the count when the two roots actually differ; an edge inside one component is a no-op.",
+    ],
+    reference: `function countComponents(n, edges) {
+  const parent = Array.from({ length: n }, (_, i) => i);
+  const size = new Array(n).fill(1);
+  let components = n;
+
+  // Iterative find with path compression: every node on the path ends up
+  // pointing straight at the root, so later lookups are nearly free.
+  const find = (x) => {
+    let root = x;
+    while (parent[root] !== root) root = parent[root];
+    while (parent[x] !== root) {
+      const next = parent[x];
+      parent[x] = root;
+      x = next;
+    }
+    return root;
+  };
+
+  for (const [a, b] of edges) {
+    const ra = find(a);
+    const rb = find(b);
+    if (ra === rb) continue; // already together
+    // Hang the smaller tree off the bigger one to keep paths short.
+    const [big, small] = size[ra] >= size[rb] ? [ra, rb] : [rb, ra];
+    parent[small] = big;
+    size[big] += size[small];
+    components--;
+  }
+  return components;
+}
+`,
+  },
 };

@@ -88,4 +88,100 @@ export class MinHeap<T> {
       href: "https://docs.python.org/3/library/heapq.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Return the k largest values, ascending, keeping only k items in memory at a time. A bounded min-heap is how a reranker keeps the best k candidates while streaming through far more than it could hold.",
+    entry: "topK",
+    starter: `/**
+ * @param {number[]} values - the stream. May be much larger than k.
+ * @param {number} k - how many to keep.
+ * @returns {number[]} the k largest, ascending. Fewer if the input is smaller.
+ */
+function topK(values, k) {
+  // Keep a min-heap of size k. The smallest of your keepers sits at the root,
+  // so it is the one to evict when something better arrives.
+}
+`,
+    tests: [
+      {
+        name: "top three",
+        body: `assertEquals(solution([5, 1, 9, 3, 7], 3), [5, 7, 9]);`,
+      },
+      {
+        name: "k larger than the input returns everything sorted",
+        body: `assertEquals(solution([2, 1], 5), [1, 2]);`,
+      },
+      {
+        name: "k of zero returns nothing",
+        body: `assertEquals(solution([3, 1], 0), []);`,
+      },
+      {
+        name: "empty input",
+        body: `assertEquals(solution([], 3), []);`,
+      },
+      {
+        name: "keeps duplicates",
+        body: `assertEquals(solution([4, 4, 1], 2), [4, 4]);`,
+      },
+      {
+        name: "handles negatives",
+        body: `assertEquals(solution([-5, -1, -9], 2), [-5, -1]);`,
+      },
+      {
+        name: "already ascending input",
+        body: `assertEquals(solution([1, 2, 3, 4], 2), [3, 4]);`,
+      },
+      {
+        name: "streams a large input without sorting all of it",
+        body: `var vs = [];
+for (var i = 0; i < 200000; i++) vs.push((i * 7919) % 100000);
+var out = solution(vs, 5);
+assertEquals(out.length, 5);
+assertEquals(out[4], 99999);`,
+      },
+    ],
+    hints: [
+      "Push until you hold k items. After that, only consider a value larger than the current minimum.",
+      "A binary heap in an array: children of i are 2i+1 and 2i+2, the parent is (i-1)>>1.",
+      "Sift up after a push, sift down after replacing the root; sort the k keepers once at the end.",
+    ],
+    reference: `function topK(values, k) {
+  if (k <= 0) return [];
+  const heap = []; // min-heap: heap[0] is the weakest keeper
+
+  const up = (i) => {
+    while (i > 0) {
+      const p = (i - 1) >> 1;
+      if (heap[p] <= heap[i]) break;
+      [heap[p], heap[i]] = [heap[i], heap[p]];
+      i = p;
+    }
+  };
+  const down = (i) => {
+    for (;;) {
+      const l = 2 * i + 1;
+      const r = l + 1;
+      let small = i;
+      if (l < heap.length && heap[l] < heap[small]) small = l;
+      if (r < heap.length && heap[r] < heap[small]) small = r;
+      if (small === i) break;
+      [heap[small], heap[i]] = [heap[i], heap[small]];
+      i = small;
+    }
+  };
+
+  for (const v of values) {
+    if (heap.length < k) {
+      heap.push(v);
+      up(heap.length - 1);
+    } else if (v > heap[0]) {
+      // Beating the weakest keeper is the only reason to touch the heap.
+      heap[0] = v;
+      down(0);
+    }
+  }
+  return heap.sort((a, b) => a - b);
+}
+`,
+  },
 };

@@ -77,4 +77,91 @@ function search(head: SkipNode, key: number): SkipNode | undefined {
       href: "https://dl.acm.org/doi/10.1145/78973.78977",
     },
   ],
+  challenge: {
+    prompt:
+      "Search a skip list and report the path you walked. Start at the top-left, move right while the next key does not overshoot, and drop a level when it would. The express lanes are why this behaves like a balanced tree without any rebalancing code.",
+    entry: "search",
+    starter: `/**
+ * @param {number[][]} levels - levels[0] is the full sorted list; higher levels are
+ *   sparser subsets of it. Every level is sorted ascending.
+ * @param {number} target
+ * @returns {{found: boolean, path: number[]}} path lists each key you land on,
+ *   in order. Dropping a level records nothing on its own.
+ */
+function search(levels, target) {
+  // Begin above the first element of the top level. At each level, step right
+  // while the NEXT key is at most the target; otherwise drop down.
+}
+`,
+    tests: [
+      {
+        name: "reaches a key along the express lane",
+        body: `var levels = [[1, 2, 3, 4, 5, 6], [1, 3, 5], [1, 5]];
+// Two steps on the top lane, and the lower lanes add nothing: six keys, two moves.
+assertEquals(solution(levels, 5), { found: true, path: [1, 5] });`,
+      },
+      {
+        name: "drops down to reach a key",
+        body: `var levels = [[1, 2, 3, 4, 5, 6], [1, 3, 5], [1, 5]];
+assertEquals(solution(levels, 3), { found: true, path: [1, 3] });`,
+      },
+      {
+        name: "reports a missing key",
+        body: `var levels = [[1, 3, 5], [1, 5]];
+assertEquals(solution(levels, 4).found, false);`,
+      },
+      {
+        name: "a target below everything walks nowhere",
+        body: `var levels = [[5, 6], [5]];
+assertEquals(solution(levels, 1), { found: false, path: [] });`,
+      },
+      {
+        name: "finds the very first key",
+        body: `var levels = [[1, 2, 3], [1, 3]];
+assertEquals(solution(levels, 1), { found: true, path: [1] });`,
+      },
+      {
+        name: "finds the last key",
+        body: `var levels = [[1, 2, 3], [1, 3]];
+assertEquals(solution(levels, 3), { found: true, path: [1, 3] });`,
+      },
+      {
+        name: "single level behaves like a linked list",
+        body: `assertEquals(solution([[1, 2, 3]], 2), { found: true, path: [1, 2] });`,
+      },
+      {
+        name: "express lanes keep the path short",
+        body: `var base = [];
+for (var i = 0; i < 4096; i++) base.push(i);
+var levels = [base];
+var cur = base;
+while (cur.length > 2) { var up = []; for (var j = 0; j < cur.length; j += 2) up.push(cur[j]); levels.push(up); cur = up; }
+var r = solution(levels, 4095);
+assertEquals(r.found, true);
+assert(r.path.length < 40, 'path too long: ' + r.path.length);`,
+      },
+    ],
+    hints: [
+      "Work downwards from the highest level, keeping the key you are currently standing on.",
+      "On each level, advance while the next key is less than or equal to the target, recording each key you move onto.",
+      "When you drop a level, resume from the position of the key you are standing on within that lower level.",
+    ],
+    reference: `function search(levels, target) {
+  const path = [];
+  let current = null; // the key we are standing on, null means before the start
+
+  for (let level = levels.length - 1; level >= 0; level--) {
+    const lane = levels[level];
+    // Resume from where the current key sits in this lane.
+    let i = current === null ? -1 : lane.indexOf(current);
+    while (i + 1 < lane.length && lane[i + 1] <= target) {
+      i++;
+      current = lane[i];
+      path.push(current);
+    }
+  }
+  return { found: current === target, path };
+}
+`,
+  },
 };

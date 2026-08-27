@@ -69,4 +69,71 @@ export function balanced(src: string): boolean {
       href: "https://developer.mozilla.org/en-US/docs/Glossary/Call_stack",
     },
   ],
+  challenge: {
+    prompt:
+      "Decide whether a string of brackets is balanced. Supports (), [] and {}. Every agent framework parses tool-call arguments this way before it can trust them.",
+    entry: "isBalanced",
+    starter: `/**
+ * @param {string} s - a string of brackets, possibly with other characters.
+ * @returns {boolean} true when every bracket is closed in the right order.
+ */
+function isBalanced(s) {
+  // A closing bracket must match the most recent unclosed opening bracket.
+  // That is exactly what a stack is for.
+}
+`,
+    tests: [
+      {
+        name: "simple pair",
+        body: `assertEquals(solution('()'), true);`,
+      },
+      {
+        name: "nested pairs",
+        body: `assertEquals(solution('{[()]}'), true);`,
+      },
+      {
+        name: "mismatched types",
+        body: `assertEquals(solution('(]'), false);`,
+      },
+      {
+        name: "wrong closing order",
+        body: `assertEquals(solution('([)]'), false);`,
+      },
+      {
+        name: "unclosed opening",
+        body: `assertEquals(solution('((('), false);`,
+      },
+      {
+        name: "stray closing",
+        body: `assertEquals(solution('())'), false);`,
+      },
+      {
+        name: "empty string is balanced",
+        body: `assertEquals(solution(''), true);`,
+      },
+      {
+        name: "ignores non-bracket characters",
+        body: `assertEquals(solution('a(b[c]d)e'), true);`,
+      },
+    ],
+    hints: [
+      "Push every opening bracket. On a closing bracket, pop and check the pair matches.",
+      "Popping an empty stack means a closing bracket arrived with nothing open — that is unbalanced.",
+      "After the whole string, anything still on the stack was never closed.",
+    ],
+    reference: `function isBalanced(s) {
+  const PAIRS = { ')': '(', ']': '[', '}': '{' };
+  const stack = [];
+  for (const ch of s) {
+    if (ch === '(' || ch === '[' || ch === '{') {
+      stack.push(ch);
+    } else if (PAIRS[ch]) {
+      // pop() on an empty array gives undefined, which never matches a bracket
+      if (stack.pop() !== PAIRS[ch]) return false;
+    }
+  }
+  return stack.length === 0;
+}
+`,
+  },
 };

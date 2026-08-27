@@ -135,6 +135,14 @@ This sums to ~260 hrs against ~250. If it runs long the cut line is Phase 3 — 
 | Prompt injection & trust boundaries | `jwt-anatomy`, `cors-lab`             |
 | Inference cost & latency budgets    | `rate-limiter`, `load-balancer`       |
 
+## Noted for a later phase — a visual learning path
+
+A graph across the labs ordering them beginner → advanced, with reused concepts placed before the things that build on them (a topological order over prerequisites), so a visitor can follow a route rather than choosing from 93 cards.
+
+Not built yet, and deliberately not designed in isolation: it overlaps almost entirely with the bridge map. Both answer "what should I do next" from a prerequisite graph; the bridge map answers it three items at a time from what you have proven, while a path answers it as a whole route. Designing them together avoids two competing navigation models, and whatever prerequisite data one needs, the other needs too.
+
+Whatever shape it takes, Product Rule 1 still binds: a path may not render as a long list of everything the visitor has not done.
+
 ## Out of scope for v1
 
 Accounts, ML fundamentals, Pyodide, open-sourcing, comments, monetization, mobile app, video, AI-generated hints, spaced repetition. Each is a v2 conversation once traffic data exists.
