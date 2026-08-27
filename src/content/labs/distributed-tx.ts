@@ -1,0 +1,98 @@
+import type { LabMeta } from "../types";
+
+export const lab: LabMeta = {
+  slug: "distributed-tx",
+  title: "Saga vs 2PC",
+  category: "Distributed Systems",
+  difficulty: "Advanced",
+  readingTimeMin: 6,
+  blurb: "2-Phase Commit vs Eventual Sagas.",
+  caption:
+    "Simulate a cross-service purchase. Compare the rigid lock-step of 2PC (Two-Phase Commit) with the flexible, compensating-transaction model of Sagas. Inject failures and watch how each system recovers — or fails.",
+  skillTags: ["Distributed Systems", "Microservices"],
+  concept:
+    "Atomic transactions are easy in a single database, but across microservices, you must choose between Strong Consistency (2PC) and Eventual Consistency (Saga).\n\n2PC (Two-Phase Commit) uses a coordinator to ask all participants to 'prepare' (lock resources), then 'commit'. It guarantees atomicity but is blocking and fragile: if the coordinator or a node fails during the lock phase, the system stalls.\n\nSagas break a transaction into a sequence of local transactions. Each step has a corresponding 'compensating transaction' (undo). If step 3 fails, the Saga runs the undo actions for steps 2 and 1. It scales better and doesn't hold locks, but allows 'interleaving' where other users might see partially complete state.",
+  complexity: [
+    { operation: "2PC Latency", time: "2 RTTs + Locks", space: "O(N) locks" },
+    { operation: "Saga Latency", time: "N local TXs", space: "O(N) log storage" },
+  ],
+  realWorld: [
+    "Bank Transfers: legacy systems often use 2PC/XA for strong atomicity.",
+    "Uber/Lyft: Sagas manage the ride-request → payment → driver-dispatch flow.",
+    "Booking.com: Sagas handle flight + hotel + car rental bundles.",
+    "Temporal / Zeebe: Workflow engines designed specifically to manage long-running Sagas.",
+  ],
+  pitfalls: [
+    "Saga steps must be idempotent because undos/retries will happen.",
+    "2PC scales poorly beyond a few nodes due to the blocking 'prepare' phase.",
+    "Lack of isolation in Sagas means you need 'semantic locks' or careful business logic to handle concurrent updates.",
+  ],
+  codeSnippet: {
+    language: "ts",
+    code: `// Saga: local transactions + compensations instead of a global lock.
+const steps = [
+  { do: reserveInventory, undo: releaseInventory },
+  { do: chargeCard,       undo: refundCard },
+  { do: createShipment,   undo: cancelShipment },
+];
+
+async function runSaga(order: Order) {
+  const done: typeof steps = [];
+  try {
+    for (const step of steps) {
+      await step.do(order); // each step commits locally and is idempotent
+      done.push(step);
+    }
+  } catch (err) {
+    for (const step of done.reverse()) await step.undo(order); // compensate backwards
+    throw err;
+  }
+}
+// 2PC gives atomicity but blocks on coordinator failure; sagas stay available
+// and pay for it with temporary, visible inconsistency.`,
+  },
+  usedBy: [
+    {
+      company: "Uber",
+      product: "Cadence / Temporal workflows",
+      usage:
+        "Long-running business transactions are expressed as durable workflows with explicit compensation activities.",
+      href: "https://www.uber.com/blog/cadence-multi-tenant-workflow-sys/",
+    },
+    {
+      company: "Amazon",
+      product: "AWS Step Functions saga pattern",
+      usage:
+        "AWS documents the saga pattern with Step Functions for order/booking flows spanning multiple services.",
+      href: "https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga-orchestration.html",
+    },
+    {
+      company: "Stripe",
+      product: "Idempotent payment operations",
+      usage:
+        "Idempotency keys make each step in a payment flow safely retryable, which is what makes compensation-based flows workable.",
+      href: "https://docs.stripe.com/api/idempotent_requests",
+    },
+    {
+      company: "Google",
+      product: "Spanner distributed commits",
+      usage:
+        "Spanner does run two-phase commit across Paxos groups — with TrueTime bounding the uncertainty window.",
+      href: "https://research.google/pubs/pub39966/",
+    },
+  ],
+  references: [
+    {
+      label: "Gray & Lamport — Consensus on transaction commit (Paxos Commit)",
+      href: "https://www.microsoft.com/en-us/research/publication/consensus-on-transaction-commit/",
+    },
+    {
+      label: "Temporal — durable execution as an alternative to 2PC",
+      href: "https://docs.temporal.io/temporal",
+    },
+    {
+      label: "Microsoft — Saga distributed transactions pattern",
+      href: "https://learn.microsoft.com/en-us/azure/architecture/patterns/saga",
+    },
+  ],
+};

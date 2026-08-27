@@ -1,28 +1,25 @@
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Clock, Gauge } from "lucide-react";
-import { getLabBySlug, labRegistry } from "@/lib/labRegistry";
+import { loadLab } from "@/content/labs";
 import { GameCard } from "@/components/system-design/GameCard";
 import { LabContent } from "@/components/system-design/LabContent";
+import { labComponents } from "@/components/system-design/registry";
 import { useLabProgress } from "@/lib/useLabProgress";
 
 export const Route = createFileRoute("/lab/$slug")({
-  loader: ({ params }) => {
-    const lab = getLabBySlug(params.slug);
+  loader: async ({ params }) => {
+    const lab = await loadLab(params.slug);
     if (!lab) throw notFound();
-    return {
-      slug: lab.slug,
-      title: lab.title,
-      blurb: lab.blurb,
-      category: lab.category,
-    };
+    return { lab };
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
       return { meta: [{ title: "Lab — Not found · Jainil Chauhan" }] };
     }
-    const t = `${loaderData.title} — Lab · Jainil Chauhan`;
-    const d = `${loaderData.blurb} Interactive ${loaderData.category.toLowerCase()} demo with concept, reference implementation, production usage at named companies, and pitfalls.`;
+    const { lab } = loaderData;
+    const t = `${lab.title} — Lab · Jainil Chauhan`;
+    const d = `${lab.blurb} Interactive ${lab.category.toLowerCase()} demo with concept, reference implementation, production usage at named companies, and pitfalls.`;
     return {
       meta: [
         { title: t },
@@ -58,8 +55,8 @@ const DIFF_COLOR: Record<string, string> = {
 
 function LabDetail() {
   const { slug } = Route.useParams();
-  const lab = labRegistry.find((l) => l.slug === slug)!;
-  const Game = lab.component;
+  const { lab } = Route.useLoaderData();
+  const Game = labComponents[slug];
   const { markCompleted } = useLabProgress();
 
   useEffect(() => {
@@ -96,7 +93,9 @@ function LabDetail() {
           <h1 className="mt-1 font-mono text-3xl font-bold text-foreground">{lab.title}</h1>
           <p className="mt-2 text-muted-foreground">{lab.blurb}</p>
           <div className="mt-3 flex flex-wrap items-center gap-2 font-mono text-xs">
-            <span className={`rounded border px-1.5 py-0.5 uppercase tracking-wider ${DIFF_COLOR[lab.difficulty]}`}>
+            <span
+              className={`rounded border px-1.5 py-0.5 uppercase tracking-wider ${DIFF_COLOR[lab.difficulty]}`}
+            >
               <Gauge className="mr-1 inline size-3" /> {lab.difficulty}
             </span>
             <span className="rounded border border-border px-1.5 py-0.5 text-muted-foreground">
@@ -107,7 +106,15 @@ function LabDetail() {
 
         <div id="lab-surface">
           <GameCard title={lab.title} caption={lab.caption} whereUsed={lab.whereUsed}>
-            <Game />
+            <Suspense
+              fallback={
+                <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">
+                  Loading demo…
+                </div>
+              }
+            >
+              <Game />
+            </Suspense>
           </GameCard>
         </div>
 

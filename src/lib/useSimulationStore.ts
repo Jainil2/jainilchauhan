@@ -17,26 +17,24 @@ export const useSimulationStore = create<SimulationState>((set) => ({
   // Start with 10 tokens
   tokenCount: 10,
   simulationsEnabled: true,
-  
+
   setSimulationsEnabled: (enabled) => set({ simulationsEnabled: enabled }),
-  
+
   killNode: (id) =>
     set((state) => ({
       activeNodes: state.activeNodes.filter((nodeId) => nodeId !== id),
     })),
-    
+
   restoreNode: (id) =>
     set((state) => ({
-      activeNodes: state.activeNodes.includes(id) 
-        ? state.activeNodes 
-        : [...state.activeNodes, id],
+      activeNodes: state.activeNodes.includes(id) ? state.activeNodes : [...state.activeNodes, id],
     })),
-    
+
   drainTokens: (amount) =>
     set((state) => ({
       tokenCount: Math.max(0, state.tokenCount - amount),
     })),
-    
+
   replenishTokens: (amount, max) =>
     set((state) => ({
       tokenCount: Math.min(max, state.tokenCount + amount),

@@ -228,8 +228,8 @@ export function Experience() {
 
       {/* Explainer */}
       <p className="mt-4 text-center font-mono text-xs text-muted-foreground">
-        Inspired by LSM-Tree storage engines (LevelDB, RocksDB, Cassandra) — append-only writes flush to
-        sorted SSTables, which compact over time for fast reads.
+        Inspired by LSM-Tree storage engines (LevelDB, RocksDB, Cassandra) — append-only writes
+        flush to sorted SSTables, which compact over time for fast reads.
       </p>
     </section>
   );
@@ -252,8 +252,7 @@ function ClassicExperience() {
         <div className="flex flex-col gap-2 border-b border-border pb-5 sm:flex-row sm:items-baseline sm:justify-between">
           <div>
             <h3 className="font-mono text-xl font-semibold text-foreground">
-              Software Engineer ·{" "}
-              <span className="text-terminal">Tech Holding</span>
+              Software Engineer · <span className="text-terminal">Tech Holding</span>
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">Ahmedabad, India</p>
           </div>

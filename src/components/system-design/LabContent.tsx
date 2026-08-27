@@ -11,7 +11,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { CodeBlock } from "./CodeBlock";
-import type { LabEntry } from "@/lib/labRegistry";
+import type { LabMeta } from "@/content/types";
 
 interface SectionProps {
   icon: React.ReactNode;
@@ -47,7 +47,7 @@ function Section({ icon, title, defaultOpen = false, children }: SectionProps) {
   );
 }
 
-export function LabContent({ lab }: { lab: LabEntry }) {
+export function LabContent({ lab }: { lab: LabMeta }) {
   return (
     <div className="mt-6 space-y-3">
       <Section icon={<BookOpen className="size-4" />} title="Concept" defaultOpen>

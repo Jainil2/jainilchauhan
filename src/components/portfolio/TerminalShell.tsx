@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { X, TerminalSquare } from "lucide-react";
-import { labRegistry } from "@/lib/labRegistry";
+import { labSummaries } from "@/content/labs";
 import { useSimulationStore } from "@/lib/useSimulationStore";
 import { useControlPlane, type EnvMode } from "@/lib/useControlPlane";
 import { useTheme } from "@/lib/useTheme";
@@ -62,13 +62,9 @@ export function TerminalShell() {
   const status = useControlPlane((s) => s.status);
   const vitals = useControlPlane((s) => s.vitals);
   const { killNode, restoreNode, drainTokens, replenishTokens } = useSimulationStore();
-  const {
-    choice: themeChoice,
-    resolved: resolvedTheme,
-    setChoice: setThemeChoice,
-  } = useTheme();
+  const { choice: themeChoice, resolved: resolvedTheme, setChoice: setThemeChoice } = useTheme();
 
-  const labSlugs = useMemo(() => labRegistry.map((l) => l.slug), []);
+  const labSlugs = useMemo(() => labSummaries.map((l) => l.slug), []);
 
   // Global open-shortcut
   useEffect(() => {
@@ -182,14 +178,14 @@ export function TerminalShell() {
         const target = rest[0] ?? "";
         if (target === "/lab" || target === "lab") {
           out(
-            labRegistry.map((l) => ({ kind: "out" as const, text: `  ${l.slug}  — ${l.title}` })),
+            labSummaries.map((l) => ({ kind: "out" as const, text: `  ${l.slug}  — ${l.title}` })),
           );
         } else {
           out([
             { kind: "out", text: "sections/" },
             ...SECTIONS.map((s) => ({ kind: "out" as const, text: `  ${s}` })),
             { kind: "out", text: "labs/" },
-            ...labRegistry.map((l) => ({ kind: "out" as const, text: `  ${l.slug}` })),
+            ...labSummaries.map((l) => ({ kind: "out" as const, text: `  ${l.slug}` })),
           ]);
         }
         break;
@@ -323,7 +319,7 @@ export function TerminalShell() {
           { kind: "out", text: `  "rps": ${rps},` },
           { kind: "out", text: `  "memory_mb": ${mem},` },
           { kind: "out", text: `  "cache_hit_rate": "98.4%"` },
-          { kind: "out", text: `}` }
+          { kind: "out", text: `}` },
         ]);
         break;
       }
@@ -334,15 +330,21 @@ export function TerminalShell() {
           { kind: "out", text: `; <<>> DiG 9.10.6 <<>> ${domain}` },
           { kind: "out", text: `;; global options: +cmd` },
           { kind: "out", text: `;; Got answer:` },
-          { kind: "out", text: `;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: ${Math.floor(Math.random() * 65000)}` },
-          { kind: "out", text: `;; flags: qr rd ra; QUERY: 1, ANSWER: 4, AUTHORITY: 0, ADDITIONAL: 1` },
+          {
+            kind: "out",
+            text: `;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: ${Math.floor(Math.random() * 65000)}`,
+          },
+          {
+            kind: "out",
+            text: `;; flags: qr rd ra; QUERY: 1, ANSWER: 4, AUTHORITY: 0, ADDITIONAL: 1`,
+          },
           { kind: "out", text: `` },
           { kind: "out", text: `;; ANSWER SECTION:` },
           { kind: "out", text: `${domain}.		300	IN	A	104.21.34.12` },
           { kind: "out", text: `${domain}.		300	IN	A	172.67.14.8` },
           { kind: "out", text: `` },
           { kind: "out", text: `;; Query time: ${Math.floor(Math.random() * 30 + 10)} msec` },
-          { kind: "out", text: `;; SERVER: 1.1.1.1#53(1.1.1.1)` }
+          { kind: "out", text: `;; SERVER: 1.1.1.1#53(1.1.1.1)` },
         ]);
         break;
       }
@@ -409,7 +411,6 @@ export function TerminalShell() {
         out({ kind: "out", text: `theme set to ${want}` });
         break;
       }
-
 
       default:
         out({ kind: "err", text: `command not found: ${cmd}  (try 'help')` });

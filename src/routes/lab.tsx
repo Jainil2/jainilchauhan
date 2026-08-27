@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { ArrowLeft, Beaker, CheckCircle2, Clock, Gauge } from "lucide-react";
-import { LAB_CATEGORIES, labRegistry, type LabCategory } from "@/lib/labRegistry";
+import { LAB_CATEGORIES, labSummaries, type LabCategory } from "@/content/labs";
 import { useLabProgress } from "@/lib/useLabProgress";
 
 export const Route = createFileRoute("/lab")({
@@ -38,7 +38,8 @@ function LabIndex() {
   const completedCount = hydrated ? completed.size : 0;
 
   const grouped = useMemo(() => {
-    const list = filter === "All" ? labRegistry : labRegistry.filter((l) => l.category === filter);
+    const list =
+      filter === "All" ? labSummaries : labSummaries.filter((l) => l.category === filter);
     if (filter !== "All") return [{ category: filter, labs: list }];
     return LAB_CATEGORIES.map((cat) => ({
       category: cat,
@@ -70,7 +71,7 @@ function LabIndex() {
             <span>
               Progress:{" "}
               <span className="text-terminal">
-                {completedCount}/{labRegistry.length}
+                {completedCount}/{labSummaries.length}
               </span>{" "}
               completed
             </span>
@@ -86,7 +87,7 @@ function LabIndex() {
         </div>
 
         <p className="mt-3 max-w-2xl text-muted-foreground">
-          {labRegistry.length} interactive demos of the system design, DSA, security, and
+          {labSummaries.length} interactive demos of the system design, DSA, security, and
           distributed-systems concepts I work with daily. Each lab is a 2–6 minute play with concept
           explainer, reference implementation, production usage at named companies, pitfalls, and
           references.
@@ -99,8 +100,8 @@ function LabIndex() {
             const active = filter === cat;
             const count =
               cat === "All"
-                ? labRegistry.length
-                : labRegistry.filter((l) => l.category === cat).length;
+                ? labSummaries.length
+                : labSummaries.filter((l) => l.category === cat).length;
             return (
               <button
                 key={cat}

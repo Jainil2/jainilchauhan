@@ -25,8 +25,7 @@ import { useControlPlane, type EnvMode } from "@/lib/useControlPlane";
  * Persisted via localStorage. Desktop only (mobile uses MobileShellFab).
  */
 export function PortfolioHUD() {
-  const { visible, setVisible, expanded, setExpanded, tab, setTab, hydrated } =
-    useHudPrefs();
+  const { visible, setVisible, expanded, setExpanded, tab, setTab, hydrated } = useHudPrefs();
   const { activeNodes, tokenCount, simulationsEnabled, setSimulationsEnabled } =
     useSimulationStore();
   const env = useControlPlane((s) => s.env);
@@ -63,7 +62,7 @@ export function PortfolioHUD() {
   return (
     <AnimatePresence mode="wait">
       {!expanded ? (
-        <motion.div 
+        <motion.div
           key="collapsed"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -265,10 +264,7 @@ function StatsTab(props: {
         <Cell
           label="cls"
           value={props.vitals.cls === null ? "…" : String(props.vitals.cls)}
-          accent={vitalTone(
-            props.vitals.cls !== null ? props.vitals.cls * 1000 : null,
-            [100, 250],
-          )}
+          accent={vitalTone(props.vitals.cls !== null ? props.vitals.cls * 1000 : null, [100, 250])}
         />
       </div>
     </div>
@@ -287,9 +283,7 @@ function MeTab({ bundleKb }: { bundleKb: number | null }) {
         <p className="mt-0.5 text-foreground">SWE · backend · distributed</p>
         <p className="text-muted-foreground">
           Nadiad, IN · bundle{" "}
-          <span className="text-foreground">
-            {bundleKb !== null ? `${bundleKb}kb` : "—"}
-          </span>
+          <span className="text-foreground">{bundleKb !== null ? `${bundleKb}kb` : "—"}</span>
         </p>
       </div>
 
@@ -417,9 +411,7 @@ function OpsTab({
 
 function openShell() {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(
-    new KeyboardEvent("keydown", { key: "j", metaKey: true }),
-  );
+  window.dispatchEvent(new KeyboardEvent("keydown", { key: "j", metaKey: true }));
 }
 
 function EnvSwitcher({ value, onChange }: { value: EnvMode; onChange: (e: EnvMode) => void }) {

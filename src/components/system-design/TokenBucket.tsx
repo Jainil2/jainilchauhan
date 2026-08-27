@@ -41,7 +41,12 @@ export function TokenBucket({ tokens, maxTokens, isRateLimited }: TokenBucketPro
             fill="oklch(0.20 0.02 150)"
           />
           {/* Bucket rim */}
-          <rect x="4" y="10" width="48" height="6" rx="3"
+          <rect
+            x="4"
+            y="10"
+            width="48"
+            height="6"
+            rx="3"
             className="text-border fill-current"
             fill="oklch(0.24 0.02 150)"
             stroke="currentColor"
@@ -109,12 +114,8 @@ export function TokenBucket({ tokens, maxTokens, isRateLimited }: TokenBucketPro
             <motion.div
               key={i}
               animate={{
-                backgroundColor: active
-                  ? "oklch(0.85 0.21 150)"
-                  : "oklch(0.30 0.02 150 / 40%)",
-                boxShadow: active
-                  ? "0 0 6px oklch(0.85 0.21 150 / 60%)"
-                  : "none",
+                backgroundColor: active ? "oklch(0.85 0.21 150)" : "oklch(0.30 0.02 150 / 40%)",
+                boxShadow: active ? "0 0 6px oklch(0.85 0.21 150 / 60%)" : "none",
               }}
               transition={{ duration: 0.2 }}
               className="size-2.5 rounded-full"

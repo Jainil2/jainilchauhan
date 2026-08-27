@@ -1,0 +1,88 @@
+export type LabCategory =
+  | "Distributed Systems"
+  | "Data Structures"
+  | "Algorithms"
+  | "Security"
+  | "AI Systems";
+
+export type Difficulty = "Beginner" | "Intermediate" | "Advanced";
+
+export const LAB_CATEGORIES: LabCategory[] = [
+  "Distributed Systems",
+  "Data Structures",
+  "Algorithms",
+  "Security",
+  "AI Systems",
+];
+
+/**
+ * One test case. `body` runs inside the challenge worker with `solution` bound
+ * to the visitor's exported function and `assert`/`assertEquals` in scope.
+ */
+export interface ChallengeTest {
+  name: string;
+  body: string;
+}
+
+export interface Challenge {
+  /** What to build, one or two sentences. */
+  prompt: string;
+  /** JSDoc + stub seeded into the editor. JavaScript — there is no transpile step. */
+  starter: string;
+  tests: ChallengeTest[];
+  /** Revealed after a pass, or on explicit give-up. */
+  reference: string;
+  /** Shown one at a time, in order. */
+  hints: string[];
+}
+
+/**
+ * A link from something the visitor already knows to something new.
+ *
+ * This is the product: `sameness` always renders before any new material, so a
+ * lab opens with "you already know 70% of this" rather than a wall of novelty.
+ */
+export interface Bridge {
+  /** Slug of the prerequisite lab. Must resolve — `prebuild` fails otherwise. */
+  slug: string;
+  /** "It IS an LRU cache, keyed by token position, evicted under memory pressure." */
+  sameness: string;
+  /** "New: attention K/V tensors, and GPU memory as the eviction budget." */
+  delta: string;
+}
+
+/**
+ * Lab metadata. Deliberately free of React imports so Node build scripts
+ * (sitemap, bridge-graph validation) and list-only pages can read it without
+ * pulling every lab component into the bundle. The component lives in
+ * `src/components/system-design/registry.ts`, keyed by the same slug.
+ */
+export interface LabMeta {
+  slug: string;
+  title: string;
+  category: LabCategory;
+  difficulty: Difficulty;
+  readingTimeMin: number;
+  blurb: string;
+  caption: string;
+  whereUsed?: { label: string; href: string };
+  /** Skill names this lab demonstrates. */
+  skillTags: string[];
+  /** Long-form explanation, shown in the "Concept" section. */
+  concept: string;
+  complexity?: { operation: string; time: string; space?: string }[];
+  codeSnippet?: { language: "ts" | "py" | "go" | "sql"; code: string };
+  realWorld?: string[];
+  pitfalls?: string[];
+  references?: { label: string; href: string }[];
+  /**
+   * Named companies/products that run on this concept, shown as chips in the
+   * "Used in production" section. `href` points at a public source (engineering
+   * blog, paper, docs); entries without one render as "commonly used in".
+   */
+  usedBy?: { company: string; product: string; usage: string; href?: string }[];
+  /** Opt-in validation. Absent means the lab is read-and-play only. */
+  challenge?: Challenge;
+  /** What this lab is a small delta from. Drives the bridge map. */
+  bridgesFrom?: Bridge[];
+}

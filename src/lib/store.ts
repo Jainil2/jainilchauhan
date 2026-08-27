@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 // --- Types ---
 export interface SimulationState {
@@ -35,7 +35,7 @@ export const useGlobalStore = create<GlobalStore>((set, get) => ({
       const currentTokens = get().tokenBucket.tokens;
       if (currentTokens > 0) {
         set((state) => ({
-          tokenBucket: { ...state.tokenBucket, tokens: state.tokenBucket.tokens - 1 }
+          tokenBucket: { ...state.tokenBucket, tokens: state.tokenBucket.tokens - 1 },
         }));
         return true;
       }
@@ -50,12 +50,15 @@ export const useGlobalStore = create<GlobalStore>((set, get) => ({
         return state;
       });
     },
-    resetBucket: () => set((state) => ({ tokenBucket: { ...state.tokenBucket, tokens: state.tokenBucket.maxTokens } }))
-  }
+    resetBucket: () =>
+      set((state) => ({
+        tokenBucket: { ...state.tokenBucket, tokens: state.tokenBucket.maxTokens },
+      })),
+  },
 }));
 
 // Setup automatic token refill interval
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   setInterval(() => {
     useGlobalStore.getState().tokenBucket.refillTokens();
   }, useGlobalStore.getState().tokenBucket.refillRateMs);

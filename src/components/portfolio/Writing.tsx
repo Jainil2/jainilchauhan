@@ -28,8 +28,8 @@ export function Writing() {
       <SectionHeading id="writing" prompt="Thoughts" title="Notes & articles" />
 
       <p className="-mt-4 mb-8 max-w-2xl text-muted-foreground">
-        Long-form notes on backend engineering, distributed systems, and the
-        unglamorous details that keep production boring. Coming soon.
+        Long-form notes on backend engineering, distributed systems, and the unglamorous details
+        that keep production boring. Coming soon.
       </p>
 
       <div className="grid gap-6 md:grid-cols-3">
@@ -45,9 +45,7 @@ export function Writing() {
               </span>
             </div>
             <h3 className="mt-5 text-base font-semibold text-foreground">{d.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              {d.excerpt}
-            </p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d.excerpt}</p>
             <p className="mt-auto pt-6 text-xs font-medium text-muted-foreground">
               Draft — coming soon
             </p>

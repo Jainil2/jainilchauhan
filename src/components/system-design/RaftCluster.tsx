@@ -32,9 +32,9 @@ export function RaftCluster() {
       term: 1,
     })),
   );
-  const [packets, setPackets] = useState<{ id: string; from: number; to: number; kind: "hb" | "vote" }[]>(
-    [],
-  );
+  const [packets, setPackets] = useState<
+    { id: string; from: number; to: number; kind: "hb" | "vote" }[]
+  >([]);
   const [log, setLog] = useState<string[]>(["term 1: node 0 elected leader"]);
 
   const nodesRef = useRef(nodes);
@@ -89,7 +89,9 @@ export function RaftCluster() {
       // Promote after a short delay
       setTimeout(() => {
         setNodes((prev) =>
-          prev.map((n) => (n.id === candidate.id && n.role === "candidate" ? { ...n, role: "leader" } : n)),
+          prev.map((n) =>
+            n.id === candidate.id && n.role === "candidate" ? { ...n, role: "leader" } : n,
+          ),
         );
         setLog((l) => [`term ${newTerm}: node ${candidate.id} elected leader`, ...l].slice(0, 5));
       }, 900);
@@ -107,15 +109,14 @@ export function RaftCluster() {
   function toggle(id: number) {
     setNodes((prev) =>
       prev.map((n) =>
-        n.id === id
-          ? n.role === "down"
-            ? { ...n, role: "follower" }
-            : { ...n, role: "down" }
-          : n,
+        n.id === id ? (n.role === "down" ? { ...n, role: "follower" } : { ...n, role: "down" }) : n,
       ),
     );
     setLog((l) =>
-      [`node ${id} ${nodesRef.current[id].role === "down" ? "restored" : "crashed"}`, ...l].slice(0, 5),
+      [`node ${id} ${nodesRef.current[id].role === "down" ? "restored" : "crashed"}`, ...l].slice(
+        0,
+        5,
+      ),
     );
   }
 
@@ -228,7 +229,8 @@ export function RaftCluster() {
           </ul>
         </div>
         <p className="font-mono text-xs text-muted-foreground">
-          Click a node to <span className="text-destructive">crash</span> it, click again to restore.
+          Click a node to <span className="text-destructive">crash</span> it, click again to
+          restore.
         </p>
       </div>
     </div>

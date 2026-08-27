@@ -100,7 +100,9 @@ function ProjectDetail() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background font-mono text-foreground">
         <p className="text-terminal text-4xl font-bold">404</p>
-        <p className="text-muted-foreground">project not found: <span className="text-terminal">/{slug}</span></p>
+        <p className="text-muted-foreground">
+          project not found: <span className="text-terminal">/{slug}</span>
+        </p>
         <Link
           to="/"
           className="mt-4 flex items-center gap-2 rounded border border-terminal/40 bg-terminal/10 px-4 py-2 text-terminal transition-all hover:glow-terminal"
@@ -132,9 +134,7 @@ function ProjectDetail() {
         <p className="font-mono text-xs uppercase tracking-widest text-cyan-accent">
           // case-study
         </p>
-        <h1 className="mt-2 font-mono text-3xl font-bold text-foreground sm:text-4xl">
-          {p.title}
-        </h1>
+        <h1 className="mt-2 font-mono text-3xl font-bold text-foreground sm:text-4xl">{p.title}</h1>
         <p className="mt-3 text-lg text-muted-foreground">{p.summary}</p>
 
         {/* Stack */}

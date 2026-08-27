@@ -60,11 +60,31 @@ export const Route = createRootRoute({
         content:
           "Backend & distributed systems engineer. Building low-latency, high-trust systems that scale quietly.",
       },
-      { name: "description", content: "Portfolio Powerhouse transforms your resume into a professional, high-quality personal portfolio website." },
-      { property: "og:description", content: "Portfolio Powerhouse transforms your resume into a professional, high-quality personal portfolio website." },
-      { name: "twitter:description", content: "Portfolio Powerhouse transforms your resume into a professional, high-quality personal portfolio website." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e2b91672-f1c0-4144-8aae-0ab0de3cbbe9/id-preview-fd5ced91--8b5c5000-fb28-41ed-ab20-99a167c4a45e.lovable.app-1777095623015.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e2b91672-f1c0-4144-8aae-0ab0de3cbbe9/id-preview-fd5ced91--8b5c5000-fb28-41ed-ab20-99a167c4a45e.lovable.app-1777095623015.png" },
+      {
+        name: "description",
+        content:
+          "Portfolio Powerhouse transforms your resume into a professional, high-quality personal portfolio website.",
+      },
+      {
+        property: "og:description",
+        content:
+          "Portfolio Powerhouse transforms your resume into a professional, high-quality personal portfolio website.",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Portfolio Powerhouse transforms your resume into a professional, high-quality personal portfolio website.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e2b91672-f1c0-4144-8aae-0ab0de3cbbe9/id-preview-fd5ced91--8b5c5000-fb28-41ed-ab20-99a167c4a45e.lovable.app-1777095623015.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e2b91672-f1c0-4144-8aae-0ab0de3cbbe9/id-preview-fd5ced91--8b5c5000-fb28-41ed-ab20-99a167c4a45e.lovable.app-1777095623015.png",
+      },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },

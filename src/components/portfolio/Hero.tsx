@@ -14,10 +14,7 @@ export function Hero() {
   const days = useDaysSince("2025-01-15");
 
   return (
-    <section
-      id="top"
-      className="relative mx-auto max-w-6xl px-4 pt-32 pb-20 sm:px-6"
-    >
+    <section id="top" className="relative mx-auto max-w-6xl px-4 pt-32 pb-20 sm:px-6">
       <div className="grid items-start gap-10 lg:grid-cols-[1.6fr_1fr]">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
@@ -33,8 +30,8 @@ export function Hero() {
             <span className="text-foreground">
               low-latency, high-trust systems that scale quietly
             </span>{" "}
-            — backend services, secure authentication platforms, and cloud
-            infrastructure that stays calm under load.
+            — backend services, secure authentication platforms, and cloud infrastructure that stays
+            calm under load.
           </p>
 
           <div
@@ -43,8 +40,7 @@ export function Hero() {
           >
             <span className="size-1.5 rounded-full bg-foreground" />
             <span>
-              <span className="text-foreground">{days.toLocaleString()} days</span> at
-              Tech Holding
+              <span className="text-foreground">{days.toLocaleString()} days</span> at Tech Holding
             </span>
           </div>
 
@@ -103,10 +99,7 @@ export function Hero() {
             </li>
             <li className="flex items-center gap-3">
               <Mail className="size-4 text-foreground" />
-              <a
-                href="mailto:jainil.chauhan@example.com"
-                className="hover:text-foreground"
-              >
+              <a href="mailto:jainil.chauhan@example.com" className="hover:text-foreground">
                 jainil.chauhan@example.com
               </a>
             </li>

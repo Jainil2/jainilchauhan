@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "prebuild": "node scripts/generate-status.mjs --phase=pre",
+    "prebuild": "node scripts/generate-content.mjs && node scripts/generate-status.mjs --phase=pre",
+    "content": "node scripts/generate-content.mjs",
     "build": "vite build && node scripts/generate-status.mjs --phase=post",
     "build:dev": "vite build --mode development && node scripts/generate-status.mjs --phase=post",
     "preview": "vite preview",

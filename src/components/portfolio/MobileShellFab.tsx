@@ -10,9 +10,7 @@ import { TerminalSquare } from "lucide-react";
 export function MobileShellFab() {
   function open() {
     if (typeof window === "undefined") return;
-    window.dispatchEvent(
-      new KeyboardEvent("keydown", { key: "j", metaKey: true }),
-    );
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "j", metaKey: true }));
   }
   return (
     <button

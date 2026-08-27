@@ -21,11 +21,7 @@ const achievements = [
 export function Education() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-      <SectionHeading
-        id="education"
-        prompt="Education"
-        title="Education & Achievements"
-      />
+      <SectionHeading id="education" prompt="Education" title="Education & Achievements" />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-lg border border-border bg-card/60 p-6">

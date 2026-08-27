@@ -8,26 +8,23 @@ export function About() {
       <div className="grid gap-10 lg:grid-cols-3">
         <div className="space-y-5 text-pretty leading-relaxed text-muted-foreground lg:col-span-2 lg:text-[1.0625rem]">
           <p>
-            I&apos;m a software engineer who likes the parts of the stack most people
-            scroll past — the queues, the auth flows, the slow query that&apos;s
-            quietly costing thousands a month. My favourite outcomes are the
-            invisible ones: pages that load before you notice, logins that just work,
-            bills that go down.
+            I&apos;m a software engineer who likes the parts of the stack most people scroll past —
+            the queues, the auth flows, the slow query that&apos;s quietly costing thousands a
+            month. My favourite outcomes are the invisible ones: pages that load before you notice,
+            logins that just work, bills that go down.
           </p>
           <p>
-            Today I work at <span className="text-foreground">Tech Holding</span>{" "}
-            on distributed backend systems and cloud platforms — shipping enterprise
-            OAuth 2.0 / OIDC for tens of thousands of users, cutting GraphQL
-            latency by ~40%, and building tooling that helps teams understand
-            what their AWS footprint is actually doing.
+            Today I work at <span className="text-foreground">Tech Holding</span> on distributed
+            backend systems and cloud platforms — shipping enterprise OAuth 2.0 / OIDC for tens of
+            thousands of users, cutting GraphQL latency by ~40%, and building tooling that helps
+            teams understand what their AWS footprint is actually doing.
           </p>
           <p>
-            I care about{" "}
-            <span className="font-medium text-foreground">measurable performance</span>,{" "}
-            <span className="font-medium text-foreground">secure-by-default architecture</span>,
-            and writing code other engineers can pick up without a tour. Currently
-            looking for backend / platform / distributed-systems roles where the
-            hard problems are the interesting ones.
+            I care about <span className="font-medium text-foreground">measurable performance</span>
+            , <span className="font-medium text-foreground">secure-by-default architecture</span>,
+            and writing code other engineers can pick up without a tour. Currently looking for
+            backend / platform / distributed-systems roles where the hard problems are the
+            interesting ones.
           </p>
         </div>
 
@@ -46,9 +43,7 @@ export function About() {
                 <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                   {row.k}
                 </dt>
-                <dd className="text-right text-[0.8125rem] font-medium text-foreground">
-                  {row.v}
-                </dd>
+                <dd className="text-right text-[0.8125rem] font-medium text-foreground">{row.v}</dd>
               </div>
             ))}
           </dl>

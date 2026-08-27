@@ -45,7 +45,10 @@ function lookupNaive(key: string, nodes: readonly string[]) {
 
 export function ConsistentHashLab() {
   const [active, setActive] = useState<string[]>(["A", "B", "C"]);
-  const [snapshot, setSnapshot] = useState<{ con: Record<string, string>; naive: Record<string, string> } | null>(null);
+  const [snapshot, setSnapshot] = useState<{
+    con: Record<string, string>;
+    naive: Record<string, string>;
+  } | null>(null);
 
   const ring = useMemo(() => buildRing(active), [active]);
 
@@ -87,9 +90,14 @@ export function ConsistentHashLab() {
               key={n}
               onClick={() => toggle(n)}
               className={`rounded border px-2 py-0.5 font-mono text-xs ${
-                on ? "border-terminal text-terminal" : "border-border text-muted-foreground line-through"
+                on
+                  ? "border-terminal text-terminal"
+                  : "border-border text-muted-foreground line-through"
               }`}
-              style={{ borderColor: on ? NODE_COLORS[n] : undefined, color: on ? NODE_COLORS[n] : undefined }}
+              style={{
+                borderColor: on ? NODE_COLORS[n] : undefined,
+                color: on ? NODE_COLORS[n] : undefined,
+              }}
             >
               {n}
             </button>
@@ -106,14 +114,25 @@ export function ConsistentHashLab() {
       <div className="grid gap-4 md:grid-cols-2">
         {/* Ring */}
         <div className="rounded border border-border bg-background/40 p-3">
-          <p className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">consistent hash ring</p>
+          <p className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+            consistent hash ring
+          </p>
           <svg viewBox="0 0 220 220" className="w-full">
-            <circle cx="110" cy="110" r="90" fill="none" stroke="oklch(0.30 0.02 150 / 40%)" strokeDasharray="3 4" />
+            <circle
+              cx="110"
+              cy="110"
+              r="90"
+              fill="none"
+              stroke="oklch(0.30 0.02 150 / 40%)"
+              strokeDasharray="3 4"
+            />
             {ring.map((v, i) => {
               const rad = (v.angle / RING) * 2 * Math.PI - Math.PI / 2;
               const x = 110 + 90 * Math.cos(rad);
               const y = 110 + 90 * Math.sin(rad);
-              return <circle key={i} cx={x} cy={y} r={2} fill={NODE_COLORS[v.node]} opacity={0.6} />;
+              return (
+                <circle key={i} cx={x} cy={y} r={2} fill={NODE_COLORS[v.node]} opacity={0.6} />
+              );
             })}
             {KEYS.map((k) => {
               const a = hash(k) % RING;
@@ -123,7 +142,14 @@ export function ConsistentHashLab() {
               const node = assignmentsCon[k];
               return <circle key={k} cx={x} cy={y} r={1.4} fill={NODE_COLORS[node] ?? "#888"} />;
             })}
-            <text x="110" y="114" textAnchor="middle" fontSize="9" fill="oklch(0.68 0.02 150)" fontFamily="JetBrains Mono">
+            <text
+              x="110"
+              y="114"
+              textAnchor="middle"
+              fontSize="9"
+              fill="oklch(0.68 0.02 150)"
+              fontFamily="JetBrains Mono"
+            >
               {KEYS.length} keys · {active.length} nodes
             </text>
           </svg>
@@ -131,29 +157,43 @@ export function ConsistentHashLab() {
 
         {/* Counters */}
         <div className="rounded border border-border bg-background/40 p-3 font-mono text-xs">
-          <p className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">key-remap after change</p>
+          <p className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">
+            key-remap after change
+          </p>
           {snapshot ? (
             <>
               <div className="mb-3 flex items-baseline justify-between">
                 <span className="text-foreground">consistent hashing</span>
-                <span className="text-terminal text-lg tabular-nums">{remappedCon}/{KEYS.length}</span>
+                <span className="text-terminal text-lg tabular-nums">
+                  {remappedCon}/{KEYS.length}
+                </span>
               </div>
               <div className="mb-3 h-1.5 overflow-hidden rounded bg-card">
-                <div className="h-full bg-terminal" style={{ width: `${(remappedCon / KEYS.length) * 100}%` }} />
+                <div
+                  className="h-full bg-terminal"
+                  style={{ width: `${(remappedCon / KEYS.length) * 100}%` }}
+                />
               </div>
               <div className="mb-3 flex items-baseline justify-between">
                 <span className="text-foreground">naive hash % N</span>
-                <span className="text-destructive text-lg tabular-nums">{remappedNaive}/{KEYS.length}</span>
+                <span className="text-destructive text-lg tabular-nums">
+                  {remappedNaive}/{KEYS.length}
+                </span>
               </div>
               <div className="h-1.5 overflow-hidden rounded bg-card">
-                <div className="h-full bg-destructive" style={{ width: `${(remappedNaive / KEYS.length) * 100}%` }} />
+                <div
+                  className="h-full bg-destructive"
+                  style={{ width: `${(remappedNaive / KEYS.length) * 100}%` }}
+                />
               </div>
               <p className="mt-3 text-muted-foreground">
                 Consistent hashing remaps ~K/N. Naive remaps almost everything → cache stampede.
               </p>
             </>
           ) : (
-            <p className="text-muted-foreground">Click <span className="text-terminal">snapshot</span>, then toggle a node to compare.</p>
+            <p className="text-muted-foreground">
+              Click <span className="text-terminal">snapshot</span>, then toggle a node to compare.
+            </p>
           )}
         </div>
       </div>

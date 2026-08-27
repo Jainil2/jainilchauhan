@@ -45,13 +45,82 @@ export function CodeBlock({ code, language = "ts" }: CodeBlockProps) {
 }
 
 const KEYWORDS = new Set([
-  "const","let","var","function","return","if","else","for","while","do",
-  "import","from","export","default","class","new","this","typeof","instanceof",
-  "true","false","null","undefined","async","await","try","catch","finally","throw",
-  "interface","type","enum","extends","implements","public","private","protected",
-  "def","lambda","pass","yield","with","as","in","is","not","and","or",
-  "package","func","go","chan","select","map","range","struct","defer","goroutine",
-  "select","insert","update","delete","from","where","values","into","table","index","create","alter","join","on","group","by","order","limit",
+  "const",
+  "let",
+  "var",
+  "function",
+  "return",
+  "if",
+  "else",
+  "for",
+  "while",
+  "do",
+  "import",
+  "from",
+  "export",
+  "default",
+  "class",
+  "new",
+  "this",
+  "typeof",
+  "instanceof",
+  "true",
+  "false",
+  "null",
+  "undefined",
+  "async",
+  "await",
+  "try",
+  "catch",
+  "finally",
+  "throw",
+  "interface",
+  "type",
+  "enum",
+  "extends",
+  "implements",
+  "public",
+  "private",
+  "protected",
+  "def",
+  "lambda",
+  "pass",
+  "yield",
+  "with",
+  "as",
+  "in",
+  "is",
+  "not",
+  "and",
+  "or",
+  "package",
+  "func",
+  "go",
+  "chan",
+  "select",
+  "map",
+  "range",
+  "struct",
+  "defer",
+  "goroutine",
+  "select",
+  "insert",
+  "update",
+  "delete",
+  "from",
+  "where",
+  "values",
+  "into",
+  "table",
+  "index",
+  "create",
+  "alter",
+  "join",
+  "on",
+  "group",
+  "by",
+  "order",
+  "limit",
 ]);
 
 function highlight(src: string, lang: string) {
@@ -76,13 +145,33 @@ function highlight(src: string, lang: string) {
 
   return tokens.map((tok, i) => {
     if (tok.k === "kw")
-      return <span key={i} className="text-cyan-accent">{tok.t}</span>;
+      return (
+        <span key={i} className="text-cyan-accent">
+          {tok.t}
+        </span>
+      );
     if (tok.k === "str")
-      return <span key={i} className="text-terminal">{tok.t}</span>;
+      return (
+        <span key={i} className="text-terminal">
+          {tok.t}
+        </span>
+      );
     if (tok.k === "num")
-      return <span key={i} className="text-amber-300">{tok.t}</span>;
+      return (
+        <span key={i} className="text-amber-300">
+          {tok.t}
+        </span>
+      );
     if (tok.k === "com")
-      return <span key={i} className="text-muted-foreground italic">{tok.t}</span>;
-    return <span key={i} className="text-foreground">{tok.t}</span>;
+      return (
+        <span key={i} className="text-muted-foreground italic">
+          {tok.t}
+        </span>
+      );
+    return (
+      <span key={i} className="text-foreground">
+        {tok.t}
+      </span>
+    );
   });
 }

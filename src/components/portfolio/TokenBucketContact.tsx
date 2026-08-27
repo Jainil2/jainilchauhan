@@ -1,33 +1,40 @@
-import React, { useState } from 'react';
-import { useGlobalStore } from '@/lib/store';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Send, AlertCircle, CheckCircle2, ShieldAlert } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from "react";
+import { useGlobalStore } from "@/lib/store";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Send, AlertCircle, CheckCircle2, ShieldAlert } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function TokenBucketContact() {
   const { tokenBucket, isSimulationsEnabled } = useGlobalStore();
-  const [status, setStatus] = useState<'idle' | 'success' | 'rate_limited'>('idle');
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [status, setStatus] = useState<"idle" | "success" | "rate_limited">("idle");
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isSimulationsEnabled) {
-      setStatus('success');
-      setTimeout(() => setStatus('idle'), 3000);
+      setStatus("success");
+      setTimeout(() => setStatus("idle"), 3000);
       return;
     }
 
     const success = tokenBucket.consumeToken();
     if (success) {
-      setStatus('success');
-      setTimeout(() => setStatus('idle'), 3000);
-      setFormData({ name: '', email: '', message: '' });
+      setStatus("success");
+      setTimeout(() => setStatus("idle"), 3000);
+      setFormData({ name: "", email: "", message: "" });
     } else {
-      setStatus('rate_limited');
-      setTimeout(() => setStatus('idle'), 3000);
+      setStatus("rate_limited");
+      setTimeout(() => setStatus("idle"), 3000);
     }
   };
 
@@ -35,7 +42,7 @@ export function TokenBucketContact() {
     <Card className="w-full max-w-md mx-auto overflow-hidden bg-background/60 backdrop-blur-xl border-white/10 shadow-2xl relative">
       {/* Decorative gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-transparent pointer-events-none" />
-      
+
       <CardHeader>
         <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
           Get in Touch
@@ -54,35 +61,35 @@ export function TokenBucketContact() {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Input 
-              placeholder="Your Name" 
+            <Input
+              placeholder="Your Name"
               value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
               className="bg-background/50 border-white/10 focus:border-purple-500/50 transition-colors"
             />
           </div>
           <div className="space-y-2">
-            <Input 
-              type="email" 
-              placeholder="Email Address" 
+            <Input
+              type="email"
+              placeholder="Email Address"
               value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
               className="bg-background/50 border-white/10 focus:border-purple-500/50 transition-colors"
             />
           </div>
           <div className="space-y-2">
-            <Textarea 
-              placeholder="Your Message..." 
+            <Textarea
+              placeholder="Your Message..."
               value={formData.message}
-              onChange={(e) => setFormData({...formData, message: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               required
               className="min-h-[120px] bg-background/50 border-white/10 focus:border-purple-500/50 transition-colors resize-none"
             />
           </div>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="w-full relative group overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white border-0"
           >
             <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
@@ -93,24 +100,25 @@ export function TokenBucketContact() {
         </form>
 
         <AnimatePresence mode="wait">
-          {status === 'success' && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }} 
-              animate={{ opacity: 1, y: 0 }} 
+          {status === "success" && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className="mt-4 p-3 rounded-lg bg-green-500/20 border border-green-500/30 flex items-center gap-2 text-green-400 text-sm"
             >
               <CheckCircle2 className="w-4 h-4" /> Message sent successfully!
             </motion.div>
           )}
-          {status === 'rate_limited' && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }} 
-              animate={{ opacity: 1, y: 0 }} 
+          {status === "rate_limited" && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className="mt-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 flex items-center gap-2 text-red-400 text-sm"
             >
-              <AlertCircle className="w-4 h-4" /> Rate limit exceeded. Please wait for tokens to refill.
+              <AlertCircle className="w-4 h-4" /> Rate limit exceeded. Please wait for tokens to
+              refill.
             </motion.div>
           )}
         </AnimatePresence>
@@ -130,7 +138,7 @@ export function TokenBucketContact() {
                 animate={{
                   scale: i < tokenBucket.tokens ? 1 : 0.8,
                   opacity: i < tokenBucket.tokens ? 1 : 0.3,
-                  backgroundColor: i < tokenBucket.tokens ? '#8b5cf6' : '#374151'
+                  backgroundColor: i < tokenBucket.tokens ? "#8b5cf6" : "#374151",
                 }}
                 className="w-8 h-8 rounded-full shadow-inner flex items-center justify-center border border-white/10"
               >
