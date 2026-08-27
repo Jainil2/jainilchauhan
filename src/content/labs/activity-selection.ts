@@ -69,4 +69,74 @@ def select(activities):
       href: "https://www.cs.princeton.edu/~wayne/kleinberg-tardos/pdf/04GreedyAlgorithmsI.pdf",
     },
   ],
+  challenge: {
+    prompt:
+      "Choose as many non-overlapping activities as possible. Sorting by earliest finish time is optimal, and the reason is worth internalising: finishing earliest leaves the most room for everything after it.",
+    entry: "selectActivities",
+    starter: `/**
+ * @param {Array<[number, number]>} activities - [start, end], end exclusive so
+ *   an activity ending at 5 does not clash with one starting at 5.
+ * @returns {number} the most activities that can be chosen without overlap.
+ */
+function selectActivities(activities) {
+  // Sort by END time, not by start and not by duration. Then take greedily.
+}
+`,
+    tests: [
+      {
+        name: "picks the compatible pair",
+        body: `assertEquals(solution([[1, 3], [2, 5], [3, 6]]), 2);`,
+      },
+      {
+        name: "touching activities do not clash",
+        body: `assertEquals(solution([[1, 2], [2, 3]]), 2);`,
+      },
+      {
+        name: "sorting by start would be wrong here",
+        body: `assertEquals(solution([[1, 10], [2, 3], [4, 5]]), 2);`,
+      },
+      {
+        name: "all overlapping",
+        body: `assertEquals(solution([[1, 5], [2, 6], [3, 7]]), 1);`,
+      },
+      {
+        name: "no activities",
+        body: `assertEquals(solution([]), 0);`,
+      },
+      {
+        name: "a single activity",
+        body: `assertEquals(solution([[0, 1]]), 1);`,
+      },
+      {
+        name: "input order does not matter",
+        body: `assertEquals(solution([[3, 6], [1, 3], [2, 5]]), 2);`,
+      },
+      {
+        name: "handles many activities",
+        body: `var acts = [];
+for (var i = 0; i < 50000; i++) acts.push([i, i + 1]);
+assertEquals(solution(acts), 50000);`,
+      },
+    ],
+    hints: [
+      "Sort a copy by end time ascending.",
+      "Track when the last chosen activity finished, starting at negative infinity.",
+      "Take an activity when its start is greater than or equal to that finish time.",
+    ],
+    reference: `function selectActivities(activities) {
+  // Earliest finish first: this is the exchange argument -- any optimal set can
+  // swap its first activity for the earliest-finishing one and stay valid.
+  const sorted = activities.slice().sort((a, b) => a[1] - b[1]);
+  let count = 0;
+  let freeAt = -Infinity;
+  for (const [start, end] of sorted) {
+    if (start >= freeAt) {
+      count++;
+      freeAt = end;
+    }
+  }
+  return count;
+}
+`,
+  },
 };

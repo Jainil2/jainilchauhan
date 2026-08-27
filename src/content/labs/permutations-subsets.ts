@@ -77,4 +77,73 @@ function permute<T>(xs: T[], k = 0, out: T[][] = []): T[][] {
       href: "https://cp-algorithms.com/algebra/all-submasks.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Generate every subset of a list, in bitmask order: subset i contains element j whenever bit j of i is set. Enumerating the power set this way needs no recursion at all, and the ordering falls out for free.",
+    entry: "subsets",
+    starter: `/**
+ * @param {any[]} xs
+ * @returns {any[][]} all 2**n subsets. Subset i holds xs[j] for every set bit j
+ *   of i, with elements in their original order.
+ */
+function subsets(xs) {
+  // Count from 0 to 2**n - 1 and read the bits of each number.
+}
+`,
+    tests: [
+      {
+        name: "empty input has one subset",
+        body: `assertEquals(solution([]), [[]]);`,
+      },
+      {
+        name: "single element",
+        body: `assertEquals(solution([1]), [[], [1]]);`,
+      },
+      {
+        name: "two elements in bitmask order",
+        body: `assertEquals(solution([1, 2]), [[], [1], [2], [1, 2]]);`,
+      },
+      {
+        name: "three elements",
+        body: `assertEquals(solution(['a', 'b', 'c']).length, 8);`,
+      },
+      {
+        name: "elements keep their original order",
+        body: `assertEquals(solution([1, 2, 3])[7], [1, 2, 3]);`,
+      },
+      {
+        name: "the full set is last",
+        body: `var out = solution([1, 2]);
+assertEquals(out[out.length - 1], [1, 2]);`,
+      },
+      {
+        name: "count doubles with each element",
+        body: `assertEquals(solution([1, 2, 3, 4, 5]).length, 32);`,
+      },
+      {
+        name: "handles duplicate values as distinct positions",
+        body: `assertEquals(solution([1, 1]), [[], [1], [1], [1, 1]]);`,
+      },
+    ],
+    hints: [
+      "There are 2 to the power n subsets, so loop i from 0 up to that.",
+      "Element j belongs to subset i when (i >> j) & 1 is 1.",
+      "Build each subset by walking j from 0 upwards, which keeps the original order.",
+    ],
+    reference: `function subsets(xs) {
+  const n = xs.length;
+  const out = [];
+  const total = 1 << n;
+  for (let mask = 0; mask < total; mask++) {
+    const subset = [];
+    // j ascending keeps elements in their original order.
+    for (let j = 0; j < n; j++) {
+      if ((mask >> j) & 1) subset.push(xs[j]);
+    }
+    out.push(subset);
+  }
+  return out;
+}
+`,
+  },
 };

@@ -65,4 +65,71 @@ export function minCoins(coins: number[], amount: number): number {
       href: "https://cp-algorithms.com/dynamic_programming/knapsack.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Find the fewest coins that make an exact amount, with unlimited coins of each denomination. Greedy works for real currencies and fails for arbitrary ones, which is the point of the exercise.",
+    entry: "minCoins",
+    starter: `/**
+ * @param {number[]} coins - denominations, each positive.
+ * @param {number} amount - target.
+ * @returns {number} fewest coins summing exactly to amount, or -1 if impossible.
+ */
+function minCoins(coins, amount) {
+  // Build up every amount from 0 to the target. Each one is 1 + the best way
+  // to make the remainder after taking some coin.
+}
+`,
+    tests: [
+      {
+        name: "simple case",
+        body: `assertEquals(solution([1, 2, 5], 11), 3);`,
+      },
+      {
+        name: "zero needs no coins",
+        body: `assertEquals(solution([1], 0), 0);`,
+      },
+      {
+        name: "impossible amount",
+        body: `assertEquals(solution([2], 3), -1);`,
+      },
+      {
+        name: "greedy would fail here",
+        body: `assertEquals(solution([1, 3, 4], 6), 2);`,
+      },
+      {
+        name: "exact single coin",
+        body: `assertEquals(solution([7], 7), 1);`,
+      },
+      {
+        name: "no coins at all",
+        body: `assertEquals(solution([], 5), -1);`,
+      },
+      {
+        name: "coins larger than the amount are ignored",
+        body: `assertEquals(solution([5, 100], 10), 2);`,
+      },
+      {
+        name: "handles a larger target",
+        body: `assertEquals(solution([1, 7, 13], 100), 10);`,
+      },
+    ],
+    hints: [
+      "Fill an array of size amount + 1 with Infinity, except index 0 which is 0.",
+      "For each amount, try every coin that fits and keep the smallest 1 + best[amount - coin].",
+      "Infinity at the end means the amount cannot be made, so return -1.",
+    ],
+    reference: `function minCoins(coins, amount) {
+  const best = new Array(amount + 1).fill(Infinity);
+  best[0] = 0; // zero coins make zero
+  for (let value = 1; value <= amount; value++) {
+    for (const coin of coins) {
+      if (coin > value) continue;
+      const candidate = best[value - coin] + 1;
+      if (candidate < best[value]) best[value] = candidate;
+    }
+  }
+  return best[amount] === Infinity ? -1 : best[amount];
+}
+`,
+  },
 };

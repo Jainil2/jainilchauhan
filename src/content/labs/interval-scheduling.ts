@@ -67,4 +67,77 @@ export function schedule(intervals: Interval[]): Interval[] {
       href: "https://www.cs.princeton.edu/~wayne/kleinberg-tardos/pdf/04GreedyAlgorithmsI.pdf",
     },
   ],
+  challenge: {
+    prompt:
+      "Find the fewest rooms needed to run every meeting. Unlike activity selection nothing is dropped here, so the answer is the largest number of meetings alive at any single moment — a sweep over start and end events.",
+    entry: "minRooms",
+    starter: `/**
+ * @param {Array<[number, number]>} meetings - [start, end], end exclusive.
+ * @returns {number} the fewest rooms that fit every meeting.
+ */
+function minRooms(meetings) {
+  // The answer is the peak overlap. Sweep the timeline counting starts up and
+  // ends down, and an end at time t must be processed before a start at t.
+}
+`,
+    tests: [
+      {
+        name: "non-overlapping needs one room",
+        body: `assertEquals(solution([[1, 2], [2, 3]]), 1);`,
+      },
+      {
+        name: "two overlapping need two",
+        body: `assertEquals(solution([[1, 5], [2, 3]]), 2);`,
+      },
+      {
+        name: "three at once need three",
+        body: `assertEquals(solution([[1, 9], [2, 8], [3, 7]]), 3);`,
+      },
+      {
+        name: "peak matters, not the total",
+        body: `assertEquals(solution([[1, 3], [2, 4], [5, 7], [6, 8]]), 2);`,
+      },
+      {
+        name: "no meetings",
+        body: `assertEquals(solution([]), 0);`,
+      },
+      {
+        name: "one meeting",
+        body: `assertEquals(solution([[0, 1]]), 1);`,
+      },
+      {
+        name: "touching meetings share a room",
+        body: `assertEquals(solution([[1, 2], [2, 3], [3, 4]]), 1);`,
+      },
+      {
+        name: "handles many meetings",
+        body: `var ms = [];
+for (var i = 0; i < 40000; i++) ms.push([0, i + 1]);
+assertEquals(solution(ms), 40000);`,
+      },
+    ],
+    hints: [
+      "Collect all start times and all end times into two sorted arrays.",
+      "Walk them together: advance the start pointer and increase the count, or advance the end pointer and decrease it.",
+      "Process an end before a start when they share a timestamp, or touching meetings will each demand a room.",
+    ],
+    reference: `function minRooms(meetings) {
+  const starts = meetings.map((m) => m[0]).sort((a, b) => a - b);
+  const ends = meetings.map((m) => m[1]).sort((a, b) => a - b);
+  let rooms = 0;
+  let peak = 0;
+  let e = 0;
+  for (let s = 0; s < starts.length; s++) {
+    // <= so a meeting ending at t frees its room for one starting at t.
+    while (e < ends.length && ends[e] <= starts[s]) {
+      rooms--;
+      e++;
+    }
+    rooms++;
+    if (rooms > peak) peak = rooms;
+  }
+  return peak;
+}
+`,
+  },
 };

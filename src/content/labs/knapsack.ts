@@ -67,4 +67,73 @@ export function knapsack(items: { w: number; v: number }[], cap: number): number
       href: "https://cp-algorithms.com/dynamic_programming/knapsack.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Choose items to maximise value without exceeding a weight budget, where each item is taken whole or not at all. The greedy value-per-weight choice is wrong here, which is exactly why the problem needs dynamic programming.",
+    entry: "knapsack",
+    starter: `/**
+ * @param {Array<[number, number]>} items - [weight, value] pairs.
+ * @param {number} capacity - total weight allowed.
+ * @returns {number} the best achievable total value.
+ */
+function knapsack(items, capacity) {
+  // For each item, the best answer is either 'skip it' or 'take it and solve
+  // the smaller budget'. Take the larger.
+}
+`,
+    tests: [
+      {
+        name: "takes the better single item",
+        body: `assertEquals(solution([[3, 4], [2, 3]], 3), 4);`,
+      },
+      {
+        name: "combines items to fill the budget",
+        body: `assertEquals(solution([[1, 1], [2, 6], [3, 10]], 5), 16);`,
+      },
+      {
+        name: "greedy by ratio would be wrong here",
+        body: `assertEquals(solution([[6, 7], [4, 5], [3, 4]], 7), 9);`,
+      },
+      {
+        name: "zero capacity holds nothing",
+        body: `assertEquals(solution([[1, 5]], 0), 0);`,
+      },
+      {
+        name: "no items",
+        body: `assertEquals(solution([], 10), 0);`,
+      },
+      {
+        name: "an item heavier than the budget is skipped",
+        body: `assertEquals(solution([[100, 99]], 10), 0);`,
+      },
+      {
+        name: "each item may be used only once",
+        body: `assertEquals(solution([[2, 5]], 10), 5);`,
+      },
+      {
+        name: "handles a larger instance",
+        body: `var items = [];
+for (var i = 1; i <= 120; i++) items.push([i % 20 + 1, (i % 13) + 1]);
+assert(solution(items, 200) > 0, 'expected a positive value');`,
+      },
+    ],
+    hints: [
+      "One row of best-value-per-capacity is enough if you handle the update order carefully.",
+      "With a single row, iterate capacity DOWNWARDS, or you will reuse the same item twice.",
+      "best[c] = max(best[c], best[c - weight] + value) for every capacity that fits the item.",
+    ],
+    reference: `function knapsack(items, capacity) {
+  const best = new Array(capacity + 1).fill(0);
+  for (const [weight, value] of items) {
+    // Downwards: an ascending sweep would let this item be taken more than
+    // once, which turns 0/1 knapsack into the unbounded version.
+    for (let c = capacity; c >= weight; c--) {
+      const candidate = best[c - weight] + value;
+      if (candidate > best[c]) best[c] = candidate;
+    }
+  }
+  return best[capacity];
+}
+`,
+  },
 };

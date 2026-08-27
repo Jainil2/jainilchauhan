@@ -77,4 +77,64 @@ function memoize<A extends unknown[], R>(fn: (...a: A) => R, key: (...a: A) => s
       href: "https://bazel.build/remote/caching",
     },
   ],
+  challenge: {
+    prompt:
+      "Compute Fibonacci numbers fast by remembering what you have already computed. The naive recursion recalculates the same subproblems exponentially many times; a cache turns that into one computation per value.",
+    entry: "fib",
+    starter: `/**
+ * @param {number} n - index, 0-based. fib(0) is 0, fib(1) is 1.
+ * @returns {number} the nth Fibonacci number.
+ */
+function fib(n) {
+  // Without memoisation this recomputes fib(30) over a million times.
+}
+`,
+    tests: [
+      {
+        name: "base cases",
+        body: `assertEquals(solution(0), 0);
+assertEquals(solution(1), 1);`,
+      },
+      {
+        name: "small values",
+        body: `assertEquals(solution(10), 55);`,
+      },
+      {
+        name: "a value the naive version chokes on",
+        body: `assertEquals(solution(40), 102334155);`,
+      },
+      {
+        name: "large index stays exact",
+        body: `assertEquals(solution(70), 190392490709135);`,
+      },
+      {
+        name: "repeated calls stay fast",
+        body: `for (var i = 0; i < 2000; i++) solution(60);
+assertEquals(solution(60), 1548008755920);`,
+      },
+      {
+        name: "consecutive values satisfy the recurrence",
+        body: `for (var n = 2; n < 30; n++) assertEquals(solution(n), solution(n - 1) + solution(n - 2));`,
+      },
+    ],
+    hints: [
+      "A plain object or Map keyed by n is enough of a cache.",
+      "Check the cache before recursing, and store the result before returning it.",
+      "An iterative bottom-up loop needs no cache at all — just the last two values.",
+    ],
+    reference: `function fib(n) {
+  if (n < 2) return n;
+  // Bottom-up: no recursion, no cache, and constant memory. The two previous
+  // values are the only state the recurrence actually needs.
+  let prev = 0;
+  let cur = 1;
+  for (let i = 2; i <= n; i++) {
+    const next = prev + cur;
+    prev = cur;
+    cur = next;
+  }
+  return cur;
+}
+`,
+  },
 };

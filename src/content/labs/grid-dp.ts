@@ -71,4 +71,79 @@ export function minPathCost(grid: number[][]): number {
       href: "https://cp-algorithms.com/dynamic_programming/intro-to-dp.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Count the distinct paths from the top-left of a grid to the bottom-right, moving only right or down, with some cells blocked. Each cell's count is just the sum of the cell above and the cell to the left — the whole problem collapses into that one line.",
+    entry: "countPaths",
+    starter: `/**
+ * @param {number[][]} grid - 0 is open, 1 is blocked.
+ * @returns {number} number of distinct paths. Zero if start or end is blocked.
+ */
+function countPaths(grid) {
+  // A blocked cell contributes nothing. The first row and column have exactly
+  // one way in until a block cuts them off.
+}
+`,
+    tests: [
+      {
+        name: "a 2x2 open grid",
+        body: `assertEquals(solution([[0, 0], [0, 0]]), 2);`,
+      },
+      {
+        name: "a 3x3 open grid",
+        body: `assertEquals(solution([[0, 0, 0], [0, 0, 0], [0, 0, 0]]), 6);`,
+      },
+      {
+        name: "a block removes routes",
+        body: `assertEquals(solution([[0, 0, 0], [0, 1, 0], [0, 0, 0]]), 2);`,
+      },
+      {
+        name: "a blocked start",
+        body: `assertEquals(solution([[1, 0], [0, 0]]), 0);`,
+      },
+      {
+        name: "a blocked finish",
+        body: `assertEquals(solution([[0, 0], [0, 1]]), 0);`,
+      },
+      {
+        name: "a single open cell",
+        body: `assertEquals(solution([[0]]), 1);`,
+      },
+      {
+        name: "a wall across the grid blocks everything",
+        body: `assertEquals(solution([[0, 0], [1, 1], [0, 0]]), 0);`,
+      },
+      {
+        name: "handles a larger grid",
+        body: `var g = [];
+for (var r = 0; r < 15; r++) { var row = []; for (var c = 0; c < 15; c++) row.push(0); g.push(row); }
+assertEquals(solution(g), 40116600);`,
+      },
+    ],
+    hints: [
+      "Make a counts grid the same shape, and set the start to 1 unless it is blocked.",
+      "For every other cell: 0 if blocked, otherwise the value above plus the value to the left, treating off-grid as 0.",
+      "One row of state is enough if you sweep left to right, but a full grid is easier to get right first.",
+    ],
+    reference: `function countPaths(grid) {
+  const rows = grid.length;
+  const cols = grid[0].length;
+  if (grid[0][0] === 1 || grid[rows - 1][cols - 1] === 1) return 0;
+
+  const ways = Array.from({ length: rows }, () => new Array(cols).fill(0));
+  ways[0][0] = 1;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (grid[r][c] === 1) {
+        ways[r][c] = 0; // a block has no routes through it
+        continue;
+      }
+      if (r > 0) ways[r][c] += ways[r - 1][c];
+      if (c > 0) ways[r][c] += ways[r][c - 1];
+    }
+  }
+  return ways[rows - 1][cols - 1];
+}
+`,
+  },
 };

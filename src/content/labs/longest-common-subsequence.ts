@@ -67,4 +67,74 @@ export function lcs(a: string[], b: string[]): number[][] {
     },
     { label: "Google — diff-match-patch", href: "https://github.com/google/diff-match-patch" },
   ],
+  challenge: {
+    prompt:
+      "Find the length of the longest subsequence common to two strings — characters in order, but not necessarily adjacent. This is the core of every diff tool, and it is why a diff can tell an insertion from a rewrite.",
+    entry: "lcsLength",
+    starter: `/**
+ * @param {string} a
+ * @param {string} b
+ * @returns {number} length of the longest common subsequence.
+ */
+function lcsLength(a, b) {
+  // When the two current characters match, both strings advance together.
+  // When they do not, take the better of advancing one or the other.
+}
+`,
+    tests: [
+      {
+        name: "classic example",
+        body: `assertEquals(solution('ABCBDAB', 'BDCABA'), 4);`,
+      },
+      {
+        name: "identical strings",
+        body: `assertEquals(solution('abc', 'abc'), 3);`,
+      },
+      {
+        name: "nothing in common",
+        body: `assertEquals(solution('abc', 'xyz'), 0);`,
+      },
+      {
+        name: "one empty string",
+        body: `assertEquals(solution('', 'abc'), 0);`,
+      },
+      {
+        name: "both empty",
+        body: `assertEquals(solution('', ''), 0);`,
+      },
+      {
+        name: "a subsequence need not be contiguous",
+        body: `assertEquals(solution('abcde', 'ace'), 3);`,
+      },
+      {
+        name: "repeated characters",
+        body: `assertEquals(solution('aaaa', 'aa'), 2);`,
+      },
+      {
+        name: "handles longer strings",
+        body: `var a = '', b = '';
+for (var i = 0; i < 600; i++) { a += 'ab'; b += 'ba'; }
+assert(solution(a, b) > 0, 'expected a positive length');`,
+      },
+    ],
+    hints: [
+      "A table of (a.length + 1) by (b.length + 1) with a zero border handles the empty cases for free.",
+      "On a match take the diagonal plus one; otherwise the maximum of the cell above and the cell to the left.",
+      "Two rows are enough if memory matters, since each row depends only on the previous one.",
+    ],
+    reference: `function lcsLength(a, b) {
+  // Two rows: each row depends only on the one before it.
+  let prev = new Array(b.length + 1).fill(0);
+  let cur = new Array(b.length + 1).fill(0);
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      // The diagonal is the state where BOTH strings advanced.
+      cur[j] = a[i - 1] === b[j - 1] ? prev[j - 1] + 1 : Math.max(prev[j], cur[j - 1]);
+    }
+    [prev, cur] = [cur, prev];
+  }
+  return prev[b.length];
+}
+`,
+  },
 };

@@ -70,4 +70,95 @@ const best = (root: Node) => Math.max(...Object.values(solve(root)));`,
       href: "https://react.dev/reference/react/Profiler",
     },
   ],
+  challenge: {
+    prompt:
+      "Pick a set of tree nodes with the largest total value where no two chosen nodes are adjacent. Every node has exactly two states — taken or not — and a child's best answer depends only on which state its parent chose.",
+    entry: "maxIndependentSet",
+    starter: `/**
+ * @param {number} n - nodes 0..n-1, rooted at 0.
+ * @param {Array<[number, number]>} edges - tree edges, undirected.
+ * @param {number[]} values - value of each node.
+ * @returns {number} the largest total value with no two chosen nodes adjacent.
+ */
+function maxIndependentSet(n, edges, values) {
+  // Per node compute two numbers: the best if it is taken, and the best if it
+  // is not. A taken node forces every child to be skipped.
+}
+`,
+    tests: [
+      {
+        name: "a single node is taken",
+        body: `assertEquals(solution(1, [], [5]), 5);`,
+      },
+      {
+        name: "a parent beats its children",
+        body: `assertEquals(solution(3, [[0, 1], [0, 2]], [10, 1, 1]), 10);`,
+      },
+      {
+        name: "children beat their parent",
+        body: `assertEquals(solution(3, [[0, 1], [0, 2]], [1, 5, 5]), 10);`,
+      },
+      {
+        name: "a chain skips the middle",
+        body: `assertEquals(solution(3, [[0, 1], [1, 2]], [4, 9, 4]), 9);`,
+      },
+      {
+        name: "a longer chain alternates",
+        body: `assertEquals(solution(4, [[0, 1], [1, 2], [2, 3]], [1, 1, 1, 1]), 2);`,
+      },
+      {
+        name: "grandchildren may join a taken root",
+        body: `assertEquals(solution(4, [[0, 1], [1, 2], [1, 3]], [5, 1, 5, 5]), 15);`,
+      },
+      {
+        name: "handles a deep tree without recursing too far",
+        body: `var edges = [];
+var values = [1];
+for (var i = 1; i < 20000; i++) { edges.push([i - 1, i]); values.push(1); }
+assertEquals(solution(20000, edges, values), 10000);`,
+      },
+    ],
+    hints: [
+      "Build an adjacency list and process children before parents — a post-order walk.",
+      "taken[v] = value[v] + sum of notTaken[child]; notTaken[v] = sum of max(taken[child], notTaken[child]).",
+      "A 20000-deep chain will overflow a recursive solution, so use an explicit stack or an iterative post-order.",
+    ],
+    reference: `function maxIndependentSet(n, edges, values) {
+  const adj = Array.from({ length: n }, () => []);
+  for (const [u, v] of edges) {
+    adj[u].push(v);
+    adj[v].push(u);
+  }
+
+  // Iterative post-order: a deep chain would blow a recursive stack.
+  const parent = new Array(n).fill(-1);
+  const order = [];
+  const stack = [0];
+  const seen = new Array(n).fill(false);
+  seen[0] = true;
+  while (stack.length) {
+    const node = stack.pop();
+    order.push(node);
+    for (const next of adj[node]) {
+      if (seen[next]) continue;
+      seen[next] = true;
+      parent[next] = node;
+      stack.push(next);
+    }
+  }
+
+  const taken = values.slice();
+  const skipped = new Array(n).fill(0);
+  // Reverse of a pre-order push sequence is a valid post-order.
+  for (let i = order.length - 1; i >= 0; i--) {
+    const node = order[i];
+    const p = parent[node];
+    if (p === -1) continue;
+    taken[p] += skipped[node]; // taking p forbids taking its children
+    skipped[p] += Math.max(taken[node], skipped[node]);
+  }
+  return Math.max(taken[0], skipped[0]);
+}
+`,
+  },
 };

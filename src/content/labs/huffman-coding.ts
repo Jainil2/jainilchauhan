@@ -77,4 +77,103 @@ export function huffman(freqs: Record<string, number>): Map<string, string> {
       href: "https://datatracker.ietf.org/doc/html/rfc1951",
     },
   ],
+  challenge: {
+    prompt:
+      "Compute the total number of bits an optimal prefix code needs for a given set of symbol frequencies. Return the total rather than the codes themselves, because ties can produce different trees but the total is always the same — which is what optimal means.",
+    entry: "totalBits",
+    starter: `/**
+ * @param {number[]} freqs - occurrence count per symbol, each positive.
+ * @returns {number} total bits to encode everything. A single distinct symbol
+ *   still needs one bit per occurrence.
+ */
+function totalBits(freqs) {
+  // Repeatedly merge the two smallest frequencies. Each merge's combined
+  // weight is exactly the bits that merge adds to the total.
+}
+`,
+    tests: [
+      {
+        name: "two equal symbols",
+        body: `assertEquals(solution([1, 1]), 2);`,
+      },
+      {
+        name: "classic example",
+        body: `assertEquals(solution([5, 9, 12, 13, 16, 45]), 224);`,
+      },
+      {
+        name: "a single symbol still needs a bit each",
+        body: `assertEquals(solution([7]), 7);`,
+      },
+      {
+        name: "no symbols",
+        body: `assertEquals(solution([]), 0);`,
+      },
+      {
+        name: "frequent symbols get shorter codes",
+        body: `assert(solution([100, 1, 1]) < solution([34, 34, 34]), 'skew should compress better');`,
+      },
+      {
+        name: "four equal symbols need two bits each",
+        body: `assertEquals(solution([1, 1, 1, 1]), 8);`,
+      },
+      {
+        name: "handles many symbols",
+        body: `var f = [];
+for (var i = 1; i <= 5000; i++) f.push(i);
+assert(solution(f) > 0, 'expected a positive bit count');`,
+      },
+    ],
+    hints: [
+      "Each merge of two weights adds their sum to the running total; that sum is the extra bit every symbol beneath gains.",
+      "A min-heap gives the two smallest weights in log n; sorting once and re-inserting also works.",
+      "The single-symbol case never merges, so handle it separately.",
+    ],
+    reference: `function totalBits(freqs) {
+  if (freqs.length === 0) return 0;
+  if (freqs.length === 1) return freqs[0]; // no merge happens, but 1 bit each
+
+  const heap = freqs.slice();
+  const up = (i) => {
+    while (i > 0) {
+      const p = (i - 1) >> 1;
+      if (heap[p] <= heap[i]) break;
+      [heap[p], heap[i]] = [heap[i], heap[p]];
+      i = p;
+    }
+  };
+  const down = (i) => {
+    for (;;) {
+      const l = 2 * i + 1;
+      const r = l + 1;
+      let small = i;
+      if (l < heap.length && heap[l] < heap[small]) small = l;
+      if (r < heap.length && heap[r] < heap[small]) small = r;
+      if (small === i) break;
+      [heap[small], heap[i]] = [heap[i], heap[small]];
+      i = small;
+    }
+  };
+  for (let i = (heap.length >> 1) - 1; i >= 0; i--) down(i);
+  const pop = () => {
+    const top = heap[0];
+    const last = heap.pop();
+    if (heap.length) {
+      heap[0] = last;
+      down(0);
+    }
+    return top;
+  };
+
+  let bits = 0;
+  while (heap.length > 1) {
+    const merged = pop() + pop();
+    // Every symbol under this merge gains one bit, and that is exactly 'merged'.
+    bits += merged;
+    heap.push(merged);
+    up(heap.length - 1);
+  }
+  return bits;
+}
+`,
+  },
 };

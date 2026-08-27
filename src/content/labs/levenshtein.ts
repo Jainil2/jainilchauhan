@@ -77,4 +77,79 @@ export function levenshtein(a: string, b: string): number {
       href: "https://link.springer.com/article/10.1007/s10032-002-0082-8",
     },
   ],
+  challenge: {
+    prompt:
+      "Compute the minimum number of single-character insertions, deletions and substitutions that turn one string into another. LLM evaluation harnesses use exactly this to score a generated answer against a reference without demanding an exact match.",
+    entry: "editDistance",
+    starter: `/**
+ * @param {string} a
+ * @param {string} b
+ * @returns {number} minimum single-character edits to turn a into b.
+ */
+function editDistance(a, b) {
+  // Three moves reach any cell: delete (from above), insert (from the left),
+  // and substitute (from the diagonal). Matching characters cost nothing.
+}
+`,
+    tests: [
+      {
+        name: "classic example",
+        body: `assertEquals(solution('kitten', 'sitting'), 3);`,
+      },
+      {
+        name: "identical strings",
+        body: `assertEquals(solution('abc', 'abc'), 0);`,
+      },
+      {
+        name: "one empty string costs its length",
+        body: `assertEquals(solution('', 'abc'), 3);
+assertEquals(solution('abc', ''), 3);`,
+      },
+      {
+        name: "both empty",
+        body: `assertEquals(solution('', ''), 0);`,
+      },
+      {
+        name: "a single substitution",
+        body: `assertEquals(solution('cat', 'bat'), 1);`,
+      },
+      {
+        name: "a single insertion",
+        body: `assertEquals(solution('cat', 'cart'), 1);`,
+      },
+      {
+        name: "symmetric in its arguments",
+        body: `assertEquals(solution('flaw', 'lawn'), solution('lawn', 'flaw'));`,
+      },
+      {
+        name: "handles longer strings",
+        body: `var a = '', b = '';
+for (var i = 0; i < 500; i++) { a += 'abc'; b += 'abd'; }
+assertEquals(solution(a, b), 500);`,
+      },
+    ],
+    hints: [
+      "The first row and column are just 0,1,2,... — the cost of deleting or inserting everything.",
+      "Cost is 0 on a character match and 1 otherwise; take the minimum of the three neighbours plus that cost.",
+      "Two rows suffice, but remember to save the diagonal value before you overwrite it.",
+    ],
+    reference: `function editDistance(a, b) {
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  const cur = new Array(b.length + 1).fill(0);
+  for (let i = 1; i <= a.length; i++) {
+    cur[0] = i; // deleting the first i characters of a
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      cur[j] = Math.min(
+        prev[j] + 1, // delete from a
+        cur[j - 1] + 1, // insert into a
+        prev[j - 1] + cost, // substitute, or free on a match
+      );
+    }
+    prev = cur.slice();
+  }
+  return prev[b.length];
+}
+`,
+  },
 };

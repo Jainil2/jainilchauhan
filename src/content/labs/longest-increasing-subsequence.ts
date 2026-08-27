@@ -69,4 +69,78 @@ export function lisLength(xs: number[]): number {
       href: "https://cp-algorithms.com/sequences/longest_increasing_subsequence.html",
     },
   ],
+  challenge: {
+    prompt:
+      "Find the length of the longest strictly increasing subsequence in n log n. The trick is that you never need the subsequence itself while searching — only the smallest possible tail for each achievable length.",
+    entry: "lisLength",
+    starter: `/**
+ * @param {number[]} xs
+ * @returns {number} length of the longest strictly increasing subsequence.
+ */
+function lisLength(xs) {
+  // Keep an array where tails[k] is the smallest value that can end an
+  // increasing subsequence of length k+1. It stays sorted, so you can binary
+  // search it.
+}
+`,
+    tests: [
+      {
+        name: "classic example",
+        body: `assertEquals(solution([10, 9, 2, 5, 3, 7, 101, 18]), 4);`,
+      },
+      {
+        name: "already increasing",
+        body: `assertEquals(solution([1, 2, 3]), 3);`,
+      },
+      {
+        name: "strictly decreasing",
+        body: `assertEquals(solution([3, 2, 1]), 1);`,
+      },
+      {
+        name: "duplicates do not extend a strict run",
+        body: `assertEquals(solution([2, 2, 2]), 1);`,
+      },
+      {
+        name: "empty input",
+        body: `assertEquals(solution([]), 0);`,
+      },
+      {
+        name: "single element",
+        body: `assertEquals(solution([5]), 1);`,
+      },
+      {
+        name: "handles negatives",
+        body: `assertEquals(solution([-5, -1, -3, 0]), 3);`,
+      },
+      {
+        name: "n log n on a large input",
+        body: `var xs = [];
+for (var i = 0; i < 100000; i++) xs.push((i * 7919) % 100000);
+assert(solution(xs) > 0, 'expected a positive length');`,
+      },
+    ],
+    hints: [
+      "Maintain a tails array; its length at the end is the answer.",
+      "For each value, binary search the first tail that is greater than or equal to it.",
+      "Replace that tail if one was found, otherwise append — replacing keeps future options as open as possible.",
+    ],
+    reference: `function lisLength(xs) {
+  const tails = []; // tails[k] = smallest possible tail of a length k+1 run
+  for (const v of xs) {
+    // First tail >= v. Using >= keeps the subsequence strictly increasing.
+    let lo = 0;
+    let hi = tails.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (tails[mid] < v) lo = mid + 1;
+      else hi = mid;
+    }
+    // Replacing rather than appending keeps later options as open as possible.
+    if (lo === tails.length) tails.push(v);
+    else tails[lo] = v;
+  }
+  return tails.length;
+}
+`,
+  },
 };
