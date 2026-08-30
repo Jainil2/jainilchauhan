@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { bridgeEdges, labSummaries } from "@/content/labs.gen";
-import { bridgesInto, bridgesOutOf, prerequisitesOf } from "./bridges";
+import {
+  MAX_NEXT_STEPS,
+  bridgesInto,
+  bridgesOutOf,
+  nextSteps,
+  prerequisitesOf,
+  startingPoints,
+} from "./bridges";
 
 const slugs = new Set(labSummaries.map((l) => l.slug));
 
@@ -103,5 +110,99 @@ describe("bridgesInto / bridgesOutOf", () => {
     for (const [target, expected] of byTarget) {
       expect(bridgesInto(target).map((b) => b.from)).toEqual(expected);
     }
+  });
+});
+
+/**
+ * The "next three" is the product, so these guard the two rules that make it
+ * one: never more than three, and never a step the visitor has already taken.
+ */
+describe("nextSteps", () => {
+  const anyTarget = bridgeEdges[0].to;
+  const itsSources = prerequisitesOf(anyTarget);
+
+  it("never returns more than three, whatever it is asked for", () => {
+    expect(nextSteps(new Set()).length).toBeLessThanOrEqual(MAX_NEXT_STEPS);
+    expect(nextSteps(new Set(), 99).length).toBeLessThanOrEqual(99);
+    // The component caps too, but the default is the one the UI relies on.
+    expect(MAX_NEXT_STEPS).toBe(3);
+  });
+
+  it("never suggests a lab that is already placed", () => {
+    const placed = new Set(bridgeEdges.map((e) => e.to));
+    expect(nextSteps(placed)).toEqual([]);
+  });
+
+  it("ranks a fully unlocked lab above a partly unlocked one", () => {
+    const placed = new Set(itsSources);
+    const [first] = nextSteps(placed);
+    expect(first.lab.slug).toBe(anyTarget);
+    expect(first.unmet).toEqual([]);
+  });
+
+  it("reports exactly the prerequisites that are still missing", () => {
+    const [firstSource, ...rest] = itsSources;
+    const step = nextSteps(new Set([firstSource]), 99).find((s) => s.lab.slug === anyTarget);
+    expect(step?.unmet.map((l) => l.slug)).toEqual(rest);
+  });
+
+  it("moves a lab from near-ready to ready when its last prerequisite is placed", () => {
+    const before = nextSteps(new Set(itsSources.slice(1)), 99).find(
+      (s) => s.lab.slug === anyTarget,
+    );
+    const after = nextSteps(new Set(itsSources), 99).find((s) => s.lab.slug === anyTarget);
+    expect(before?.unmet.length).toBe(1);
+    expect(after?.unmet.length).toBe(0);
+  });
+
+  it("takes its reframe from a lab the visitor has actually placed", () => {
+    const placed = new Set(itsSources);
+    const step = nextSteps(placed, 99).find((s) => s.lab.slug === anyTarget);
+    expect(step?.reason).toBe(bridgesInto(anyTarget)[0].sameness);
+  });
+
+  it("gives no reframe when nothing it bridges from has been placed", () => {
+    // Claiming "this IS the thing you already built" about a lab they have
+    // not done is the one sentence this surface must never print.
+    for (const step of nextSteps(new Set(), 99)) {
+      expect(step.reason).toBe("");
+    }
+  });
+
+  it("is deterministic, so the server and client renders agree", () => {
+    const placed = new Set(itsSources);
+    expect(nextSteps(placed).map((s) => s.lab.slug)).toEqual(
+      nextSteps(placed).map((s) => s.lab.slug),
+    );
+  });
+
+  it("returns nothing for a limit of zero", () => {
+    expect(nextSteps(new Set(), 0)).toEqual([]);
+  });
+});
+
+describe("startingPoints", () => {
+  it("offers only prerequisites, never the AI labs they unlock", () => {
+    const sources = new Set(bridgeEdges.map((e) => e.from));
+    for (const lab of startingPoints(new Set(), 99)) {
+      expect(sources.has(lab.slug), `${lab.slug} is not a bridge source`).toBe(true);
+    }
+  });
+
+  it("never offers something already placed", () => {
+    const placed = new Set(bridgeEdges.map((e) => e.from));
+    expect(startingPoints(placed, 99)).toEqual([]);
+  });
+
+  it("puts the prerequisite that unlocks the most first", () => {
+    const unlocks = new Map<string, number>();
+    for (const e of bridgeEdges) unlocks.set(e.from, (unlocks.get(e.from) ?? 0) + 1);
+    const [first] = startingPoints(new Set(), 99);
+    const best = Math.max(...unlocks.values());
+    expect(unlocks.get(first.slug)).toBe(best);
+  });
+
+  it("caps at three by default", () => {
+    expect(startingPoints(new Set()).length).toBeLessThanOrEqual(MAX_NEXT_STEPS);
   });
 });

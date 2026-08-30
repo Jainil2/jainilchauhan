@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { ArrowLeft, Beaker, CheckCircle2, Clock, Gauge } from "lucide-react";
 import { LAB_CATEGORIES, labSummaries, type LabCategory } from "@/content/labs";
+import { NextThree } from "@/components/bridge/NextThree";
 import { useKnowledge } from "@/lib/useKnowledge";
 
 export const Route = createFileRoute("/lab")({
@@ -94,6 +95,13 @@ function LabIndex() {
           explainer, reference implementation, production usage at named companies, pitfalls, and
           references.
         </p>
+
+        {/*
+         * Above the grid on purpose. The grid is 108 cards of things you have
+         * not done; this is the answer to "what next", and it has to arrive
+         * before the wall rather than under it.
+         */}
+        <NextThree />
 
         {/* Category filter */}
         <div className="mt-6 flex flex-wrap items-center gap-2 font-mono text-xs">
