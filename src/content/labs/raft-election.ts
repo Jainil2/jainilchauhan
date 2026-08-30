@@ -11,6 +11,15 @@ export const lab: LabMeta = {
     "Click the leader to crash it. Followers time out, vote, and elect a new leader with animated RequestVote RPCs.",
   whereUsed: { label: "Distributed coordination work", href: "/#experience" },
   skillTags: ["Distributed Systems", "System Design"],
+  bridgesFrom: [
+    {
+      slug: "quickselect",
+      sameness:
+        "Deciding what is committed IS a selection problem. Take each follower's replicated index, and the commit point is the k-th largest where k is the majority size — the same order statistic you computed without sorting the whole array.",
+      delta:
+        "The array is a moving target: values only ever rise, arrive asynchronously, and some entries never arrive at all, so the answer is recomputed every round rather than once. A wrong k-th element is no longer a wrong percentile but a lost acknowledged write, which is why the raw order statistic is not enough — a leader may only commit entries from its own term, so entries from earlier terms must be excluded before selecting, even when a majority already holds them.",
+    },
+  ],
   concept:
     "Raft is a consensus algorithm designed to be understandable. A cluster of nodes elects exactly one leader; all writes flow through that leader and are replicated to followers via AppendEntries RPCs. If the leader fails, followers detect the missing heartbeat (election timeout, randomized 150–300ms), increment their term, and call RequestVote.\n\nA candidate wins if it collects votes from a majority — that's why odd cluster sizes are standard (3, 5, 7). Once elected, the leader pushes its log to followers; conflicting entries are overwritten. The 'commit' point is the highest log index replicated on a majority.\n\nRaft cleanly separates leader election, log replication, and safety, making it the consensus algorithm of choice for etcd, Consul, CockroachDB, and TiKV.",
   complexity: [

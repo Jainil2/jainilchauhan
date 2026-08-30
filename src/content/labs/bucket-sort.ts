@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Map normalized values into ranges. Bucket sort is powerful when input is roughly uniformly distributed.",
   skillTags: ["DSA", "Algorithms"],
+  bridgesFrom: [
+    {
+      slug: "counting-sort",
+      sameness:
+        "It IS counting sort with wider slots. Map each value to a slot by arithmetic, drop it in, then read the slots out in order — the same no-comparisons distribution step, with each slot covering a range of values rather than exactly one.",
+      delta:
+        "Because a slot now holds several distinct values, it needs sorting internally before concatenation, which is what makes this work on floats and on ranges too wide to count. The linear-time claim quietly acquires a condition: it holds only if the input is spread evenly across the buckets. Skewed data piles everything into one bucket and the runtime degrades to whatever sort runs inside it, so this is the rare algorithm whose complexity depends on the distribution rather than the size.",
+    },
+  ],
   concept:
     "Bucket sort partitions input into value ranges, sorts each bucket, then concatenates buckets in order. If values are uniformly distributed and bucket counts stay small, the result is close to linear time.\n\nIt is a distribution sort: performance depends less on comparisons and more on how evenly the bucket function spreads data.",
   complexity: [

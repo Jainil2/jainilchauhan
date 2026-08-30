@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Consider edges in ascending weight order. Union-Find accepts edges that connect different components and rejects cycle-forming edges.",
   skillTags: ["DSA", "Graphs"],
+  bridgesFrom: [
+    {
+      slug: "disjoint-set-union",
+      sameness:
+        "It IS union-find with a sort in front. Walk the edges from cheapest to most expensive, and take an edge exactly when its endpoints have different roots — the find tells you whether the edge would close a cycle, and the union records that you took it.",
+      delta:
+        "That is the entire algorithm; the greedy correctness is doing no work that union-find is not already doing. Cost is O(E log E) dominated by the sort, since the union-find part is effectively linear, and it means Kruskal never needs the graph to be connected: run out of edges early and what you have is a minimum spanning forest, one tree per component, with no special handling.",
+    },
+  ],
   concept:
     "Kruskal's algorithm sorts all edges by weight, then scans from cheapest to most expensive. An edge is accepted only if it connects two different components; otherwise it would create a cycle. Union-Find makes the component test fast.\n\nKruskal is especially clean when edges are already available as a list or when the graph is sparse.",
   complexity: [

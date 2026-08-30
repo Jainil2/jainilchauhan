@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Count 10 million unique items using only 1.5KB of memory. Watch the 'buckets' record the maximum number of leading zeros in hashed values to estimate cardinality with a ~1% error rate. Space-efficiency at its peak.",
   skillTags: ["DSA", "System Design", "Big Data"],
+  bridgesFrom: [
+    {
+      slug: "bloom-filter",
+      sameness:
+        "It IS the same trick as a bloom filter: hash the element, use the hash bits to touch a tiny fixed-size sketch, never store the element itself, and accept a wrong answer in exchange for constant memory.",
+      delta:
+        "What the bits mean changes, and so does the shape of the error. A bloom filter records that a slot was hit; HyperLogLog records the longest run of leading zeros seen, because a rare hash pattern implies many distinct inputs. The result is an estimate of cardinality with a relative error rather than a one-sided guarantee, so unlike the bloom filter there is no answer it can give you with certainty — it can be high or low, and the only knob is how many registers you are willing to pay for.",
+    },
+  ],
   concept:
     "HyperLogLog (HLL) is a probabilistic algorithm used to estimate the number of unique elements (cardinality) in a set. While a Set would require memory proportional to the number of elements, HLL can estimate a cardinality of billions using less than 2KB of memory.\n\nIt works by hashing every incoming item and looking at the number of leading zeros in the binary hash. If you see a hash with 10 leading zeros, it's statistically likely that you've seen ~2^10 items. HLL averages these observations across thousands of 'buckets' to produce a highly accurate estimate.\n\nThe trade-off is a small, predictable error rate (usually 0.81% for 16,384 buckets).",
   complexity: [

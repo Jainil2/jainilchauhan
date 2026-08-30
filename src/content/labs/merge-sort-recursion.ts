@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Split down to singletons, then merge back into sorted order. Merge sort is the canonical divide-and-conquer algorithm.",
   skillTags: ["DSA", "Divide and Conquer"],
+  bridgesFrom: [
+    {
+      slug: "sorting-race",
+      sameness:
+        "It IS the merge sort you already watched run in the race — split in half, sort each half, merge the two sorted halves. This lab just opens the recursion up so you can see the calls.",
+      delta:
+        "Watching the recursion is what makes the O(n log n) stop being a fact you memorised: there are log n levels, each does O(n) work merging, and neither depends on the input's arrangement, which is why merge sort has no bad case. It also exposes the cost the race hides — merging needs somewhere to put the output, so this is the one contestant that is not in place, and that O(n) extra buffer is precisely what makes it the algorithm that survives when the data no longer fits in memory.",
+    },
+  ],
   concept:
     "Merge sort divides an array into halves until each piece has one element, then merges sorted halves back together. The divide phase creates log n levels, and each level performs O(n) total merge work.\n\nIt guarantees O(n log n), is stable, and adapts well to linked lists and external sorting because merging is sequential.",
   complexity: [

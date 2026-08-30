@@ -9,6 +9,15 @@ export const lab: LabMeta = {
   blurb: "Choose multiplication order that minimizes scalar operations.",
   caption: "Compare two parenthesizations with the same result but very different costs.",
   skillTags: ["DSA", "Dynamic Programming"],
+  bridgesFrom: [
+    {
+      slug: "grid-dp",
+      sameness:
+        "It IS a DP table indexed by two coordinates, filled from smaller answers to larger ones, exactly as you filled the grid.",
+      delta:
+        "A cell here means a subrange i to j, and it does not depend on its immediate neighbours but on every way of splitting that range in two. So the fill order becomes by increasing interval length rather than row by row, and each cell costs O(n) to evaluate instead of O(1) — the total goes to O(n cubed). This is the shape of every interval DP, and the thing it teaches is that the expensive part was never the multiplication itself but choosing the order, which changes the scalar operation count by orders of magnitude without changing the result at all.",
+    },
+  ],
   concept:
     "Matrix multiplication is associative, so A(BC) and (AB)C produce the same final matrix, but the number of scalar operations can be wildly different. Matrix-chain DP tries every split k between i and j, combining the best left cost, best right cost, and multiplication cost.\n\nThis is interval DP: solve smaller ranges, then compose larger ranges.",
   complexity: [{ operation: "Optimal parenthesization", time: "O(n^3)", space: "O(n^2)" }],

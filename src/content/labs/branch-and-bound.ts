@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Expand the best bound and prune branches that cannot beat the incumbent. This is exhaustive search with math-guided cuts.",
   skillTags: ["DSA", "Optimization"],
+  bridgesFrom: [
+    {
+      slug: "n-queens",
+      sameness:
+        "It IS the same backtracking search. A DFS over partial solutions, extending one choice at a time and abandoning a branch the moment it is shown to be useless.",
+      delta:
+        "N-Queens prunes on feasibility — a branch dies because it cannot be completed at all. Here branches are all feasible, so pruning has to be on optimality: compute an optimistic bound on the best that branch could still achieve, and cut it when that cannot beat the best complete solution found so far. Two consequences follow. Finding a good solution early makes everything after it faster, so the exploration order becomes a performance decision, and a bound that is not genuinely optimistic prunes the optimum away and reports a wrong answer with total confidence.",
+    },
+  ],
   concept:
     "Branch and bound solves optimization problems by branching over decisions and computing a bound on the best possible result inside each branch. If a branch cannot beat the current best solution, it is pruned.\n\nThe quality of the bound determines performance. Strong bounds prune aggressively; weak bounds degrade toward brute force.",
   complexity: [

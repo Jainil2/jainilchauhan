@@ -10,6 +10,22 @@ export const lab: LabMeta = {
   caption:
     "Click cells to drop walls. Run Dijkstra and watch the visited frontier expand before the shortest path lights up.",
   skillTags: ["DSA"],
+  bridgesFrom: [
+    {
+      slug: "graph-traversal",
+      sameness:
+        "It IS breadth-first search. Same frontier, same visited set, same expand-the-nearest-first shape — and on a graph where every edge has weight 1, Dijkstra and BFS visit the vertices in exactly the same order.",
+      delta:
+        "The frontier is ordered by accumulated distance instead of by arrival, which is the only change. It buys correct shortest paths on weighted edges, and it costs the flat O(V + E): the frontier now needs a priority queue, making it O(E log V). It also introduces an assumption BFS never had — distances must never decrease, so a single negative edge makes the greedy finalisation wrong.",
+    },
+    {
+      slug: "heap-priority-queue",
+      sameness:
+        "The frontier IS the priority queue you built. Push each discovered vertex keyed by its tentative distance, pop the smallest, and the popped vertex's distance is final.",
+      delta:
+        "The complication is that distances improve after a vertex is already in the queue, and a binary heap cannot cheaply find and update an entry. Practical implementations therefore push a duplicate with the better key and ignore stale pops by checking against the recorded distance — the queue can hold more entries than the graph has vertices, and forgetting the staleness check is the classic bug that produces plausible but wrong paths.",
+    },
+  ],
   concept:
     "Dijkstra's algorithm finds the shortest path from a source to every other node in a graph with non-negative edge weights. It maintains a priority queue of (distance, node) and repeatedly pops the closest unvisited node, relaxing edges to its neighbors.\n\nWith a binary-heap priority queue: O((V + E) log V). With a Fibonacci heap: O(E + V log V), but constants make binary heaps faster in practice.\n\nFor maps and games where you have a heuristic (e.g. Euclidean distance to the goal), A* — Dijkstra plus an admissible heuristic — explores far fewer nodes. For negative edges, use Bellman-Ford. For all-pairs, use Floyd-Warshall.",
   complexity: [{ operation: "Single-source", time: "O((V + E) log V)", space: "O(V)" }],

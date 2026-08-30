@@ -10,6 +10,22 @@ export const lab: LabMeta = {
   caption:
     "See the web through Google's original lens. Watch 'authority' flow between nodes via links. Adjust the damping factor and watch how the most connected and influential pages rise to the top of the rankings.",
   skillTags: ["Algorithms", "Graphs", "Data Science"],
+  bridgesFrom: [
+    {
+      slug: "graph-traversal",
+      sameness:
+        "It IS a walk over the graph. Start at a node, follow an outgoing edge, repeat — the same neighbour iteration as BFS, with the next step chosen at random rather than from a queue.",
+      delta:
+        "The walk never ends and never marks anything visited. Each node holds a probability instead of a boolean, and the answer is where that distribution settles after many steps, so there is no termination condition, only a convergence threshold. The walk's failure modes need patching too: a node with no outgoing links traps the surfer and a disconnected region is unreachable, which is exactly what the damping factor's random jump repairs.",
+    },
+    {
+      slug: "sparse-matrix",
+      sameness:
+        "One iteration IS a sparse matrix-vector multiply. The link structure is a matrix with a non-zero wherever a link exists, the ranks are a vector, and the update multiplies one by the other.",
+      delta:
+        "The web's link matrix is almost entirely zeros, so the dense form would be billions squared and the sparse form is merely billions — the algorithm is only computable because the representation refuses to store what is not there. Cost per iteration is O(E), not O(V squared), and the whole computation becomes a handful of passes over an edge list, which is why it parallelises across machines so cleanly.",
+    },
+  ],
   concept:
     "PageRank is the algorithm that launched Google. it measures the importance of website pages by treating links as votes. A page is important if many other pages link to it, especially if those linking pages are themselves important.\n\nIt works via a 'random surfer' model: a user clicks random links, and occasionally jumps to a random page (the **Damping Factor**, usually 0.85). The PageRank of a node is the probability that the surfer ends up there after many steps.\n\nMathematically, it's an eigenvector problem: we repeatedly multiply a probability vector by a transition matrix until it converges.",
   complexity: [

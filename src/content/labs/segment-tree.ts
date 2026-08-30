@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Select ranges and compute sums from covered intervals. Segment trees trade memory for fast range aggregation.",
   skillTags: ["DSA", "Algorithms"],
+  bridgesFrom: [
+    {
+      slug: "binary-tree",
+      sameness:
+        "It IS a binary tree over the array's index range. The root covers the whole array, each node splits its range in half for its two children, and the leaves are the individual elements.",
+      delta:
+        "Every internal node caches an aggregate — sum, min, max — over its range, which turns a range query into a walk that stops as soon as a node's range is fully contained. A point update invalidates exactly one root-to-leaf path, so writes stay O(log n) instead of the O(1) an array gives you, and that is the trade: you make every write slightly more expensive so that no read is ever a full scan.",
+    },
+  ],
   concept:
     "A segment tree recursively partitions an array into intervals. Each tree node stores an aggregate for its interval, such as sum, min, max, gcd, or a custom merge value. Range queries combine only the nodes that fully cover the requested interval.\n\nPoint updates update one leaf and recompute ancestors. Lazy propagation extends the structure to range updates by deferring work until a child interval is needed.",
   complexity: [

@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Adjust producer and consumer rates, then compare buffering, dropping, and throttling policies. Watch queue growth expose overload.",
   skillTags: ["Distributed Systems", "Streaming", "Backend"],
+  bridgesFrom: [
+    {
+      slug: "circular-buffer",
+      sameness:
+        "It IS the bounded buffer you already built. A producer writes at one index, a consumer reads at another, the capacity is fixed, and the entire design question is what happens the moment the writer catches the reader — reject, block, or overwrite. Those are still the only three answers.",
+      delta:
+        "The producer is now on another machine and cannot see the indexes, so 'full' has to travel back to it as a signal: a slower acknowledgement, a paused TCP window, a 429. Nothing enforces the bound for you either, so an unbounded queue silently substitutes memory and latency for the rejection you did not write, and the collapse arrives as an out-of-memory kill rather than a full-buffer error.",
+    },
+  ],
   concept:
     "Backpressure is the signal that a downstream component cannot keep up. Without it, queues grow until latency explodes or memory is exhausted. Systems respond by buffering, dropping low-value work, slowing producers, applying rate limits, or splitting load across more consumers.\n\nGood backpressure is explicit and measurable: queue depth, lag, max in-flight requests, bounded buffers, deadlines, and rejection rates. It changes overload from hidden collapse into a controlled product decision.",
   complexity: [

@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Highlight each component. DFS or BFS marks all nodes reachable from a start node before moving to the next unvisited node.",
   skillTags: ["DSA", "Graphs"],
+  bridgesFrom: [
+    {
+      slug: "graph-traversal",
+      sameness:
+        "It IS the traversal you already wrote. Run BFS or DFS from a vertex and it marks exactly one component; the only addition is an outer loop that starts a fresh traversal from every vertex still unvisited.",
+      delta:
+        "The shared visited set is what keeps the total cost at O(V + E) rather than O(V) traversals: every vertex and edge is touched once across the whole run, no matter how many components there are. It also reframes the traversal's output — you stop caring about the order vertices were reached in and start caring only about which run reached them, which is the first time the traversal is used as a labelling rather than as a search.",
+    },
+  ],
   concept:
     "A connected component is a maximal group of nodes where every node can reach every other node through undirected edges. To find all components, iterate over vertices; whenever a vertex is unvisited, start DFS or BFS and mark the entire reachable group.\n\nConnected components answer whether a graph is split into islands. They are also the foundation for clustering, image regions, account merging, and graph cleanup.",
   complexity: [

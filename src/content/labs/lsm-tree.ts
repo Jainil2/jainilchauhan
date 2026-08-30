@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Experience the high-throughput engine behind NoSQL. Watch as writes are buffered in a MemTable, flushed to immutable SSTables, and eventually merged through background compaction. Fast writes, at the cost of background I/O.",
   skillTags: ["DSA", "System Design", "Databases"],
+  bridgesFrom: [
+    {
+      slug: "external-merge-sort",
+      sameness:
+        "Compaction IS external merge sort. Sorted runs too large for memory, merged k at a time into bigger sorted runs by taking the smallest head element — the same algorithm, running forever instead of once.",
+      delta:
+        "The sort is never finished, which is the entire design. Writes land in a memory buffer that is flushed as a new small sorted run, so a write costs a sequential append rather than a random in-place update, and the merge runs in the background to keep the number of runs bounded. That moves the cost to reads, which may have to check several runs, and creates the trade every LSM engine tunes: compact aggressively for read speed and pay write amplification, or compact lazily and let reads fan out.",
+    },
+  ],
   concept:
     "Log-Structured Merge-Trees (LSM Trees) are the data structure of choice for write-heavy workloads. Unlike B-Trees, which perform random-access updates, LSM Trees turn all writes into sequential I/O.\n\n1. Writes hit an in-memory **MemTable** (usually a Skip List).\n2. When full, the MemTable is flushed to disk as an immutable **SSTable** (Sorted String Table).\n3. Over time, many SSTables accumulate. A background **Compaction** process merges them, removing deleted or overwritten keys and keeping the total number of files manageable.\n\nThis architecture provides massive write throughput but introduces 'Read Amplification' (checking multiple files) and 'Write Amplification' (re-writing data during compaction).",
   complexity: [

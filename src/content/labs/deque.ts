@@ -10,6 +10,22 @@ export const lab: LabMeta = {
   caption:
     "Push and pop from either side. Deques combine stack-like and queue-like behavior without shifting the whole collection.",
   skillTags: ["DSA", "Algorithms"],
+  bridgesFrom: [
+    {
+      slug: "queue",
+      sameness:
+        "It IS a queue. Push at one end, pop from the other, FIFO — use only pushBack and popFront and a deque is indistinguishable from the queue you already have.",
+      delta:
+        "Both ends now accept both operations, which costs nothing asymptotically but rules out the simplest implementations: a singly linked list cannot pop from the tail in O(1), so a deque needs a doubly linked list or a ring buffer underneath. In exchange you get sliding-window algorithms, where the ability to discard from the back is what keeps the window monotonic and the whole scan O(n).",
+    },
+    {
+      slug: "stack",
+      sameness:
+        "It IS also a stack. Restrict yourself to pushBack and popBack and you have LIFO with the same semantics as the stack you already built.",
+      delta:
+        "Being both at once is the point: one structure can back a stack, a queue, or a work-stealing scheduler where the owner pops one end and thieves steal from the other. That flexibility removes the type-level guarantee — a stack cannot be accidentally read FIFO, a deque can, so the discipline moves from the structure into your code.",
+    },
+  ],
   concept:
     "A deque, or double-ended queue, supports insertion and removal at both front and back. Implementations usually use a linked block list or circular array so both ends are O(1).\n\nDeques are useful when algorithms need both ends: sliding-window maximum keeps candidate values in monotonic order, work-stealing schedulers pop local work from one end and steal from the other, and editors use deques for history buffers.",
   complexity: [

@@ -10,6 +10,22 @@ export const lab: LabMeta = {
   caption:
     "Move n and watch solved Fibonacci values stay cached. Memoization is top-down dynamic programming.",
   skillTags: ["DSA", "Dynamic Programming"],
+  bridgesFrom: [
+    {
+      slug: "hash-table",
+      sameness:
+        "The memo IS a hash table sitting in front of a pure function. Key is the argument, value is the result, and the lookup is the same average O(1) get you already implemented.",
+      delta:
+        "What changes is what the cache is worth. A cache normally saves latency; here it saves a complexity class, because the naive recursion recomputes the same subproblems exponentially many times and the table collapses that to one evaluation each — exponential to linear. That only works if the function is deterministic and side-effect free, which is why memoisation is a property of the function as much as of the table.",
+    },
+    {
+      slug: "lru-cache",
+      sameness:
+        "It IS a cache: same map from a computed key to a computed value, same hit-or-compute path on every call.",
+      delta:
+        "This one never evicts, and that is not laziness. Every entry may be needed again by a caller further up the recursion, so dropping a subproblem does not cost one recomputation — it costs the entire exponential subtree beneath it. A memo table with an LRU policy can be arbitrarily slower than one without, which is the inverse of the usual trade-off and the reason memo tables are bounded by the problem size rather than by a capacity you choose.",
+    },
+  ],
   concept:
     "Naive Fibonacci recursion recomputes the same subproblems many times. Memoization stores each solved F(n), so later calls return immediately. This changes the runtime from exponential to linear.\n\nThis is the core dynamic programming move: identify overlapping subproblems, define a recurrence, cache results, and reuse them.",
   complexity: [

@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Toggle include/exclude root. Tree DP often computes states like take-this-node vs skip-this-node.",
   skillTags: ["DSA", "Dynamic Programming", "Trees"],
+  bridgesFrom: [
+    {
+      slug: "grid-dp",
+      sameness:
+        "It IS the same dynamic programming. Each subproblem solved once, each answer assembled from the answers of smaller subproblems, and a table keyed by whatever identifies a subproblem — here a node instead of a cell.",
+      delta:
+        "A grid hands you the fill order for free; a tree does not, so the traversal supplies it — a post-order DFS guarantees every child is solved before its parent. And each node returns several answers rather than one, typically the best with this node taken and the best without, because the parent's decision constrains what the child is allowed to do. That tuple is the whole technique: collapse it to a single number and there is no way for a parent to know which of its children's answers are still compatible with its own choice.",
+    },
+  ],
   concept:
     "Tree DP solves recursive problems where each node combines answers from children. Many problems return multiple states per node. For example, maximum independent set returns include-node and exclude-node: including a node excludes children, while excluding it allows each child to choose its best state.\n\nBecause trees have no cycles, postorder traversal naturally solves children before parents.",
   complexity: [{ operation: "Postorder DP", time: "O(n)", space: "O(h)" }],

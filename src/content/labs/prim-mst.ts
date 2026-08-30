@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Add the cheapest edge crossing from the visited set to the unvisited set. Prim keeps one growing connected tree.",
   skillTags: ["DSA", "Graphs"],
+  bridgesFrom: [
+    {
+      slug: "dijkstra",
+      sameness:
+        "It IS Dijkstra with one expression changed. Same frontier in a priority queue, same pop-the-cheapest-and-expand loop, same visited set — only the key differs: the weight of the single edge crossing the frontier, rather than the total distance from the source.",
+      delta:
+        "Because the key does not accumulate, the tree it grows minimises total edge weight instead of per-node distance. The consequence trips people up: the path between two vertices inside a minimum spanning tree can be far longer than their shortest path, so an MST is not a routing table. The starting vertex also stops mattering — every start yields a tree of the same total weight, where Dijkstra's answer is defined entirely by its source.",
+    },
+  ],
   concept:
     "Prim's algorithm finds a minimum spanning tree of a connected weighted undirected graph. It starts from any node, maintains a visited set, and repeatedly chooses the cheapest edge that connects visited to unvisited nodes.\n\nWith a priority queue, Prim is efficient on sparse graphs. It is a natural fit when the graph is already represented by adjacency lists and you want to grow from a known starting point.",
   complexity: [

@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Write and read through a fixed ring. Head and tail wrap with modulo arithmetic so no element shifting is required.",
   skillTags: ["DSA", "Streaming", "Systems"],
+  bridgesFrom: [
+    {
+      slug: "queue",
+      sameness:
+        "It IS a queue. Push at the tail, pop from the head, strict FIFO order — the interface and the guarantees are unchanged from the queue you already built.",
+      delta:
+        "The backing array is fixed and the indices wrap with a modulo instead of growing, so the structure can never allocate at runtime. That predictability is why audio, network and logging paths use it, and the cost is that full is now a real state: a producer that outruns the consumer must block, drop the newest, or overwrite the oldest. An unbounded queue turns overload into memory exhaustion; this turns it into a decision you have to make explicitly.",
+    },
+  ],
   concept:
     "A circular buffer stores data in a fixed-size array with head and tail indexes that wrap around. Writing advances tail; reading advances head. When full, the buffer either rejects writes, blocks, or overwrites old data depending on policy.\n\nThis design gives predictable memory usage and O(1) operations, which is why it appears in audio pipelines, network drivers, log buffers, embedded systems, and streaming queues.",
   complexity: [

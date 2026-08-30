@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Increase downstream failure rate and call the service. After repeated failures, the breaker opens, blocks requests, and probes with half-open recovery.",
   skillTags: ["Distributed Systems", "Resilience", "Backend"],
+  bridgesFrom: [
+    {
+      slug: "rate-limiter",
+      sameness:
+        "It IS admission control in front of a call: count events in a recent window, compare against a threshold, and reject before doing any work. The failure counter is the same sliding window you implemented, and the open state is the same immediate rejection.",
+      delta:
+        "The threshold is derived from the callee's observed health rather than fixed by policy, so the limiter tightens itself — and it must then decide when to loosen again, which is what half-open is for. That adds a failure a rate limiter cannot have: a breaker that never probes starves a dependency that recovered, so the system stays down after the outage ended.",
+    },
+  ],
   concept:
     "A circuit breaker protects callers from repeatedly waiting on a failing dependency. In the closed state, requests pass through. After enough failures, the breaker opens and fails fast. After a cooldown, it enters half-open and allows a small number of probe requests. A successful probe closes the circuit; another failure opens it again.\n\nThis pattern turns slow cascading failure into bounded degradation. It is usually paired with timeouts, bulkheads, fallback responses, retry budgets, and observability.",
   complexity: [

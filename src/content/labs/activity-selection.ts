@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Activities with equal value reduce to interval scheduling. Pick the next activity that finishes earliest.",
   skillTags: ["DSA", "Greedy"],
+  bridgesFrom: [
+    {
+      slug: "sorting-race",
+      sameness:
+        "The algorithm IS a sort. Order the activities by finish time and what remains is a single linear pass that takes anything starting after the last one you kept — the sort is doing all of the work.",
+      delta:
+        "Because the sort dominates, the whole thing is O(n log n) and the scan is free, which means correctness lives entirely in the comparator. Sort by start time, or by duration, or by earliest start instead, and the identical one-pass scan returns a confidently wrong answer with no error and no warning. Greedy algorithms are not fragile in their loop; they are fragile in their sort key.",
+    },
+  ],
   concept:
     "Activity selection is the classic greedy scheduling problem: given start and finish times, choose the maximum number of mutually compatible activities. When every activity has equal value, earliest-finish-time greedy is optimal.\n\nThe problem teaches the exchange argument: replace the first activity in an optimal solution with the earliest finishing compatible one without making the solution worse.",
   complexity: [

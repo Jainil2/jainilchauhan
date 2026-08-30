@@ -11,6 +11,15 @@ export const lab: LabMeta = {
     "Toggle nodes on/off and watch how consistent hashing remaps only a small fraction of keys, while naive `hash % N` would remap nearly everything — the difference between a graceful degradation and a cache stampede.",
   whereUsed: { label: "Cache & sharding work", href: "/#projects" },
   skillTags: ["Distributed Systems", "System Design", "Redis"],
+  bridgesFrom: [
+    {
+      slug: "hash-table",
+      sameness:
+        "It IS a hash table. The hash of the key decides where the value lives, lookup is one computation rather than a search, and load depends entirely on how evenly the hash spreads keys — every property you already know still holds.",
+      delta:
+        "Buckets are now machines that die and get added, so the bucket count changes constantly and a plain modulo would remap nearly every key each time. Placing nodes on a ring makes that remapping proportional to the change instead of total. A resize stops being a pause and becomes a data migration, which is why virtual nodes exist: they smooth the slices so no single machine inherits a hot one.",
+    },
+  ],
   concept:
     "Consistent hashing solves a sharding problem: when you add or remove a node, how do you avoid remapping every key? With naive `hash(key) % N`, a single node change shuffles ~all keys. With consistent hashing, a key remapping is bounded to ~K/N keys.\n\nThe trick: hash both keys and nodes onto a circular ring (typically 0 to 2^32). A key is owned by the next node clockwise. Adding a node steals only the slice between it and the previous node; removing a node hands its slice to the next clockwise node.\n\nReal implementations use 'virtual nodes' (each physical node owns hundreds of points on the ring) to smooth out load and reduce variance. Without vnodes, a single hot node can dominate.",
   complexity: [

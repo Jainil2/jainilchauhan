@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Send requests into three backend nodes and compare routing policies. Complete active requests to see why least-connections reacts better to slow servers than simple round-robin.",
   skillTags: ["Distributed Systems", "System Design", "Backend"],
+  bridgesFrom: [
+    {
+      slug: "heap-priority-queue",
+      sameness:
+        "Least-connections IS extract-min. Backends are keyed by in-flight count, you pop the smallest, hand it the request, increment its key and put it back — the same heap operation you used for scheduling and Dijkstra.",
+      delta:
+        "The keys change without anyone telling you. A backend's count drops whenever a request finishes anywhere, and with several balancers there is no shared heap at all, so the minimum you popped was true a moment ago and is not now. Every balancer stampedes the same 'least busy' node and overwhelms it — which is why production picks two backends at random and takes the better of the pair rather than trusting a global minimum.",
+    },
+  ],
   concept:
     "A load balancer spreads traffic across healthy backend instances so one machine does not become the bottleneck. The policy matters: round-robin is simple but ignores current load, least-connections tracks in-flight work, weighted routing sends more traffic to larger instances, and hash-based routing keeps related requests stable.\n\nReal production balancers also perform health checks, connection draining, TLS termination, sticky sessions, retries, outlier detection, and circuit breaking. The goal is not only even traffic; it is predictable latency during failure, deploys, and uneven workloads.",
   complexity: [

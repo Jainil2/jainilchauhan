@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Augment paths through a small network and watch capacities fill. Residual capacity determines where more flow can still move.",
   skillTags: ["DSA", "Graphs", "Optimization"],
+  bridgesFrom: [
+    {
+      slug: "graph-traversal",
+      sameness:
+        "Finding an augmenting path IS a graph traversal. Walk from source to sink over edges that still have capacity left, and every BFS or DFS you have written does this unchanged.",
+      delta:
+        "The graph is mutated by the walk. Pushing flow along a path subtracts capacity from its edges and adds a backward edge of the same amount, so the next traversal runs on a different graph — and those backward edges are what let a later path undo an earlier greedy mistake. Termination stops being about visiting everything and becomes about no path existing at all, so the algorithm is a loop over traversals rather than a single one.",
+    },
+  ],
   concept:
     "Max flow asks for the largest amount that can be sent from a source to a sink through capacity-limited edges. Algorithms maintain a residual graph: unused forward capacity and backward edges that allow earlier choices to be revised.\n\nThe abstraction appears anywhere limited resources move through a network: bandwidth, assignments, traffic, supply chains, and matching problems.",
   complexity: [

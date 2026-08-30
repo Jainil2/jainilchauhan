@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Deconstruct a JSON Web Token. Edit the payload and watch the signature turn red. Learn why JWTs are 'signed, not encrypted' and how to safely store user claims without a database round-trip.",
   skillTags: ["Security", "Auth", "Backend"],
+  bridgesFrom: [
+    {
+      slug: "merkle-tree",
+      sameness:
+        "Verifying a token IS the hash comparison you already trusted a Merkle root for: recompute a digest over the bytes you were handed and check it against one you consider authoritative. Change a single character of the payload and the digest no longer matches, exactly as a changed block cascades into a different root.",
+      delta:
+        "What makes the digest authoritative is a secret key rather than a chain up to a published root, so verification needs no server round trip and no stored session — which is the entire appeal and the entire risk. Integrity is all you get: the payload is base64, not encryption, so it is readable by anyone holding the token, and anyone holding the key can mint claims that verify perfectly. Revocation, which a session table gave you for free, now has to be built back.",
+    },
+  ],
   concept:
     "A JSON Web Token (JWT) is a compact, URL-safe way to represent claims between two parties. It consists of three parts separated by dots: **Header**, **Payload**, and **Signature**.\n\n- **Header**: Contains the algorithm (e.g., HS256) and token type.\n- **Payload**: Contains the actual data (claims) like user ID or expiration time.\n- **Signature**: Used to verify that the sender is who they say they are and that the message wasn't tampered with.\n\nJWTs are usually signed with a secret (HMAC) or a public/private key pair (RSA/ECDSA). Crucially, the payload is only Base64-encoded, NOT encrypted — anyone with the token can read the data, but only those with the key can modify it without breaking the signature.",
   realWorld: [

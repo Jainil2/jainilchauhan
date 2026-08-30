@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Identify natural sorted runs and merge them. TimSort powers Python and Java object sorting because real data is often already partly sorted.",
   skillTags: ["DSA", "Algorithms"],
+  bridgesFrom: [
+    {
+      slug: "merge-sort-recursion",
+      sameness:
+        "It IS merge sort. Same merge of two sorted sequences, same stability, same O(n log n) worst case — the runs being merged are simply found rather than created.",
+      delta:
+        "Instead of halving until size one, it scans for stretches that are already ordered and extends short ones with insertion sort. Real data is full of such stretches, so already-sorted input costs one pass, O(n), which no textbook merge sort achieves. The price is that the merging is now governed by stack invariants over run lengths rather than by the recursion shape, and those invariants are load-bearing: the published implementation shipped for years with a subtly wrong one that could overflow the run stack.",
+    },
+  ],
   concept:
     "TimSort is a hybrid stable sorting algorithm derived from merge sort and insertion sort. It scans for natural ordered runs already present in the input, extends small runs with insertion sort, and merges runs while maintaining stack invariants that keep merging balanced.\n\nIt performs especially well on real-world data because logs, UI lists, and database results are often partially sorted before sorting begins.",
   complexity: [

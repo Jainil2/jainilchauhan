@@ -10,6 +10,22 @@ export const lab: LabMeta = {
   caption:
     "Simulate a cross-service purchase. Compare the rigid lock-step of 2PC (Two-Phase Commit) with the flexible, compensating-transaction model of Sagas. Inject failures and watch how each system recovers — or fails.",
   skillTags: ["Distributed Systems", "Microservices"],
+  bridgesFrom: [
+    {
+      slug: "n-queens",
+      sameness:
+        "A saga IS backtracking. Commit one step, move to the next, and when a step fails, walk back through the steps you already took applying their inverse until the state is clean — the same undo-on-failure unwind you wrote to take a queen back off the board.",
+      delta:
+        "The undo is neither free nor exact. Lifting a queen restores the board perfectly; refunding a charge is a new transaction the customer already saw, and the compensation can itself fail, so every one of them has to be retryable and idempotent. Backtracking explores states nobody observed; a saga commits states other users can read halfway through, which is the atomicity you are trading away for the locks you refuse to hold.",
+    },
+    {
+      slug: "raft-election",
+      sameness:
+        "The prepare phase IS a vote round: a coordinator asks every participant, counts the replies, and only then announces the decision — the same collect-then-decide shape as an election.",
+      delta:
+        "The threshold is unanimity rather than a majority, so there is no quorum to route around a node that went quiet, and one slow participant blocks everyone. Worse, a coordinator that dies after collecting votes leaves participants holding locks with no way to learn the outcome and no timeout that can safely resolve it — where a Raft follower simply times out and starts a new term. That gap is why 2PC is called blocking and consensus is not.",
+    },
+  ],
   concept:
     "Atomic transactions are easy in a single database, but across microservices, you must choose between Strong Consistency (2PC) and Eventual Consistency (Saga).\n\n2PC (Two-Phase Commit) uses a coordinator to ask all participants to 'prepare' (lock resources), then 'commit'. It guarantees atomicity but is blocking and fragile: if the coordinator or a node fails during the lock phase, the system stalls.\n\nSagas break a transaction into a sequence of local transactions. Each step has a corresponding 'compensating transaction' (undo). If step 3 fails, the Saga runs the undo actions for steps 2 and 1. It scales better and doesn't hold locks, but allows 'interleaving' where other users might see partially complete state.",
   complexity: [

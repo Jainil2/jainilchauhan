@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Find the optimal path with intelligence. Compare A* to Dijkstra and watch how the heuristic (distance to goal) guides the search, pruning thousands of unnecessary explorations. The standard for game AI and GPS.",
   skillTags: ["DSA", "AI"],
+  bridgesFrom: [
+    {
+      slug: "dijkstra",
+      sameness:
+        "It IS Dijkstra. Same priority queue, same relaxation, same finalise-the-smallest loop — and with a heuristic that always returns zero, A star reduces to Dijkstra exactly, line for line.",
+      delta:
+        "The queue key becomes cost-so-far plus estimated-cost-remaining, which steers the expansion toward the goal instead of expanding uniformly in every direction. On a large grid that is the difference between exploring a disc and exploring a cone. The guarantee now depends on the heuristic: if it never overestimates, the path is still optimal; if it ever does, the algorithm still returns a path, still returns it fast, and gives no indication that it is not the shortest one.",
+    },
+  ],
   concept:
     "A* is an extension of Dijkstra's algorithm that uses a heuristic to guide its search. While Dijkstra explores in all directions equally (circularly), A* prioritizes nodes that 'look' closer to the goal.\n\nIt uses the function `f(n) = g(n) + h(n)`:\n- `g(n)`: the actual cost from the start to node `n`.\n- `h(n)`: the estimated cost from `n` to the goal (the heuristic).\n\nIf the heuristic is **admissible** (it never overestimates the cost), A* is guaranteed to find the shortest path while exploring far fewer nodes than Dijkstra.",
   complexity: [{ operation: "Search", time: "O(E) worst case", space: "O(V)" }],

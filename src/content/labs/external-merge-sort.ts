@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Create sorted disk runs, then merge them. External sorting optimizes I/O instead of CPU comparisons.",
   skillTags: ["DSA", "Databases", "Big Data"],
+  bridgesFrom: [
+    {
+      slug: "merge-sort-recursion",
+      sameness:
+        "It IS merge sort. Sorted runs are combined by repeatedly taking the smallest head element — the identical merge you already wrote, just fed from files instead of subarrays.",
+      delta:
+        "The cost model changes from comparisons to I/O passes, and that reorders every decision. Splitting stops at whatever fits in RAM, so the runs are made by an in-memory sort rather than by recursing to single elements, and the merge becomes k-way in one pass because a second pass over a terabyte is far more expensive than a k-element heap. The merge's O(n) extra buffer, an annoyance in memory, becomes the entire design constraint on disk.",
+    },
+  ],
   concept:
     "External merge sort handles data too large to fit in memory. It reads memory-sized chunks, sorts each chunk into a run on disk, then performs a k-way merge using buffers and a priority queue.\n\nThe key cost is I/O. Good implementations choose run size, merge fan-in, compression, and sequential access patterns to minimize disk passes.",
   complexity: [

@@ -9,6 +9,15 @@ export const lab: LabMeta = {
   blurb: "Compute minimum coins or number of ways for a target amount.",
   caption: "Change the amount and inspect the DP table. Each amount reuses smaller solved amounts.",
   skillTags: ["DSA", "Dynamic Programming"],
+  bridgesFrom: [
+    {
+      slug: "fibonacci-memoization",
+      sameness:
+        "It IS the same memoised recurrence. The answer for an amount is built from the answers for smaller amounts, every subproblem is computed once, and the table does the same job it did for Fibonacci.",
+      delta:
+        "Each state now branches once per coin instead of twice, so the transition is a minimum over choices rather than a sum, and the table is indexed by amount. The subtle part is that the two questions people ask of it differ only in loop order: iterating amounts outside coins counts ordered sequences, iterating coins outside amounts counts combinations. Same table, same recurrence, and the loop nesting silently decides which problem you actually solved.",
+    },
+  ],
   concept:
     "Coin change appears in two common forms: minimum coins to make an amount, or number of combinations. For minimum coins, dp[a] = min(dp[a], dp[a - coin] + 1). The table builds from amount 0 upward.\n\nThe exact loop order changes semantics. Iterating coins outside amounts counts combinations; iterating amount outside coins can count permutations.",
   complexity: [{ operation: "Min coins", time: "O(amount * coins)", space: "O(amount)" }],

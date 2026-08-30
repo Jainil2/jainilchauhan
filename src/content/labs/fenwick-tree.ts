@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Move the prefix endpoint and watch the query summarize values with lowbit jumps. Fenwick trees are smaller and simpler than segment trees for prefix-style operations.",
   skillTags: ["DSA", "Algorithms"],
+  bridgesFrom: [
+    {
+      slug: "segment-tree",
+      sameness:
+        "It IS the same idea as a segment tree: internal aggregates over ranges so a prefix sum costs O(log n) instead of a scan, and a point update repairs O(log n) of them. The nodes even correspond — a Fenwick tree keeps only the ones a prefix query can actually land on.",
+      delta:
+        "Dropping the rest means the tree needs no pointers and no 4n array, just n slots navigated by the lowest set bit of the index. Half the memory and much smaller constants, and one real restriction: prefix queries are combined by subtraction, so the operation has to be invertible. Sums and XOR work, range minimum does not, which is the case where the full segment tree is still the answer.",
+    },
+  ],
   concept:
     "A Fenwick tree, or Binary Indexed Tree, stores partial sums in an array. The lowbit operation, i & -i, tells each index how large a range it summarizes. Prefix queries repeatedly subtract lowbit; point updates repeatedly add lowbit.\n\nFenwick trees are excellent for prefix sums, frequency tables, inversion counts, and dynamic cumulative distributions when the operation has an inverse.",
   complexity: [

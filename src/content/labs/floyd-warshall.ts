@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Allow each intermediate node and update the distance matrix. Floyd-Warshall is compact and powerful for dense graphs.",
   skillTags: ["DSA", "Graphs", "Dynamic Programming"],
+  bridgesFrom: [
+    {
+      slug: "bellman-ford",
+      sameness:
+        "The core step IS the same relaxation: if going through some intermediate point is cheaper than what you have, take it. Same comparison, same update, same tolerance for negative edges.",
+      delta:
+        "The relaxation is applied over pairs rather than over edges, and the outer loop is over which vertices are allowed to be intermediates. That gives every pair's shortest path in O(V cubed) with three lines and no data structures, which beats running Bellman-Ford from every source on dense graphs. The loop order is load-bearing in a way that is easy to get wrong: k has to be the outermost loop, because the invariant is that the table already accounts for all intermediates before k, and swapping the loops produces a table that looks reasonable and is silently incorrect.",
+    },
+  ],
   concept:
     "Floyd-Warshall computes shortest paths between every pair of vertices. It uses dynamic programming over allowed intermediate nodes: when node k becomes available, every pair i,j checks whether going through k improves its distance.\n\nThe algorithm is simple and handles negative edges, but not negative cycles. Its O(V^3) runtime makes it best for small or dense graphs where all-pairs answers are needed.",
   complexity: [

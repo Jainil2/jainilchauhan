@@ -9,6 +9,22 @@ export const lab: LabMeta = {
   blurb: "Find the longest ordered subsequence without requiring contiguity.",
   caption: "Advance across values and track the best subsequence ending at each index.",
   skillTags: ["DSA", "Dynamic Programming"],
+  bridgesFrom: [
+    {
+      slug: "longest-common-subsequence",
+      sameness:
+        "It IS a longest common subsequence problem. Take the array, sort a copy of it, and the LIS of the array is the LCS of the array with its own sorted copy — the same table you already filled solves this with no new recurrence.",
+      delta:
+        "That reduction costs O(n squared), and it is worth knowing mainly because it explains why LIS feels like LCS. The extra structure here — one sequence, a total order — allows something LCS cannot do: keep an array of the smallest possible tail for each length and binary search it per element, which brings the whole thing to O(n log n). The tails array is not itself a valid subsequence, only its length is meaningful, which is the detail that makes reconstructing the actual sequence need a separate parent array.",
+    },
+    {
+      slug: "binary-search",
+      sameness:
+        "The fast solution IS binary search in a loop. Maintain a sorted array of the smallest tail value achievable for each subsequence length, and for each element binary search for the position it belongs in.",
+      delta:
+        "The array being searched changes as you go, which is the part that feels wrong at first — but it stays sorted by construction, so the invariant holds. Each element costs one O(log n) search and one write, giving O(n log n) instead of the quadratic scan over all previous elements. The trade is interpretability: the quadratic DP stores an answer per index and can be read directly, while the tails array stores something that is not a subsequence at all.",
+    },
+  ],
   concept:
     "The O(n^2) LIS DP defines lis[i] as the longest increasing subsequence ending at i. It scans all earlier j where nums[j] < nums[i], then extends the best candidate. A faster O(n log n) method keeps tails: the smallest possible ending value for each length.\n\nLIS is useful for ordering, ranking, diffing, and reducing problems to monotonic subsequences.",
   complexity: [

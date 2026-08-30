@@ -11,6 +11,15 @@ export const lab: LabMeta = {
     "Animate the OIDC dance between a browser, client app, authz server (Ory Hydra-style), and resource server. Swap scenarios to see why PKCE matters and how a replayed code gets rejected.",
   whereUsed: { label: "Auth stack at Tech Holding", href: "/#experience" },
   skillTags: ["Security", "System Design"],
+  bridgesFrom: [
+    {
+      slug: "jwt-anatomy",
+      sameness:
+        "The id_token IS the JWT you already took apart — same three segments, same signature check — and 'who is this user' reduces to that verification plus reading the claims inside.",
+      delta:
+        "The key is not yours. You fetch the issuer's public key from its JWKS endpoint, so a valid signature no longer means a valid token: you must also pin the issuer, the audience and the nonce, or a perfectly signed token minted for another site logs its holder into yours. And the token now has to be obtained safely rather than merely read, which is what the code exchange and PKCE are for — the verifier proves that whoever redeems the authorization code is the client that started the flow.",
+    },
+  ],
   concept:
     "OAuth 2.0 grants delegated access to resources; OIDC layers identity (who is the user) on top via the id_token. The Authorization Code flow is the recommended grant for both web and SPAs — combined with PKCE (Proof Key for Code Exchange) for public clients that can't keep a secret.\n\nPKCE works by having the client generate a random code_verifier, hashing it (S256) into a code_challenge sent to the authz server. When exchanging the auth code for tokens, the client must present the original verifier. An attacker who intercepts the auth code can't redeem it without the verifier — even if they capture the redirect.\n\nOther safeguards: state parameter (CSRF), nonce (id_token replay), short-lived access tokens, refresh-token rotation, audience binding, JWKS-based signature validation.",
   realWorld: [

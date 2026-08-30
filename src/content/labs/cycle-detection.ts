@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Add an edge to create a cycle. DFS detects back edges in directed graphs and non-parent visited edges in undirected graphs.",
   skillTags: ["DSA", "Graphs"],
+  bridgesFrom: [
+    {
+      slug: "graph-traversal",
+      sameness:
+        "It IS depth-first search. Same recursion, same visited marks, same edge iteration — a cycle is detected purely by noticing where an edge points during the walk you already do.",
+      delta:
+        "One bit is added: whether a vertex is on the current recursion stack, not merely visited. An edge to a finished vertex is a shortcut, an edge to a vertex still on the stack is a cycle, and conflating the two is the bug that reports cycles in every diamond-shaped DAG. Undirected graphs need the opposite care — the edge back to your parent is not a cycle, so it must be excluded explicitly.",
+    },
+  ],
   concept:
     "Cycle detection asks whether a path can return to a previously visited node. In directed graphs, DFS tracks three states: unvisited, visiting, and done. Seeing an edge to a visiting node means a back edge and therefore a cycle. In undirected graphs, seeing a visited neighbor that is not the parent indicates a cycle.\n\nCycle detection is essential for dependency validation, deadlock detection, scheduling, and graph sanity checks.",
   complexity: [

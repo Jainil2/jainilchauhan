@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Bucket numbers by ones or tens digit. Stable passes from least-significant to most-significant digit produce sorted output.",
   skillTags: ["DSA", "Algorithms"],
+  bridgesFrom: [
+    {
+      slug: "counting-sort",
+      sameness:
+        "It IS counting sort, run once per digit. Each pass is the same count-then-place distribution you already wrote, applied to one digit position at a time, least significant first.",
+      delta:
+        "Counting on a digit rather than a whole value is what fixes counting sort's memory problem: the counter array is sized by the radix, 256 buckets, not by the value range, so 64-bit integers cost eight passes instead of an impossible amount of memory. Stability stops being a nicety and becomes correctness — each pass must preserve the order the previous pass established, and an unstable inner sort silently destroys the work of every earlier digit.",
+    },
+  ],
   concept:
     "Radix sort processes keys by digits rather than comparing whole values. LSD radix sort starts with the least-significant digit and uses a stable sort, often counting sort, for each digit. MSD radix sort starts from the most-significant digit and recursively partitions.\n\nFor fixed-width integers or strings, radix sort can be linear in the number of digits times n.",
   complexity: [{ operation: "Sort", time: "O(d(n + b))", space: "O(n + b)" }],

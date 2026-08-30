@@ -10,6 +10,22 @@ export const lab: LabMeta = {
   caption:
     "Step through BFS and DFS on identical graphs. Watch the queue (FIFO) explore in layers and the stack (LIFO) plunge depth-first. The shape of the frontier is everything.",
   skillTags: ["DSA"],
+  bridgesFrom: [
+    {
+      slug: "queue",
+      sameness:
+        "BFS IS the queue. Put the start vertex in, pop one, push its unvisited neighbours, repeat — the algorithm is the queue's FIFO behaviour applied to a graph, nothing more.",
+      delta:
+        "FIFO is what makes the traversal expand in rings of equal distance, which is why BFS finds the fewest-edges path and why the first time you reach a vertex is the best time. The cost is memory: the queue holds an entire frontier, and on a wide graph that frontier can be most of the vertices at once.",
+    },
+    {
+      slug: "stack",
+      sameness:
+        "DFS IS the stack. The same loop with a stack in place of the queue produces depth-first order, and the recursive version is that same stack, provided by the language instead of by you.",
+      delta:
+        "LIFO drives the walk as deep as possible before backing up, which finds a path fast but gives no guarantee it is short. Memory becomes proportional to depth rather than width, so it handles wide graphs the queue cannot — and it introduces a failure the queue version does not have, since the recursive form overflows the call stack on a long enough path.",
+    },
+  ],
   concept:
     "BFS (Breadth-First Search) explores layer by layer using a queue. It finds the shortest path in an unweighted graph — the first time you reach a node, you've reached it through the fewest edges.\n\nDFS (Depth-First Search) plunges as deep as possible before backtracking, using a stack (or recursion). It's the right tool for cycle detection, topological sort, finding connected components, and any problem where you need to enumerate paths or do tree-shaped recursion.\n\nBoth are O(V + E) time, O(V) space. The difference is the data structure — and that's why they're often the first interview question after arrays: they teach how a tiny choice (queue vs stack) reshapes the entire algorithm's behavior.",
   complexity: [

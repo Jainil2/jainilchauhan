@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Push elements until capacity doubles. Most pushes are O(1); the resize push copies old elements into a larger backing array.",
   skillTags: ["DSA", "Memory"],
+  bridgesFrom: [
+    {
+      slug: "array",
+      sameness:
+        "It IS an array. The storage underneath is the same fixed, contiguous block with the same O(1) indexing, and every read you already know behaves identically.",
+      delta:
+        "The only addition is a length kept separately from the capacity, plus a reallocation when they meet. That single move is what makes append amortised rather than constant: most appends are free, and one in every n copies the whole buffer, so a latency graph of appends is flat with periodic spikes rather than a straight line.",
+    },
+  ],
   concept:
     "A dynamic array wraps a fixed array with a length and capacity. Appending is cheap while capacity remains. When the array fills, it allocates a larger backing store, commonly 2x capacity, copies existing elements, then writes the new value.\n\nA resize is O(n), but it happens rarely enough that append is amortized O(1). This is the structure behind JavaScript arrays, Python lists, Java ArrayList, C++ vector, and Go slices.",
   complexity: [

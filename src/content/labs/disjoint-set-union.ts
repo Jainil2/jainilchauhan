@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Union sets and watch components merge. DSU answers whether two nodes belong to the same component almost instantly.",
   skillTags: ["DSA", "Graphs"],
+  bridgesFrom: [
+    {
+      slug: "array",
+      sameness:
+        "The whole structure IS an array. One slot per element, and the slot holds the index of that element's parent; the sets are simply the trees that array encodes, with a root being any element that points at itself.",
+      delta:
+        "Reads mutate. Path compression rewrites the entries it walks past, so find is not a lookup but an amortised repair, and the cost of an operation is only meaningful averaged over a sequence. The structure is also one-way: it merges sets and never splits them, so undoing a union means rebuilding from scratch.",
+    },
+  ],
   concept:
     "Disjoint Set Union, also called union-find, maintains a partition of items into non-overlapping sets. Find returns a representative root; union merges two sets. Path compression flattens trees during find, and union by rank/size keeps them shallow.\n\nWith both optimizations, operations are effectively constant time: O(alpha(n)), where alpha is the inverse Ackermann function and grows so slowly it is below 5 for practical inputs.",
   complexity: [

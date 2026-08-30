@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Search for values by branching left or right at each comparison. Balanced height gives logarithmic lookup.",
   skillTags: ["DSA", "Trees"],
+  bridgesFrom: [
+    {
+      slug: "binary-tree",
+      sameness:
+        "It IS a binary tree. Same nodes, same at-most-two-children shape, same traversals — pre-order, in-order and post-order all work here exactly as you wrote them.",
+      delta:
+        "One rule is added: everything in the left subtree is smaller than the node, everything in the right is larger. That single invariant turns a structure you could only traverse into one you can search, because a comparison at each node discards half the remaining tree, and it makes the in-order walk emit sorted output for free. The invariant is also the liability — nothing enforces balance, so inserting already-sorted keys builds a tree of height n and every O(log n) claim collapses to O(n).",
+    },
+  ],
   concept:
     "A binary search tree stores keys so every left subtree is smaller than the node and every right subtree is larger. This lets search, insert, and delete discard half-ish of the remaining tree at each step when the tree is balanced.\n\nThe weakness is shape. Inserting sorted data into a naive BST creates a linked list with O(n) operations. Balanced trees such as AVL and red-black trees add rotations to keep height logarithmic.",
   complexity: [

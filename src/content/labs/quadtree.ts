@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Efficiently find points in a 2D area. Watch the space recursively subdivide into four quadrants as more points are added. Perfect for collision detection, map markers, and image compression.",
   skillTags: ["DSA", "Graphics", "GeoSpatial"],
+  bridgesFrom: [
+    {
+      slug: "binary-search-tree",
+      sameness:
+        "It IS a search tree in two dimensions. Same recursive partitioning, same descend-into-the-relevant-child search, same idea that structure lets you ignore most of the data — with four children instead of two because a point splits the plane both ways at once.",
+      delta:
+        "Two dimensions have no total order, so a query region can straddle a boundary and force you into several children at once. Search stops being a single path and becomes a bounded exploration, so the O(log n) is about depth rather than about work done. Balance also changes hands: a BST degenerates on bad insertion order, a quadtree degenerates on clustered points, and re-inserting in a different order does not fix it.",
+    },
+  ],
   concept:
     "A QuadTree is a spatial data structure used to partition a two-dimensional space by recursively subdividing it into four quadrants (Northwest, Northeast, Southwest, Southeast). \n\nInstead of checking every point in the world (O(N)), a QuadTree allows you to prune entire branches of the search tree that don't overlap with your query area. This turns a global search into an O(log N) operation.\n\nIt is the 2D equivalent of an Octree (3D) and is a foundational structure for game engines, geographic information systems (GIS), and sparse data representations.",
   complexity: [

@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Add an obstacle and watch path counts change. Each cell depends on previously solved adjacent cells.",
   skillTags: ["DSA", "Dynamic Programming"],
+  bridgesFrom: [
+    {
+      slug: "fibonacci-memoization",
+      sameness:
+        "It IS memoised recursion. A cell's answer is built from the cells it depends on, each subproblem is solved once and stored, and the recurrence is the same shape as the one you already cached.",
+      delta:
+        "The key becomes a pair of coordinates, so the memo is a table rather than a line, and that makes the fill order explicit: iterate rows top to bottom and a cell's dependencies are always already computed, which removes the recursion entirely. It also exposes an optimisation that is invisible in the recursive form — if each row depends only on the row above, you can keep one row instead of the whole grid and the memory drops from O(rows times cols) to O(cols).",
+    },
+  ],
   concept:
     "Grid DP appears when movement is constrained, often to right/down or four directions with acyclic ordering. For path counting, each cell combines top and left counts. For minimum path sum, each cell takes its cost plus min(top, left).\n\nThe trick is choosing an iteration order where dependencies are already solved.",
   complexity: [

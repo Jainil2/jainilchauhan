@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Relax every edge pass by pass. Unlike Dijkstra, Bellman-Ford can handle negative weights and detect reachable negative cycles.",
   skillTags: ["DSA", "Graphs"],
+  bridgesFrom: [
+    {
+      slug: "dijkstra",
+      sameness:
+        "The inner step IS Dijkstra's relaxation, unchanged: if the distance to u plus the weight of edge u-v beats the distance to v, improve v. Same test, same update, same array of tentative distances.",
+      delta:
+        "What is dropped is the greedy order. Instead of trusting a priority queue to hand you vertices in a safe sequence, it relaxes every edge V-1 times, which costs O(VE) but never assumes a finalised distance can only stay put. That assumption was the thing negative edges broke, so the slower algorithm is the one that survives them — and a V-th pass that still improves something is a proof of a negative cycle, a condition Dijkstra cannot even detect, let alone report.",
+    },
+  ],
   concept:
     "Bellman-Ford computes shortest paths from one source by repeatedly relaxing every edge. After at most V-1 passes, every shortest path without cycles has been discovered. A final pass that can still improve a distance proves a reachable negative-weight cycle.\n\nIt is slower than Dijkstra but more general because edge weights may be negative. This matters in systems that model credits, arbitrage, penalties, or constraint differences.",
   complexity: [

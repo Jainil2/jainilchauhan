@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Witness how distributed systems track time without a central clock. Trigger events on different nodes and watch the vectors grow. Detect 'happened-before' relationships and identify concurrent write conflicts (siblings).",
   skillTags: ["Distributed Systems", "System Design"],
+  bridgesFrom: [
+    {
+      slug: "topological-sort",
+      sameness:
+        "Vector clocks compute the relation topological sort depends on. Comparing two vectors answers whether one event had to happen before the other, and when neither dominates, the events are concurrent — precisely the pairs a topological order was free to emit in either sequence.",
+      delta:
+        "You never see the DAG. Each node infers the ordering incrementally from counters riding along on messages, so the graph is discovered rather than given and no node ever holds all of it. Concurrency also stops being a harmless tie you can break arbitrarily: two concurrent writes to the same key are a real conflict, because picking either order silently discards the other update. That is why the resolution rule — last-write-wins, sibling versions, or a CRDT — is an application decision rather than a detail of the algorithm.",
+    },
+  ],
   concept:
     "In a distributed system, there is no single 'now'. Physical clocks drift, making them unreliable for ordering events. Vector clocks are a logical clock mechanism used to determine the partial ordering of events and detect causality violations.\n\nEach node maintains a vector of counters (one for every node in the cluster). When a node performs an internal event, it increments its own counter. When it sends a message, it includes its vector. The receiver updates its vector by taking the element-wise maximum. \n\nIf vector A is strictly less than vector B, then A 'happened before' B. If neither is less than the other, the events happened concurrently, and we have a conflict that requires resolution (e.g., Last-Write-Wins or application-side merging).",
   complexity: [

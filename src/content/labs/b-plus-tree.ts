@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Scan linked leaf pages under a small internal index. B+ trees optimize databases for range scans and block storage.",
   skillTags: ["DSA", "Databases", "System Design"],
+  bridgesFrom: [
+    {
+      slug: "btree-index",
+      sameness:
+        "It IS a B-tree. Same high fan-out, same split-on-full growth, same all-leaves-at-equal-depth shape, same page-sized nodes chosen to match the disk.",
+      delta:
+        "Values are removed from the internal nodes and live only at the leaves, which are then chained together left to right. Internal nodes hold nothing but separator keys, so they pack more of them per page and the tree gets shallower — fewer disk reads per lookup. The chained leaves are the real prize: a range scan descends once and then walks the leaf list sequentially instead of re-traversing the tree per key, which is why every relational database index is a B+ tree rather than a B-tree.",
+    },
+  ],
   concept:
     "A B+ tree is a high-fanout balanced search tree used for storage indexes. Internal nodes store separator keys that guide search. Records live in leaf pages, and leaves are linked so range scans can proceed sequentially.\n\nHigh fanout keeps height small, often 3-4 levels for millions of keys. Because nodes align with disk or SSD pages, each search performs a small number of page reads instead of many pointer hops.",
   complexity: [

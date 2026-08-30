@@ -9,6 +9,15 @@ export const lab: LabMeta = {
   blurb: "Find the smallest capacity separating source from sink.",
   caption: "Compare two cuts through the network. The best cut capacity equals the max-flow value.",
   skillTags: ["DSA", "Graphs", "Optimization"],
+  bridgesFrom: [
+    {
+      slug: "max-flow",
+      sameness:
+        "It IS max flow. Not analogous to it — equal to it: the maximum flow value and the minimum cut capacity are the same number, and after a max-flow run the cut is read straight off the residual graph as the set of vertices still reachable from the source.",
+      delta:
+        "So the work is already done, and what changes is what you ask for. Flow answers how much can get through; the cut answers which edges are the reason it cannot be more, which turns a throughput number into a list of things to fix. The same duality is why image segmentation and project selection reduce to a flow computation nobody would otherwise have guessed was involved.",
+    },
+  ],
   concept:
     "An s-t cut partitions vertices into a source side and a sink side. Its capacity is the sum of capacities on edges crossing from source side to sink side. The min-cut problem asks for the lowest such capacity.\n\nThe max-flow min-cut theorem states that the maximum source-to-sink flow equals the minimum cut capacity. After a max-flow run, nodes reachable from the source in the residual graph identify a minimum cut.",
   complexity: [

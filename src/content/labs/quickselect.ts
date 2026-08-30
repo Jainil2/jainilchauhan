@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Partition around a pivot and recurse only into the side containing rank k. Quickselect is selection, not sorting.",
   skillTags: ["DSA", "Algorithms"],
+  bridgesFrom: [
+    {
+      slug: "sorting-race",
+      sameness:
+        "It IS quicksort's partition step, unchanged. Pick a pivot, move smaller elements left and larger right, and the pivot lands in its final sorted position.",
+      delta:
+        "After partitioning you know which side k falls in, so you recurse into that side only and throw the other away. The work per level halves instead of staying at n, which sums to O(n) expected rather than O(n log n) — finding the median is genuinely cheaper than sorting. The worst case is inherited unchanged: bad pivots still give O(n squared), and only median-of-medians or a random pivot removes it.",
+    },
+  ],
   concept:
     "Quickselect uses the same partitioning idea as quicksort, but after partitioning it only recurses into the side containing the desired rank. This gives O(n) average time for kth smallest/largest selection.\n\nIt is ideal when you need a median, percentile, or top-k threshold without paying O(n log n) to sort the full input.",
   complexity: [

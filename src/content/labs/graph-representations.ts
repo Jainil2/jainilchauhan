@@ -10,6 +10,22 @@ export const lab: LabMeta = {
   caption:
     "Switch between adjacency list and matrix views. Sparse graphs favor lists; dense graphs and O(1) edge checks can favor matrices.",
   skillTags: ["DSA", "Graphs"],
+  bridgesFrom: [
+    {
+      slug: "array",
+      sameness:
+        "The adjacency matrix IS a two-dimensional array. Row u, column v, and the cell says whether the edge exists — the same index arithmetic you already use.",
+      delta:
+        "Storage becomes V squared regardless of how many edges you actually have, which is the whole trade. Edge existence becomes an O(1) test and matrix algebra over the graph becomes available, but a social graph with a million users would need a trillion cells to store an average of a few hundred friends each. The representation is only honest when the graph is dense.",
+    },
+    {
+      slug: "linked-list",
+      sameness:
+        "The adjacency list IS a list per vertex. The graph is literally an array of linked lists, one holding each vertex's neighbours, and iterating a vertex's edges IS the list walk you already wrote.",
+      delta:
+        "Memory drops to O(V + E), which is why every real graph library uses this, and the cost lands on a different operation: asking whether a specific edge exists now means scanning one vertex's list instead of a single index. Every traversal you write from here on assumes this shape, because BFS and DFS only ever ask for a vertex's neighbours and never for a random edge.",
+    },
+  ],
   concept:
     "A graph models entities as vertices and relationships as edges. The representation determines memory use and operation cost. An adjacency list stores neighbors per vertex, using O(V + E) space and working well for sparse graphs. An adjacency matrix stores every possible pair, using O(V^2) space but giving O(1) edge-existence checks.\n\nDirected graphs store edge direction; weighted graphs attach costs; multigraphs allow repeated edges. Choosing the representation is often the first performance decision in a graph problem.",
   complexity: [

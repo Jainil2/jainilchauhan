@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Place one queen per row and reject attacked columns or diagonals. Backtracking searches only valid partial states.",
   skillTags: ["DSA", "Backtracking"],
+  bridgesFrom: [
+    {
+      slug: "permutations-subsets",
+      sameness:
+        "It IS the permutation generator you already wrote. One queen per row and one per column means any solution IS a permutation of column indices, and the recursion that builds it is the same choose-undo-choose loop.",
+      delta:
+        "The only addition is a legality test before descending, and it changes everything about the cost: rejecting a partial placement prunes an entire subtree of permutations that would otherwise be generated and thrown away at the end. That is the difference between exploring n factorial complete boards and exploring a searchable fraction of them, and it makes the test itself performance-critical — checking diagonals by scanning the board reintroduces the work the pruning just saved, which is why the diagonals are tracked in sets.",
+    },
+  ],
   concept:
     "N-Queens asks for placing N queens on an N x N chessboard so no two attack each other. Backtracking places a queen row by row, maintaining used columns and diagonals. If a placement violates constraints, that branch is abandoned immediately.\n\nThe technique generalizes to constraint satisfaction: build partial solutions, prune invalid states, and backtrack when no option remains.",
   complexity: [{ operation: "Backtracking search", time: "O(N!) worst-ish", space: "O(N)" }],

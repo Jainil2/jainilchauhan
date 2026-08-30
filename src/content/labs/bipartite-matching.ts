@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Augment the matching until no improving path remains. Matching powers assignment, scheduling, and recommendation constraints.",
   skillTags: ["DSA", "Graphs", "Optimization"],
+  bridgesFrom: [
+    {
+      slug: "max-flow",
+      sameness:
+        "It IS a max-flow problem. Add a source pointing at every left vertex, a sink fed by every right vertex, give every edge capacity 1, and the maximum flow IS the maximum matching — an augmenting path in that network is exactly an alternating path here.",
+      delta:
+        "Unit capacities make the flow integral, so every unit that arrives at the sink corresponds to one real pair rather than to a fraction. That also lets you skip building the network: the direct implementation just runs the augmenting-path search over the original graph, and Hopcroft-Karp improves it further by finding a maximal set of shortest augmenting paths per phase instead of one at a time.",
+    },
+  ],
   concept:
     "Bipartite matching pairs nodes from a left set to nodes in a right set so no node is used more than once. An augmenting path alternates between unmatched and matched edges; flipping that path increases the matching size by one.\n\nThe problem can be solved with DFS augmenting paths, Hopcroft-Karp for better asymptotics, or max-flow by connecting a source to left nodes and right nodes to a sink.",
   complexity: [

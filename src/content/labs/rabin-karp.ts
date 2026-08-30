@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Search for a needle in a haystack using math. Watch the rolling hash window slide across the text, updating its value in O(1) time. Efficiently detect pattern matches and potential collisions with cryptographic-like hashing.",
   skillTags: ["Algorithms", "Strings", "Hashing"],
+  bridgesFrom: [
+    {
+      slug: "hash-table",
+      sameness:
+        "It IS hashing, used for comparison instead of for storage. Hash the pattern once, hash each window of the text, and only compare strings when the hashes agree — the same reduce-a-key-to-a-number step you already rely on.",
+      delta:
+        "The hash has to be rolling: removing the leaving character and adding the entering one in O(1), so a window of length m does not cost m work to hash. And a collision means something different here. In a hash table a collision costs a probe; here it would mean reporting a match that is not there, so every hash hit must be verified character by character. That verification is what keeps the worst case at O(nm) even though the expected case is O(n + m).",
+    },
+  ],
   concept:
     "Rabin-Karp is a string-searching algorithm that uses hashing to find any one of a set of pattern strings in a text. \n\nInstead of checking every character at every position (O(N*M)), it calculates a hash for the pattern and compares it to the hash of the current window in the text. To make this efficient, it uses a **Rolling Hash**: when the window slides, the new hash is calculated from the old hash in O(1) time by 'removing' the character that left and 'adding' the one that entered.\n\nIf the hashes match, the algorithm performs a character-by-character check to handle potential collisions.",
   complexity: [

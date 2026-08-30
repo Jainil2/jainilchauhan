@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Adjust capacity and compare item choices. Each item can be taken or skipped exactly once.",
   skillTags: ["DSA", "Dynamic Programming"],
+  bridgesFrom: [
+    {
+      slug: "coin-change",
+      sameness:
+        "It IS the same table. Capacity along one axis, one row per item, and the same take-it-or-leave-it recurrence comparing what you get by including an item against what you already had without it.",
+      delta:
+        "Each item may be used at most once, and remarkably that entire difference is encoded in the direction of one loop. Iterating capacity downward means an item's row reads values that do not yet include that item, so it is used once; iterate upward and you have unbounded coin change back. The other change is what the cell holds — a maximised value rather than a minimised count — which is also why the pseudo-polynomial O(n times W) hides a real cost: the table scales with the numeric capacity, so a knapsack with huge capacities is not tractable just because it has few items.",
+    },
+  ],
   concept:
     "0/1 knapsack asks for the maximum value that fits within a weight capacity when each item can be chosen at most once. The recurrence compares skipping the item vs taking it and adding the best value for remaining capacity.\n\nIt is a canonical DP because the same subproblem appears repeatedly: best value using first i items and capacity w.",
   complexity: [

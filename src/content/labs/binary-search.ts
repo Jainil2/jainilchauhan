@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Step through lo, mid, and hi. Binary search is simple, but boundary handling is where most bugs live.",
   skillTags: ["DSA", "Algorithms"],
+  bridgesFrom: [
+    {
+      slug: "binary-search-tree",
+      sameness:
+        "It IS a walk down a binary search tree that was never built. The midpoint of the range plays the root, each comparison discards a subtree, and the sequence of midpoints you visit is exactly a root-to-leaf path.",
+      delta:
+        "Because the tree is implied by the array's indices rather than by pointers, it is perfectly balanced by construction — you get the O(log n) guarantee an AVL tree needs rotations to earn, with zero memory overhead. The cost is that the shape is fixed to the data: inserting one element means shifting an O(n) tail to keep the array sorted, which is precisely the write cost a real tree exists to buy back.",
+    },
+  ],
   concept:
     "Binary search works on sorted monotonic data. It compares the target with the middle element, discards the half that cannot contain the answer, and repeats. The same idea applies to arrays, answer-space search, lower_bound/upper_bound, and monotonic predicates.\n\nThe key is maintaining an invariant: the answer is always inside the active range, or the active range represents the boundary being searched.",
   complexity: [

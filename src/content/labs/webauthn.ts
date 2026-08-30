@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Step into the future of authentication. Simulate a hardware-backed registration and login flow. See how public-key cryptography and biometrics replace vulnerable passwords with unphishable Passkeys.",
   skillTags: ["Security", "Auth", "Passkeys"],
+  bridgesFrom: [
+    {
+      slug: "jwt-anatomy",
+      sameness:
+        "It IS asymmetric signature verification, the RS256 half of the token lab, run in the other direction: the server stores only a public key and checks something signed by a private key it has never seen and cannot reproduce.",
+      delta:
+        "What gets signed is a fresh challenge the server just issued, not a self-contained set of claims, so a captured signature is worthless a second later — replay stops being something you mitigate with short expiry. The signature also covers the origin, so a lookalike domain cannot collect anything usable, which is what makes it unphishable. And the credential table stops being a target: dumping it yields public keys, because the private key never leaves the authenticator, which is also why account recovery, not theft, becomes the hard problem.",
+    },
+  ],
   concept:
     "WebAuthn (Web Authentication) is a web standard that allows users to log in to websites using secure, hardware-backed credentials like biometrics (TouchID/FaceID) or USB security keys (YubiKeys).\n\nUnlike passwords, which are sent to a server and can be stolen, WebAuthn uses **Public Key Cryptography**:\n1. The user's device creates a unique key pair for the site.\n2. The device sends the **Public Key** to the server.\n3. To log in, the server sends a 'challenge'. The device signs it with the **Private Key** (after biometric verification) and sends it back.\n\nThis is 'unphishable' because the device only signs challenges for the specific domain it was registered with.",
   realWorld: [

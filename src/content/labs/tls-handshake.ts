@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Watch the 5-step dance that secures the internet. Animate the exchange of certificates, the Diffie-Hellman key agreement, and the transition from slow asymmetric encryption to fast, shared symmetric keys.",
   skillTags: ["Security", "Networking", "HTTPS"],
+  bridgesFrom: [
+    {
+      slug: "merkle-tree",
+      sameness:
+        "Certificate validation IS the proof walk you already did. You are handed a chain, you check each link by hashing the child and verifying it against its parent, and the leaf is trusted only because the chain terminates at a root you already hold. One bad link invalidates everything beneath it, exactly as one changed block changes the root.",
+      delta:
+        "The links are signatures rather than plain hashes, so an attacker cannot recompute them — but that also means trust is delegated: anyone your root store trusts can sign for any domain, which is a political property, not a cryptographic one. And validation is only half the handshake. The rest exists to derive a shared symmetric key, because the asymmetric operations you just paid for are far too slow to encrypt the actual traffic.",
+    },
+  ],
   concept:
     "Transport Layer Security (TLS) is the protocol that provides privacy and data integrity between two communicating applications. It is the 'S' in HTTPS.\n\nThe 'Handshake' is the initial negotiation where the client and server:\n1. Agree on the TLS version and cipher suites.\n2. Authenticate the server via its Certificate (and optionally the client).\n3. Establish a **Shared Session Key** using asymmetric encryption (RSA or Diffie-Hellman).\n\nOnce the handshake is complete, all further communication is encrypted using fast **Symmetric Encryption** (like AES) with the shared key established during the handshake.",
   realWorld: [

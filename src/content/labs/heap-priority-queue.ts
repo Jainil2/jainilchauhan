@@ -10,6 +10,22 @@ export const lab: LabMeta = {
   caption:
     "Push and pop the minimum value. The root is always the next highest-priority item while the full array remains only partially ordered.",
   skillTags: ["DSA", "Algorithms"],
+  bridgesFrom: [
+    {
+      slug: "binary-tree",
+      sameness:
+        "It IS a binary tree, and specifically a complete one — every level full except the last, which fills left to right. That completeness is why it needs no pointers at all: node i's children live at 2i+1 and 2i+2 of a flat array.",
+      delta:
+        "The ordering rule is weaker than a search tree's. A parent only beats its children; siblings are unordered, and there is no relationship between subtrees. That weakness is exactly what buys the guaranteed shape, so a heap can never degenerate the way an unbalanced BST does — but it also means you cannot search a heap. Finding an arbitrary element is O(n), and in-order traversal returns nothing meaningful.",
+    },
+    {
+      slug: "queue",
+      sameness:
+        "The interface IS a queue. You push work in, you pop work out, and consumers cannot see anything but the next item.",
+      delta:
+        "The order changes from arrival to priority, and that changes the failure mode rather than the API. A FIFO queue guarantees every item is eventually served; a priority queue does not, so a steady stream of high-priority work starves the low-priority items indefinitely. Schedulers fix this by ageing entries, which is an admission that fairness was a property the plain queue gave you for free.",
+    },
+  ],
   concept:
     "A binary heap is a complete binary tree usually stored in an array. In a min-heap, every parent is less than or equal to its children, so the minimum is always at the root. Push bubbles a value up; pop swaps root with the last item and bubbles down.\n\nA priority queue exposes this behavior as insert plus extract-min/extract-max. It is central to scheduling, Dijkstra, A*, event simulation, and top-k problems.",
   complexity: [

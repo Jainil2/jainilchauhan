@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Increment two replicas independently, then merge. The counter converges by taking the max value seen for each replica slot.",
   skillTags: ["Distributed Systems", "Databases"],
+  bridgesFrom: [
+    {
+      slug: "vector-clocks",
+      sameness:
+        "A G-Counter IS a vector clock. One slot per replica, a replica only ever increments its own slot, and merging two replicas takes the element-wise maximum — the same vector and the same merge you already implemented.",
+      delta:
+        "The vector is read as a value rather than as an ordering: sum the slots and you have the count. Because max is idempotent, commutative and associative, duplicated, reordered and delayed messages all land on the same answer, so concurrency stops being a conflict to resolve and becomes the normal case — there is no resolution rule because there is nothing to resolve. The price is that the structure only goes one way; decrementing needs a second vector, and deletion is harder still.",
+    },
+  ],
   concept:
     "A CRDT is a data type designed so replicas can update independently and later merge into the same value. The G-Counter is the simplest example: each replica owns one slot in a vector and only increments its own slot. Merge takes the element-wise maximum. The visible count is the sum of the vector.\n\nBecause merge is associative, commutative, and idempotent, replicas converge even if messages arrive out of order, duplicate, or after partitions. More advanced CRDTs model sets, maps, registers, text editing, and presence.",
   complexity: [

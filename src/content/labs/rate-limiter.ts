@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Fire single requests or 20-request bursts. Watch how each rate-limiter strategy responds — the same traffic, four different verdicts. Pick the one that matches your tolerance for bursts vs smoothness.",
   skillTags: ["System Design", "Distributed Systems"],
+  bridgesFrom: [
+    {
+      slug: "queue",
+      sameness:
+        "The leaky bucket IS the FIFO queue you built: enqueue on arrival, dequeue from the front, reject when it is full. The token bucket is the same structure read from the other side — capacity that refills instead of drains.",
+      delta:
+        "The dequeue is driven by a clock rather than by a consumer asking for work, so queue depth is no longer bookkeeping — it is latency the caller is paying, and a full queue is a 429 someone receives rather than an exception you catch. Sizing the bucket is deciding how much burst you convert into delay before you convert it into refusal. Across a cluster the structure has to be shared, so the counter moves into Redis and every decision buys a network round trip.",
+    },
+  ],
   concept:
     "Rate limiting protects a service from being overwhelmed. The four common strategies trade bursts vs smoothness vs memory:\n\n• Token Bucket — tokens refill at a steady rate up to a cap; each request consumes one. Allows bursts up to the cap. Used by Stripe, AWS, GCP.\n• Leaky Bucket — requests enter a FIFO queue that drains at a fixed rate. Smooths output; excess overflows. Common in network shapers.\n• Fixed Window — count requests per N-second window; reset on tick. Simple but allows 2× burst at the window boundary.\n• Sliding Log/Window — track request timestamps and only count those in the last N seconds. Most accurate, costs memory per request.\n\nDistributed rate limiting (across a cluster) usually centralizes counters in Redis (INCR + EXPIRE) or uses a probabilistic approximation per node.",
   complexity: [

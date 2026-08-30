@@ -10,6 +10,22 @@ export const lab: LabMeta = {
   caption:
     "Union incoming edges and watch components merge. Union-Find is the graph connectivity workhorse behind Kruskal and online component tracking.",
   skillTags: ["DSA", "Graphs"],
+  bridgesFrom: [
+    {
+      slug: "disjoint-set-union",
+      sameness:
+        "It IS the disjoint set union you already built, with graph vertices as the elements. Each edge that arrives is a union, each connectivity question is two finds compared for equality.",
+      delta:
+        "Framing it as a graph makes the restriction visible: this answers whether two vertices are connected, and nothing else. It cannot produce the path between them, it cannot tell you the distance, and it cannot handle an edge being removed — deletion would require splitting a set, which the structure has no way to do.",
+    },
+    {
+      slug: "connected-components",
+      sameness:
+        "It answers the same question as the component labelling you did with traversal: which vertices are in the same group.",
+      delta:
+        "The difference is when the edges arrive. Traversal needs the whole graph up front and costs O(V + E) every time it changes; union-find absorbs edges one at a time and answers queries in between at effectively constant cost. That makes it the right tool for a stream and the wrong tool for a snapshot you also want to explore, since it stores connectivity without storing the graph.",
+    },
+  ],
   concept:
     "Union-Find maintains connected components as edges arrive. Each node points to a parent representative. Find returns the root; union merges two roots. Path compression and union by size or rank make operations almost constant time.\n\nFor undirected graphs where edges are only added, Union-Find is usually faster and simpler than rerunning DFS after every edge.",
   complexity: [

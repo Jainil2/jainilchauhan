@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Toggle individual bits and watch the byte value change. Bitsets compress booleans and enable fast set operations with bitwise logic.",
   skillTags: ["DSA", "Systems"],
+  bridgesFrom: [
+    {
+      slug: "array",
+      sameness:
+        "It IS an array of booleans. Same indexed access, same iteration, same semantics for get and set — index i still means element i.",
+      delta:
+        "The elements are packed 64 to a word instead of one per byte, so the index becomes a word plus a bit offset and every write turns into a read-modify-write with a mask. You buy an 8x memory drop and word-parallel union and intersection, and you pay with the loss of per-element addressing: you cannot hand out a reference to one bit, and two threads writing neighbouring bits are writing the same word.",
+    },
+  ],
   concept:
     "A bitset stores boolean values as individual bits instead of full bytes or objects. This reduces memory by up to 8x or more and enables word-level operations: AND for intersection, OR for union, XOR for differences, and bit shifts for compact state transitions.\n\nBitsets are ideal when the universe of possible values is bounded and can be mapped to integer positions.",
   complexity: [

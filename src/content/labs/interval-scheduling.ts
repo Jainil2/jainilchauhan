@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Pick intervals by earliest finish time. The local greedy choice leaves maximum room for future compatible intervals.",
   skillTags: ["DSA", "Greedy"],
+  bridgesFrom: [
+    {
+      slug: "activity-selection",
+      sameness:
+        "It IS activity selection under different vocabulary. Same input of start and end times, same sort by earliest finish, same single pass taking anything compatible, same exchange argument for why that is optimal.",
+      delta:
+        "Seeing it as intervals is what exposes the assumption the greedy rests on: every interval counts the same, so more is always better. Attach a value to each one and the earliest finisher can be exactly the wrong choice — a single long lucrative booking can beat three short ones. That is the boundary where the greedy stops being correct and weighted interval scheduling has to sort by finish time and then run a DP with binary search, which is a good deal more work for a problem that looks identical.",
+    },
+  ],
   concept:
     "Interval scheduling asks for the largest set of non-overlapping intervals. The optimal greedy rule is to sort by finish time and repeatedly choose the first interval that starts after the last selected interval ends.\n\nThis works because the earliest-finishing compatible interval never leaves less room for future intervals than a later-finishing choice.",
   complexity: [{ operation: "Sort + select", time: "O(n log n)", space: "O(1) to O(n)" }],

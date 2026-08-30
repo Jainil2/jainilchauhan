@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "A linked list that acts like a balanced tree. Use 'express lanes' (higher levels) to skip large sections of data. Watch the coin-flip decide the height of each node during insertion. The simplicity of a list with the speed of a tree.",
   skillTags: ["DSA", "Redis"],
+  bridgesFrom: [
+    {
+      slug: "linked-list",
+      sameness:
+        "It IS a sorted linked list. The bottom level is exactly the list you already built — same nodes, same next pointers, same linear walk — and every search still ends there.",
+      delta:
+        "Each node is randomly promoted to extra levels above, so a search starts on a sparse express lane and drops down only when the next node overshoots. That turns the O(n) walk into O(log n) expected, but expected is the operative word: the structure is randomised, so a pathological level assignment is possible and no rebalancing ever happens, unlike a tree that guarantees its height.",
+    },
+  ],
   concept:
     "A Skip List is a probabilistic data structure that provides the same O(log N) search and insertion complexity as a balanced binary tree (like an AVL or Red-Black tree), but with a much simpler implementation based on linked lists.\n\nIt consists of multiple layers. The bottom layer is a standard sorted linked list. Each higher layer acts as an 'express lane' for the lists below. To find a value, you start at the top level and 'skip' forward until you would overshoot, then drop down a level.\n\nInsertion height is determined randomly (usually a 50% chance to grow a level), which statistically ensures that the layers maintain the proper density for O(log N) performance.",
   complexity: [

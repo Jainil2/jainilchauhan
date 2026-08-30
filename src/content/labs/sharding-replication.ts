@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Type a key to route it to a shard. Switch between quorum and async replication to see the consistency/latency tradeoff on writes.",
   skillTags: ["Distributed Systems", "Databases", "System Design"],
+  bridgesFrom: [
+    {
+      slug: "consistent-hashing",
+      sameness:
+        "Routing a key to a shard IS the ring. Hash the key, find its owner, send the request there — placement, rebalancing cost and hot-key risk all behave exactly as they did.",
+      delta:
+        "Each shard now has N copies, so 'who owns this key' becomes 'how many copies must answer before the write is done'. That quorum choice, not the placement, is where latency and durability actually live: R + W > N buys you reads that see your own writes and pays for it on every request, while acknowledging on the primary and replicating asynchronously is fast and leaves a window in which a failover loses writes the client was already told succeeded.",
+    },
+  ],
   concept:
     "Sharding partitions data across machines, usually by hashing or ranges, so storage and write load scale horizontally. Replication copies each shard to multiple nodes for availability and read scale. Together, they form the backbone of large databases and search systems.\n\nWrites can wait for a quorum of replicas, which improves consistency but adds latency, or acknowledge on the primary and replicate asynchronously, which is faster but may lose recent writes during failover. Rebalancing, hot keys, secondary indexes, and cross-shard transactions are the hard parts.",
   complexity: [

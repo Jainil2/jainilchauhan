@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Store and search strings by their common prefixes. Watch as words like 'CAT' and 'CART' share the same initial nodes. Perfect for dictionaries, IP routing, and predictive text.",
   skillTags: ["DSA", "Strings"],
+  bridgesFrom: [
+    {
+      slug: "binary-tree",
+      sameness:
+        "It IS a tree. Nodes, children, a root, and a descent from the root to find something — every traversal instinct you built on binary trees transfers.",
+      delta:
+        "Two things change and both follow from the same decision. The branching factor becomes the alphabet rather than two, and the key stops being stored in the node: a node's key is the path taken to reach it. That is why a prefix query costs the length of the prefix rather than the log of the collection size, and why memory explodes on sparse alphabets — an unused child slot still occupies space in every node unless you switch to a map per node.",
+    },
+  ],
   concept:
     "A Trie (from 'retrieval') is a tree-based data structure used for storing a set of strings where each node represents a single character. Words with common prefixes share the same path from the root.\n\nUnlike a hash map, a Trie allows for efficient prefix-based queries ('find all words starting with 'tra''). Searching for a word of length L takes O(L) time, regardless of how many millions of words are in the Trie.\n\nWhile space-intensive for small sets, Tries become very efficient as the overlap between strings increases.",
   complexity: [

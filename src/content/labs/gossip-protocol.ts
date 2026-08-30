@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "A cluster of nodes spreads state like a virus. Adjust the fanout and watch how a single update infects the entire network in O(log N) steps. Perfect for decentralized systems without a single point of failure.",
   skillTags: ["Distributed Systems", "System Design"],
+  bridgesFrom: [
+    {
+      slug: "graph-traversal",
+      sameness:
+        "It IS a breadth-first traversal of the cluster graph. A node that learns something passes it to its neighbours, they pass it on, and the frontier widens until everything reachable has been reached. The version check that stops a node re-broadcasting stale news is the visited set doing its usual job.",
+      delta:
+        "There is no queue and no visited set anyone owns. Each node picks peers at random every round instead of walking an adjacency list, so nodes hear the same update many times and delivery is probabilistic rather than guaranteed. You give up the exact O(V+E) walk and get O(log N) rounds that still finish when nodes die mid-traversal — which is the property a single traversal, run from a single coordinator, can never have.",
+    },
+  ],
   concept:
     "Gossip protocols (or epidemic protocols) are a family of decentralized communication patterns inspired by the way social gossip or viruses spread. In a cluster, each node periodically picks a random peer and 'gossips' its latest state. \n\nThe beauty of gossip is its resilience: it requires no central coordinator, and even if half the network fails, the message will still eventually reach every surviving node. It converges in O(log N) rounds, where N is the number of nodes. \n\nModern systems use gossip for failure detection (detecting when a node goes down), membership (knowing who is in the cluster), and metadata synchronization.",
   complexity: [

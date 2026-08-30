@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Run tasks only when dependencies are complete. The ready queue reveals how topological ordering powers builds, migrations, and schedulers.",
   skillTags: ["DSA", "Algorithms"],
+  bridgesFrom: [
+    {
+      slug: "graph-traversal",
+      sameness:
+        "Kahn's algorithm IS breadth-first search. Same queue, same pop-and-expand loop; the only difference is which vertices are allowed to enter it.",
+      delta:
+        "A vertex joins the frontier when its in-degree hits zero rather than when it is first discovered, so it waits for its last dependency instead of its first. That gating is also the cycle detector: if the queue empties while vertices remain, those vertices are waiting on each other, and the algorithm reports it by counting rather than by any extra pass. Unlike BFS the output order is not unique — any order the dependencies permit is a correct answer, which makes this the rare algorithm where two implementations can both be right and disagree.",
+    },
+  ],
   concept:
     "Topological sort orders nodes in a directed acyclic graph so every dependency appears before the work that depends on it. Kahn's algorithm tracks each node's in-degree, pushes zero-dependency nodes into a queue, removes them one by one, and decreases the in-degree of their outgoing neighbors.\n\nIf nodes remain but the ready queue is empty, the graph contains a cycle. That makes topological sort useful both for scheduling valid work and detecting invalid dependency graphs.",
   complexity: [

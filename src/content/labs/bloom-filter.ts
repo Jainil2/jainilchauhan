@@ -11,6 +11,22 @@ export const lab: LabMeta = {
     "Type a word — three hash functions flip three bits. Membership checks return 'maybe' or 'definitely not'. Watch the false-positive rate climb as the bit array fills.",
   whereUsed: { label: "Cache stack at Tech Holding", href: "/#projects" },
   skillTags: ["DSA", "Redis"],
+  bridgesFrom: [
+    {
+      slug: "hash-table",
+      sameness:
+        "It IS a hash table. Hash the key, go to that slot — the same addressing you already implemented, run k times with k different hash functions.",
+      delta:
+        "The slot holds one bit instead of the key, so nothing is ever stored and collisions are never resolved. That is the entire structure: constant memory per element regardless of key size, and an answer that is either definitely-not-present or probably-present. Being wrong stops being a bug and becomes a tuned parameter, and two operations disappear outright — you cannot enumerate the contents, and you cannot delete without breaking every other key that shares a bit.",
+    },
+    {
+      slug: "bitset",
+      sameness:
+        "The storage IS a bitset. One flat array of bits, addressed by index, set with a mask — exactly the structure you already packed.",
+      delta:
+        "The indices come from hashes rather than from the caller, so the bits are no longer owned by any one element. Density becomes the thing to watch: as more keys are inserted the fraction of set bits rises, and the false positive rate rises with it, so a bloom filter has a capacity you must size up front even though it never physically runs out of room.",
+    },
+  ],
   concept:
     "A Bloom filter is a space-efficient probabilistic data structure that answers one question: 'have we seen this item before?' It can be wrong in one direction — it may say 'maybe yes' when the answer is no (false positive), but it will never say 'no' when the answer is yes.\n\nIt works by maintaining an array of m bits and k independent hash functions. Insert: hash the item k times, set those k bits. Lookup: hash again — if any of the k bits is 0, the item is definitely not in the set. If all k bits are 1, it might be in the set.\n\nThe false-positive rate grows as the bit array fills: roughly (1 − e^(−kn/m))^k. Tuning k and m for an expected n gives you a controllable error budget.",
   complexity: [

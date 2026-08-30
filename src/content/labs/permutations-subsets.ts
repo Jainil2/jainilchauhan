@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Switch between include/exclude subsets and order-sensitive permutations. Both are core backtracking templates.",
   skillTags: ["DSA", "Backtracking"],
+  bridgesFrom: [
+    {
+      slug: "stack",
+      sameness:
+        "The recursion IS a stack. Every recursive call pushes a frame holding the choice just made, and every return pops it — replace the call stack with an explicit stack of partial answers and the algorithm is unchanged.",
+      delta:
+        "What the stack holds is a partial solution being mutated in place, so the pop has to undo the choice as well as discard it. That undo is the whole discipline of backtracking and the source of its classic bug: append to a shared array, recurse, and forget to remove the element, and every branch inherits the previous branch's state. Storing the result also needs care for the same reason — pushing the working array rather than a copy leaves you with n references to one array that ends up empty.",
+    },
+  ],
   concept:
     "Subset generation branches on each item: include it or skip it. Permutation generation branches by choosing each remaining item for the next position. These templates are the basis for exhaustive search and many pruning algorithms.\n\nThe output size dominates runtime: there are 2^n subsets and n! permutations.",
   complexity: [

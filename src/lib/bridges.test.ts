@@ -136,8 +136,11 @@ describe("nextSteps", () => {
   it("ranks a fully unlocked lab above a partly unlocked one", () => {
     const placed = new Set(itsSources);
     const [first] = nextSteps(placed);
-    expect(first.lab.slug).toBe(anyTarget);
+    // Those same sources can fully unlock several labs at once, and the shorter
+    // read wins the tie — so assert the rule (nothing in the way ranks first)
+    // and that the target is somewhere in the ranking, not that it is first.
     expect(first.unmet).toEqual([]);
+    expect(nextSteps(placed, 99).some((s) => s.lab.slug === anyTarget)).toBe(true);
   });
 
   it("reports exactly the prerequisites that are still missing", () => {

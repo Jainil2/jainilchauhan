@@ -11,6 +11,22 @@ export const lab: LabMeta = {
     "Click any key to access it. Recent keys move to the head; the tail gets evicted when capacity is exceeded.",
   whereUsed: { label: "Session cache layer", href: "/#projects" },
   skillTags: ["DSA", "Redis", "System Design"],
+  bridgesFrom: [
+    {
+      slug: "hash-table",
+      sameness:
+        "The lookup half IS a hash table. Key to value, average O(1), same collision behaviour, same resize concerns — nothing about get changes.",
+      delta:
+        "A hash table has no opinion about which entry to drop when memory runs out, because it never runs out; it just grows. Adding a capacity forces a policy, and the policy needs an ordering the hash table does not have, which is why one structure is not enough here.",
+    },
+    {
+      slug: "linked-list",
+      sameness:
+        "The ordering half IS a doubly linked list. Most recently used at the head, least recently used at the tail, and the O(1) unlink-and-relink of a node given its pointer is exactly the operation the list already gave you.",
+      delta:
+        "The list alone cannot find the node for a key without walking it, so the two structures are stitched together: the map stores pointers into the list. That is what makes eviction O(1), and it is also what makes correctness fragile — every touch has to update both halves, and a get that forgets to move the node silently degrades the cache to FIFO.",
+    },
+  ],
   concept:
     "An LRU (Least-Recently-Used) cache evicts the entry that hasn't been touched for the longest time. The classic O(1) implementation pairs a hash map (key → list node) with a doubly-linked list (most-recent at head, least-recent at tail).\n\nGet: hash-lookup → unlink the node → push to head. Put: if key exists, update + push to head; if at capacity, evict the tail. Both are O(1) because every operation is a constant number of pointer rewires plus a hash op.\n\nLRU is the default eviction policy for most caches because it captures temporal locality cheaply. Variants like LRU-K, ARC, and 2Q add scan resistance for workloads where one-shot reads would otherwise pollute the cache.",
   complexity: [

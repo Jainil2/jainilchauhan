@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Run the naive strategy and watch all 5 philosophers grab the left fork → instant deadlock. Switch to resource ordering or asymmetric and watch them eat. The wait-for graph never closes a cycle.",
   skillTags: ["DSA", "System Design", "Distributed Systems"],
+  bridgesFrom: [
+    {
+      slug: "cycle-detection",
+      sameness:
+        "Deadlock IS a cycle in a directed graph. Threads are nodes, an edge means 'waits for a resource held by', and the circular wait in the Coffman conditions is exactly the back edge your detector found. Break the cycle and the deadlock cannot exist.",
+      delta:
+        "Nobody hands you the graph. It is scattered across lock tables in different processes and only exists at the instant you sample it, so detection means either building it continuously or waiting on a timeout and guessing. And because detection ends with aborting a victim, the fix moves upstream: a global lock ordering makes the cycle unconstructible, which is cheaper than finding one after it has already stopped the system.",
+    },
+  ],
   concept:
     "Dijkstra's Dining Philosophers problem is the canonical concurrency parable. Five philosophers sit around a table; between each pair is one fork. Each needs both adjacent forks to eat. If everyone grabs their left fork at the same time, everyone waits forever for their right — a perfect circular wait, the textbook deadlock.\n\nDeadlock requires four conditions (Coffman, 1971): mutual exclusion, hold-and-wait, no preemption, and a circular wait. Break any one and you can't deadlock.\n\nClassic fixes: (1) global resource ordering — always grab the lower-numbered fork first, breaking the circular wait; (2) asymmetric solution — one philosopher reverses their order; (3) try-and-back-off with random retry (livelock risk!); (4) waiter/arbitrator mediates fork access.\n\nReal systems hit this constantly: database transactions waiting on row locks, distributed locks across services, even goroutine channel sends.",
   realWorld: [

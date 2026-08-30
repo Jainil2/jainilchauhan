@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Step through SCC groups. Tarjan compresses cycles into components using discovery indexes and low-link values.",
   skillTags: ["DSA", "Graphs"],
+  bridgesFrom: [
+    {
+      slug: "connected-components",
+      sameness:
+        "It IS the same question — group the vertices that can all reach each other — and Kosaraju's answer IS the same traversal, run twice.",
+      delta:
+        "Direction breaks the symmetry that made one pass enough. In an undirected graph reachability goes both ways, so a single traversal from any vertex captures the whole component; with directed edges u reaching v says nothing about v reaching u, so you need a pass to order the vertices by finish time and a second pass on the reversed graph to close the loop. The output also gains a structure the undirected version never had: contract each component and what remains is always a DAG, which is why this is the standard first step before running anything that requires acyclicity.",
+    },
+  ],
   concept:
     "A strongly connected component, or SCC, is a maximal set of directed graph nodes where every node can reach every other node. Tarjan's algorithm performs one DFS, assigns discovery indexes, maintains low-link values, and pops a component when a node is the root of an SCC.\n\nCollapsing SCCs turns a directed graph into a DAG, which is useful for dependency analysis, compiler optimization, deadlock reasoning, and graph simplification.",
   complexity: [

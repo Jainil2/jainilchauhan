@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Insert keys into a B-tree of order 4 and watch nodes split as they fill. Lookup any key to compare against a naive table scan — this is exactly how Postgres and MySQL turn O(n) into O(log n).",
   skillTags: ["DSA", "Postgres", "System Design"],
+  bridgesFrom: [
+    {
+      slug: "binary-search-tree",
+      sameness:
+        "It IS a search tree with the same ordering invariant: keys in a node separate the ranges its children cover, and a lookup compares and descends exactly as it does in a BST.",
+      delta:
+        "A node holds hundreds of keys instead of one, and that single change is driven entirely by hardware. Reading one byte from disk costs the same as reading a whole page, so the tree is shaped to make each page read discard as much of the search space as possible — a few hundred keys per node means a billion rows sit three or four levels deep instead of thirty. Balance is maintained by splitting full nodes upward rather than by rotations, which is why the tree grows from the root and every leaf stays at the same depth.",
+    },
+  ],
   concept:
     "A B-tree (or B+ tree) is a self-balancing search tree where each node holds many keys instead of just one. This is critical for storage engines: a node fits inside a single disk page (~4KB-16KB), so each level of the tree is one disk read.\n\nWith a fanout of 100+, a B-tree of 100 million rows is only 4 levels deep — meaning a row lookup costs ~4 disk reads. A binary tree at the same scale would be 27+ levels deep.\n\nWhen a node fills (more than `order` keys), it splits in half and pushes the median key up to the parent. The tree grows at the root, never the leaves, which is why B-trees stay balanced. B+ trees (the variant Postgres and MySQL use) keep all data in leaf nodes and link the leaves into a sorted list, making range scans O(log n + k) instead of O((log n) × k).",
   complexity: [

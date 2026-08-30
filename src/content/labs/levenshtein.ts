@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Find the minimum number of edits to turn one string into another. Watch the Dynamic Programming matrix fill up as it calculates the cost of Insertions, Deletions, and Substitutions. The foundation of diffing and spell-check.",
   skillTags: ["Algorithms", "Strings", "Dynamic Programming"],
+  bridgesFrom: [
+    {
+      slug: "longest-common-subsequence",
+      sameness:
+        "It IS the same table. Rows are one string, columns are the other, cell (i, j) is the answer for the two prefixes, and each cell is computed from the three neighbours above, left, and diagonal.",
+      delta:
+        "Only the cell's meaning and the costs change: LCS maximises what the two strings share, edit distance minimises the operations to turn one into the other, and the three neighbours become deletion, insertion and substitution. That makes the costs a parameter rather than a constant — weight substitutions higher and you get a different metric out of identical code, which is how spell-checkers, diff tools and DNA alignment all end up running the same loop with different numbers in it.",
+    },
+  ],
   concept:
     "Levenshtein Distance (or Edit Distance) measures the minimum number of single-character edits required to change one string into another. Edits include: Insertion, Deletion, and Substitution.\n\nIt is a classic application of **Dynamic Programming**. We build a 2D matrix where `dp[i][j]` represents the distance between the first `i` characters of string A and the first `j` characters of string B. \n\nEach cell is calculated from its neighbors: a match costs 0 + diagonal, while a mismatch costs 1 + the minimum of the three adjacent cells.",
   complexity: [

@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Toggle a violation fix to see recoloring and rotation. Red-black trees keep height bounded without being as strict as AVL.",
   skillTags: ["DSA", "Trees"],
+  bridgesFrom: [
+    {
+      slug: "avl-tree",
+      sameness:
+        "It IS a self-balancing binary search tree of the same kind as the AVL tree. Same ordering invariant, same rotations, same idea that the tree repairs its own shape on the way back up from a write.",
+      delta:
+        "The invariant is looser — equal black-height rather than heights within one — so a red-black tree can be up to twice as tall as an AVL tree of the same size. It accepts slower lookups to make writes cheaper: rebalancing after an insert takes at most a couple of rotations and mostly recolouring, where AVL may rotate all the way to the root. That is why read-heavy in-memory indexes reach for AVL and general-purpose libraries like the standard library map and the Linux scheduler reach for red-black.",
+    },
+  ],
   concept:
     "A red-black tree is a balanced BST with color invariants: nodes are red or black, the root is black, red nodes cannot have red children, and every path to a null leaf has the same number of black nodes. These rules bound height to O(log n).\n\nCompared with AVL, red-black trees allow looser balance and typically perform fewer rotations on updates, which makes them popular for general-purpose ordered maps.",
   complexity: [

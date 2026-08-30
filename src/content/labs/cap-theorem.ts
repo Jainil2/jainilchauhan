@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Trigger a network partition between two halves of a 3-node cluster. Pick CP (refuse writes on the minority) or AP (accept writes, diverge). Then heal the partition and watch conflict resolution.",
   skillTags: ["Distributed Systems", "System Design"],
+  bridgesFrom: [
+    {
+      slug: "connected-components",
+      sameness:
+        "A network partition IS the component split you already computed. Drop edges from the cluster graph and the nodes fall into maximal groups that can still reach each other and cannot reach the rest — that is literally what the word partition means here.",
+      delta:
+        "No node can run the algorithm, because none of them can see the graph. A node knows only who answered it recently, and cannot distinguish a dead peer from an unreachable one, so each side decides alone from a partial view: count what I can still reach, compare against the membership I remember. CAP is the statement that with only that view you must choose — refuse writes and lose availability, or accept writes on both sides and reconcile divergence later.",
+    },
+  ],
   concept:
     "CAP says: in the presence of a network Partition, a distributed system must choose between Consistency and Availability. You can't have all three.\n\nCP systems (etcd, Spanner, Mongo with majority writes) refuse writes on the minority side of a partition — guaranteeing that any successful read returns the most recent write. The cost: minority partitions become read-only or fully unavailable.\n\nAP systems (Cassandra, DynamoDB with eventual consistency, Riak) accept writes on both sides during a partition, then reconcile when the partition heals — using strategies like last-write-wins, vector clocks, or CRDTs. The cost: reads can return stale data, and conflict resolution can lose writes.\n\nCAP is about partitions specifically. The day-to-day trade-off is closer to PACELC: when there's a Partition, choose A or C; Else, choose Latency or Consistency.",
   realWorld: [

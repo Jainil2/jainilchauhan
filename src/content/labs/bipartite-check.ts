@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Toggle a conflict and see two-coloring fail. A graph is bipartite when every edge connects opposite colors.",
   skillTags: ["DSA", "Graphs"],
+  bridgesFrom: [
+    {
+      slug: "graph-traversal",
+      sameness:
+        "It IS BFS or DFS with one extra field per vertex. Traverse as usual, and colour each newly discovered vertex the opposite of the one you came from.",
+      delta:
+        "The test is a single check on every edge you touch: if a neighbour is already coloured the same as the current vertex, the graph is not bipartite. That turns an abstract property into a linear-time traversal, and it proves something concrete — a failure means an odd-length cycle exists, and the traversal tree tells you where. Disconnected graphs need the same outer loop as components, since each island is coloured independently.",
+    },
+  ],
   concept:
     "A graph is bipartite if its vertices can be split into two sets such that every edge connects nodes from different sets. BFS or DFS can test this by assigning alternating colors. If an edge ever connects nodes with the same color, the graph is not bipartite.\n\nBipartite graphs are exactly graphs with no odd-length cycles. They are the structure behind matching problems, assignment systems, recommendations, and constraint checks.",
   complexity: [{ operation: "Two-color check", time: "O(V + E)", space: "O(V)" }],

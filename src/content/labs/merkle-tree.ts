@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Mutate a data block (leaf node) to see its hash change. Watch how the invalidation bubbles up the tree, changing the Root Hash. Used in Git, Blockchain, and DynamoDB.",
   skillTags: ["System Design", "Security"],
+  bridgesFrom: [
+    {
+      slug: "binary-tree",
+      sameness:
+        "It IS a binary tree. Leaves hold data, internal nodes hold a value derived from their two children, and you walk root-to-leaf exactly as before.",
+      delta:
+        "The derived value is a cryptographic hash of the children, which makes every node a fingerprint of its whole subtree. Comparing two large datasets collapses to comparing two roots, and when they differ you descend only into the mismatched side, so finding the changed block costs O(log n) hashes instead of a full scan. The property is one-directional: the tree proves a leaf belongs to a root, but it can never tell you what a leaf contains.",
+    },
+  ],
   concept:
     "A Merkle tree is a binary tree where each leaf is the hash of a data block, and each internal node is the hash of the concatenation of its children's hashes. The single root hash uniquely fingerprints the entire dataset.\n\nThe magic: to prove a single block is part of the dataset, you only need O(log n) sibling hashes — a Merkle proof. To detect any tampering, you re-hash the changed block; the change cascades up to a different root.\n\nThis enables efficient verification in adversarial settings (blockchains, content-addressed storage) and efficient sync in distributed systems (compare roots; if they differ, descend into the differing subtree to find the diverging block).",
   complexity: [

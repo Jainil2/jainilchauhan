@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Fill the DP matrix row by row. Matching characters extend the diagonal; mismatches take the best neighbor.",
   skillTags: ["DSA", "Dynamic Programming"],
+  bridgesFrom: [
+    {
+      slug: "grid-dp",
+      sameness:
+        "It IS grid DP. A two-dimensional table where every cell is built from its neighbours above and to the left, filled in a single row-by-row sweep, with the answer waiting in the far corner.",
+      delta:
+        "The axes are two strings rather than two spatial dimensions, so cell (i, j) means the best answer for the first i characters against the first j. The recurrence branches on a comparison — matching characters extend the diagonal, mismatching ones take the better of the two neighbours — and that branch is what makes the table reconstructable: walking backwards from the corner recovers the actual subsequence, not just its length, which the pure counting version of grid DP never needed to support.",
+    },
+  ],
   concept:
     "LCS finds the longest sequence that appears in both inputs in the same order, not necessarily contiguously. If characters match, dp[i][j] = 1 + dp[i-1][j-1]. Otherwise it takes max(dp[i-1][j], dp[i][j-1]).\n\nIt is the foundation for diff tools and sequence similarity because it preserves relative ordering.",
   complexity: [

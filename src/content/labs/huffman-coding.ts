@@ -10,6 +10,22 @@ export const lab: LabMeta = {
   caption:
     "Merge the two lowest-frequency nodes repeatedly. Frequent symbols get shorter codes; rare symbols get longer codes.",
   skillTags: ["DSA", "Compression", "Greedy"],
+  bridgesFrom: [
+    {
+      slug: "heap-priority-queue",
+      sameness:
+        "The algorithm IS repeated extract-min. Take the two least frequent symbols out of the priority queue, merge them into a node whose frequency is their sum, put it back, and repeat until one node remains.",
+      delta:
+        "The queue is doing the optimisation, not a clever insight — greedily merging the two rarest symbols is provably optimal because the rarest symbols must end up deepest. The consequence is that the entire cost is n heap operations, O(n log n), and that the tree is built bottom-up: you do not know the code for any symbol until the last merge is done.",
+    },
+    {
+      slug: "binary-tree",
+      sameness:
+        "The codebook IS a binary tree. Left is a 0, right is a 1, and a symbol's code is the path taken to reach its node.",
+      delta:
+        "Every symbol sits at a leaf, and that placement is what makes the code prefix-free: no codeword can be a prefix of another because no leaf is an ancestor of another. That is why the decoder needs no delimiters and no lengths — it walks the tree bit by bit and emits a symbol whenever it lands on a leaf, which also means a single flipped bit does not corrupt one character but desynchronises the rest of the stream.",
+    },
+  ],
   concept:
     "Huffman coding constructs an optimal prefix-free binary code for known symbol frequencies. It repeatedly removes the two least frequent nodes from a priority queue, merges them, and pushes the combined node back.\n\nPrefix-free means no code is the prefix of another, so decoding is unambiguous. The greedy merge is optimal because the two least frequent symbols can safely be placed deepest as siblings.",
   complexity: [

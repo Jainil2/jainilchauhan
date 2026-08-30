@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Publish events to a topic. Messages are partitioned and processed asynchronously by a consumer group. Watch out for consumer lag if you publish too fast!",
   skillTags: ["System Design", "Distributed Systems", "Kafka"],
+  bridgesFrom: [
+    {
+      slug: "circular-buffer",
+      sameness:
+        "A partition IS a ring buffer. Producers append at a write index, consumers read at their own index, capacity is bounded by the retention window, and the gap between the two indexes — consumer lag — is the same fullness measure you were already tracking.",
+      delta:
+        "Reader and writer no longer share memory, and there are many readers each holding a private index, so a slow consumer cannot block the producer. It just drifts toward the wrap, and when the writer laps it the records are gone. Overflow stops being a full-buffer error and becomes silent data loss, visible only as lag climbing on a dashboard — which is why lag, not queue depth, is the metric people page on.",
+    },
+  ],
   concept:
     "A distributed log (Kafka, Pulsar, Kinesis) is a partitioned, append-only commit log per topic. Producers append to a partition; consumers track their own offset. This decouples producers from consumers — they don't need to be online at the same time, and consumers can replay history.\n\nPartitioning is the unit of parallelism: each partition is consumed by exactly one member of a consumer group. Within a partition, ordering is guaranteed; across partitions, it isn't. The partitioning key (often user_id) decides which partition a message lands in — pick it carefully because skewed keys mean hot partitions.\n\nConsumer lag (= producer offset − consumer offset) is the canonical health metric. Steady lag = matched throughput. Growing lag = consumers can't keep up; scale out, batch more, or shed load.",
   realWorld: [

@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Build a heap, extract the root into the sorted suffix, and heapify the remaining prefix.",
   skillTags: ["DSA", "Algorithms"],
+  bridgesFrom: [
+    {
+      slug: "heap-priority-queue",
+      sameness:
+        "It IS the priority queue you already built, drained. Heapify the array, then pop the max n times; each pop leaves a hole at the end of the array that is exactly where that element belongs.",
+      delta:
+        "Because the heap lives in the same array being sorted, nothing is allocated — an O(n log n) worst case with O(1) extra memory, which merge sort cannot offer and quicksort cannot guarantee. What it loses is locality: sift-down jumps to 2i+1, so it touches the array in a cache-hostile pattern and reliably finishes behind quicksort in wall-clock time despite the better bound. That is why it usually appears as introsort's fallback rather than as anyone's first choice.",
+    },
+  ],
   concept:
     "Heap sort first transforms the array into a max heap. The largest item is at the root, so it swaps the root with the end of the array, shrinks the heap, and heapifies the root again. Repeating this produces a sorted suffix.\n\nIt has guaranteed O(n log n) time and O(1) auxiliary space, but it is not stable and usually has worse cache behavior than quicksort or TimSort.",
   complexity: [

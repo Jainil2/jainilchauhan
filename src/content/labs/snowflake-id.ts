@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Generate IDs that are unique across thousands of machines without a central database. Deconstruct the 64-bit ID into its components: Timestamp, Worker ID, and Sequence number. Fast, sorted, and collision-free.",
   skillTags: ["Distributed Systems", "System Design"],
+  bridgesFrom: [
+    {
+      slug: "bitset",
+      sameness:
+        "It IS bit packing. Several independent fields share one 64-bit word and each is read back with a shift and a mask — the same arithmetic that let you store thousands of flags in a handful of integers.",
+      delta:
+        "The field widths are a capacity budget rather than a memory saving. 41 bits fixes how long your epoch lasts, 10 bits caps how many workers can ever exist, 12 bits caps IDs per millisecond per worker. Overflow does not corrupt a flag, it hands out a duplicate primary key — so the generator must stall until the next millisecond, and a clock that steps backwards can reissue IDs it already gave away.",
+    },
+  ],
   concept:
     "Snowflake is a distributed ID generation service used when you need unique, roughly time-sorted (k-ordered) 64-bit integers across a massive cluster without the bottleneck of a central auto-incrementing database.\n\nThe 64 bits are typically divided: 1 bit (unused), 41 bits (milliseconds since epoch), 10 bits (machine/worker ID), and 12 bits (sequence number). This allows for 4,096 IDs per millisecond per worker, for ~69 years.\n\nBecause the timestamp is the most significant part, IDs are naturally sorted by time, which is highly beneficial for database indexing (keeping B-Tree inserts sequential).",
   complexity: [

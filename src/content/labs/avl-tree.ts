@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Insert a skewing value and rotate back into balance. AVL tracks balance factor and performs rotations when height differs too much.",
   skillTags: ["DSA", "Trees"],
+  bridgesFrom: [
+    {
+      slug: "binary-search-tree",
+      sameness:
+        "It IS a binary search tree — same ordering invariant, same comparison-driven descent, same in-order walk for sorted output. Every search you wrote works here unmodified.",
+      delta:
+        "Each insert and delete also restores a height rule: the two subtrees of any node differ in height by at most one, enforced with rotations on the way back up. That converts the average case into a worst case guarantee, so the sorted-insertion order that turned a plain BST into a linked list is now harmless. You pay for it on writes, which now do O(log n) extra bookkeeping and can no longer be a simple leaf attachment.",
+    },
+  ],
   concept:
     "An AVL tree is a self-balancing binary search tree. For every node, the height difference between left and right subtrees must be -1, 0, or 1. After insertion or deletion, the tree restores this invariant using single or double rotations.\n\nAVL trees are stricter than red-black trees, so lookups are very fast due to lower height. The cost is more frequent rotations on write-heavy workloads.",
   complexity: [

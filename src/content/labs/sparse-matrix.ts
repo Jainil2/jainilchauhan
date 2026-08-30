@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Scan non-zero matrix cells and compare the dense grid to coordinate triples. Sparse storage saves memory when most entries are zero.",
   skillTags: ["DSA", "ML", "Databases"],
+  bridgesFrom: [
+    {
+      slug: "array",
+      sameness:
+        "A dense matrix IS an array. Two dimensions are a convenience over one contiguous block plus an index formula, row * cols + col, and the sparse formats keep arrays as the substrate — CSR is three plain arrays: values, column indices, and where each row starts.",
+      delta:
+        "What you give up is the index formula. Reading cell (i, j) stops being arithmetic and becomes a search inside row i's slice, so random access degrades from O(1) to O(log nnz) while memory drops from rows times cols to the number of non-zeros. That trade only pays while the matrix really is mostly empty — past roughly ten percent density the index bookkeeping costs more than the zeros did.",
+    },
+  ],
   concept:
     "A sparse matrix represents a grid where most values are zero or empty. Instead of storing every cell, formats like COO store triples (row, column, value), CSR groups values by row, and CSC groups by column.\n\nSparse matrices are fundamental in search, recommendation systems, graphs, scientific computing, machine learning, and analytics because real relationships are often sparse.",
   complexity: [

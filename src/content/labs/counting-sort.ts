@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Count each key, then rebuild output from frequencies. Counting sort wins when the value range is bounded.",
   skillTags: ["DSA", "Algorithms"],
+  bridgesFrom: [
+    {
+      slug: "array",
+      sameness:
+        "It IS an array used as a lookup table, with the value being sorted as the index. Count how many times each value appears, then walk the counters in order and write each value out that many times.",
+      delta:
+        "No two elements are ever compared, so the O(n log n) comparison lower bound simply does not apply — this is genuinely linear. The cost moves from time into space and becomes proportional to the range of the values rather than their count: sorting a hundred small integers is trivial, sorting a hundred 32-bit integers this way would ask for four billion counters. That constraint is the entire reason radix sort exists.",
+    },
+  ],
   concept:
     "Counting sort avoids comparisons. It counts how many times each integer key appears, then emits keys in order. A stable variant uses prefix sums to place records in output while preserving equal-key order.\n\nThe runtime is O(n + k), where k is the key range. That is linear only when k is reasonably small.",
   complexity: [

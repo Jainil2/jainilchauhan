@@ -10,6 +10,15 @@ export const lab: LabMeta = {
   caption:
     "Run BFS augmentations and track bottlenecks. Edmonds-Karp is slower than modern flow algorithms but easier to reason about.",
   skillTags: ["DSA", "Graphs", "Optimization"],
+  bridgesFrom: [
+    {
+      slug: "max-flow",
+      sameness:
+        "It IS the max-flow loop you already ran: find an augmenting path in the residual graph, push the bottleneck along it, repeat until no path remains. Nothing about the flow, the residuals or the termination changes.",
+      delta:
+        "It fixes the choice of path, always taking a shortest one by BFS. That single rule replaces a bound that depends on the capacity values with O(V E squared), which depends only on the graph's size — the difference between an algorithm that can crawl on a graph with large capacities and one whose runtime you can predict from the vertex and edge counts alone.",
+    },
+  ],
   concept:
     "Edmonds-Karp is the Ford-Fulkerson method with one rule: choose augmenting paths using BFS in the residual graph. That shortest-path rule gives a polynomial O(VE^2) bound and avoids pathological path choices.\n\nIt is a practical teaching algorithm for residual graphs, bottlenecks, and flow conservation before moving to Dinic or Push-Relabel.",
   complexity: [
