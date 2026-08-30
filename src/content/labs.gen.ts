@@ -22,6 +22,14 @@ export const labSummaries: LabSummary[] = [
     "blurb": "Greedily choose compatible activities with equal value."
   },
   {
+    "slug": "agent-loop",
+    "title": "Agent Loop & Tool Use",
+    "category": "AI Systems",
+    "difficulty": "Advanced",
+    "readingTimeMin": 7,
+    "blurb": "A dependency graph executed in order — discovered one node at a time."
+  },
+  {
     "slug": "ann-search",
     "title": "ANN Search & HNSW",
     "category": "AI Systems",
@@ -44,6 +52,14 @@ export const labSummaries: LabSummary[] = [
     "difficulty": "Intermediate",
     "readingTimeMin": 5,
     "blurb": "Heuristic-based pathfinding."
+  },
+  {
+    "slug": "attention",
+    "title": "Attention as a Lookup Table",
+    "category": "AI Systems",
+    "difficulty": "Advanced",
+    "readingTimeMin": 7,
+    "blurb": "Query, key, value — a hash table where every key matches a little."
   },
   {
     "slug": "avl-tree",
@@ -614,6 +630,14 @@ export const labSummaries: LabSummary[] = [
     "blurb": "Grow a minimum spanning tree from one connected frontier."
   },
   {
+    "slug": "prompt-injection",
+    "title": "Prompt Injection & Trust Boundaries",
+    "category": "AI Systems",
+    "difficulty": "Advanced",
+    "readingTimeMin": 7,
+    "blurb": "Untrusted input arriving as instructions — with no signature to check."
+  },
+  {
     "slug": "quadtree",
     "title": "QuadTree / GeoSpatial",
     "category": "Data Structures",
@@ -668,6 +692,14 @@ export const labSummaries: LabSummary[] = [
     "difficulty": "Advanced",
     "readingTimeMin": 6,
     "blurb": "5-node consensus with crash recovery."
+  },
+  {
+    "slug": "rag-pipeline",
+    "title": "RAG Retrieval Pipeline",
+    "category": "AI Systems",
+    "difficulty": "Advanced",
+    "readingTimeMin": 7,
+    "blurb": "Three labs you already finished, in a row — where the recalls multiply."
   },
   {
     "slug": "rate-limiter",
@@ -790,6 +822,14 @@ export const labSummaries: LabSummary[] = [
     "blurb": "The foundation of HTTPS."
   },
   {
+    "slug": "tokenization",
+    "title": "Tokenization & BPE",
+    "category": "AI Systems",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "A trie walk over merges a corpus voted for — and the unit you are billed in."
+  },
+  {
     "slug": "topological-sort",
     "title": "Topological Sort",
     "category": "Algorithms",
@@ -851,6 +891,18 @@ export interface BridgeEdge {
 
 export const bridgeEdges: BridgeEdge[] = [
   {
+    "to": "agent-loop",
+    "from": "topological-sort",
+    "sameness": "Tool calls form a dependency graph and run in dependency order: a step whose inputs are not ready cannot execute, and a step whose inputs failed never becomes ready. That is the ordering you already implemented.",
+    "delta": "The graph does not exist yet. The model emits one call at a time and decides the next after seeing the result, so there is no whole graph to sort and no way to detect a cycle in advance — a loop only shows up as the same call repeating. Kahn's algorithm terminates because the graph is finite; this terminates because you gave it a step budget."
+  },
+  {
+    "to": "agent-loop",
+    "from": "circuit-breaker",
+    "sameness": "Same containment around an unreliable dependency: watch failures, stop calling something that keeps failing, and fail the operation rather than hanging on it forever.",
+    "delta": "The dependency is non-deterministic, so 'failing' now includes succeeding with a plausible wrong answer. No error rate detects that, which is why the budget is the primary guard rather than the error threshold — the loop is bounded by steps and tokens spent, not only by exceptions raised."
+  },
+  {
     "to": "ann-search",
     "from": "skip-list",
     "sameness": "HNSW IS a skip list. A sparse top layer takes huge strides across the whole set, each layer below is denser, and you descend a layer the moment the current one stops improving — the same express-lane-then-local-lane trick you already implemented, with the same probabilistic layer assignment per node.",
@@ -861,6 +913,18 @@ export const bridgeEdges: BridgeEdge[] = [
     "from": "quadtree",
     "sameness": "Same premise as the quadtree: partition space so a lookup touches a small region rather than every point, and let the structure of the data decide where the cuts go.",
     "delta": "Recursive partitioning collapses past roughly ten dimensions — the cells needed to cover the space outgrow the points, and every query ends up touching most of them anyway. So high-dimensional search abandons partitioning for a navigable graph: nodes hold links to a few near neighbours plus a couple of deliberately long-range ones, and you walk edges instead of descending cells."
+  },
+  {
+    "to": "attention",
+    "from": "hash-table",
+    "sameness": "The vocabulary is not a metaphor. Attention has queries, keys and values, and it does the same thing your hash table did: present a query, find the keys it matches, return the associated values.",
+    "delta": "The match is soft. Instead of one bucket, every key gets a weight from the softmax and the result is the weighted sum of all values — so there is no miss, no collision, and no 'not found'. That is also the cost: a lookup is O(n) in the number of keys, not O(1), and with n keys per query the whole layer is O(n²)."
+  },
+  {
+    "to": "attention",
+    "from": "sparse-matrix",
+    "sameness": "The attention matrix is n×n and, in a decoder, structurally half empty — no position may attend to a future one, so everything above the diagonal is masked out. You already know how to represent and skip that triangle.",
+    "delta": "Those zeros are a rule rather than absent data, so they cannot be dropped from the layout: the mask is applied before the softmax, as -∞, because a zero score is still a real weight after exponentiating. And the dense half is what hurts — it grows quadratically with context length, which is why FlashAttention tiles the computation instead of ever materialising the matrix."
   },
   {
     "to": "continuous-batching",
@@ -905,6 +969,18 @@ export const bridgeEdges: BridgeEdge[] = [
     "delta": "The budget is GPU memory rather than entry count, so entries have wildly different sizes. And an eviction is not a miss you refetch — it is a recompute of every token in that sequence, which is why it shows up as a latency spike rather than an error."
   },
   {
+    "to": "prompt-injection",
+    "from": "jwt-anatomy",
+    "sameness": "Same shape as the unverified token you took apart: data arrives from outside carrying a claim about what it is allowed to do, and everything depends on whether the receiver checks that claim or takes its word.",
+    "delta": "There is nothing to check. A JWT has a signature, so 'is this claim authentic' is a computation with an answer. Instructions and content share one undifferentiated text channel with no envelope, no signature, and no delimiter the model is obliged to respect — so the boundary cannot be verified at parse time. It has to be enforced by what the tools permit after the model has already been convinced."
+  },
+  {
+    "to": "prompt-injection",
+    "from": "cors-lab",
+    "sameness": "Same question CORS exists to answer: this content came from somewhere else, so what is it allowed to reach? Origin, and the privileges attached to it, is the whole subject.",
+    "delta": "CORS is enforced by the browser, outside the page's control. Nothing enforces this. Once a retrieved document is in the context window it is the same colour as the system prompt as far as the model is concerned, so origin has to be tracked by your own code and carried forward — a call built on data from an untrusted document is itself untrusted, however trustworthy the caller looked."
+  },
+  {
     "to": "quantization",
     "from": "bitset",
     "sameness": "It is the same packing you implemented: values that do not need a full machine word share one, and reading a value means an offset plus a mask. Memory falls geometrically with the bits per value.",
@@ -915,6 +991,24 @@ export const bridgeEdges: BridgeEdge[] = [
     "from": "huffman-coding",
     "sameness": "Both spend bits in proportion to how much they matter. Huffman gives frequent symbols shorter codes; quantisation gives each weight group only as many levels as its range justifies.",
     "delta": "Quantisation is lossy and fixed-width, so it is chosen for predictable memory and fast decode rather than for optimal compression."
+  },
+  {
+    "to": "rag-pipeline",
+    "from": "embeddings",
+    "sameness": "Stage zero is the lab you just did. Chunks are embedded once at ingest, the question is embedded at query time, and relevance is the cosine between them.",
+    "delta": "The two sides are no longer symmetric. A question and the passage answering it rarely look alike — 'why did the deploy fail' and a log excerpt share almost no vocabulary — so query and document are often embedded by different modes of the same model, and pure similarity retrieves things about the topic rather than things that answer it."
+  },
+  {
+    "to": "rag-pipeline",
+    "from": "ann-search",
+    "sameness": "Stage one is the approximate search you built, with the same recall you already learned to measure against a brute-force baseline.",
+    "delta": "Its misses now arrive somewhere new. A neighbour the graph never visited is not a slightly worse search result any more — it is a passage the model never sees, so the answer comes out fluent, confident and unsupported. Retrieval failures surface as hallucinations, which is why they get blamed on the model."
+  },
+  {
+    "to": "rag-pipeline",
+    "from": "reranking",
+    "sameness": "Stage two is the two-stage ranker, unchanged: a cheap shortlist, an expensive cross-encoder, the same ceiling set by first-stage recall.",
+    "delta": "There is now a third cut after it that has nothing to do with relevance. The context window is finite, so the best passages are packed until the budget runs out and the rest are dropped — a document can be ranked first by every scorer in the pipeline and still not make it into the prompt."
   },
   {
     "to": "reranking",
@@ -945,6 +1039,18 @@ export const bridgeEdges: BridgeEdge[] = [
     "from": "branch-and-bound",
     "sameness": "It is the same speculate-then-prune shape you implemented: explore a candidate path cheaply, evaluate it against something authoritative, and discard everything after the point it stops holding up.",
     "delta": "The cheap explorer is a small language model rather than a bound function, and verification is exact rather than a heuristic — a rejected token costs wasted GPU time but never a wrong answer."
+  },
+  {
+    "to": "tokenization",
+    "from": "trie",
+    "sameness": "Encoding is a longest-match walk over a prefix structure — the same operation you implemented for autocomplete. Feed characters, follow the longest sequence the vocabulary knows, emit it, continue from there.",
+    "delta": "The entries were not defined by anyone; they were learned by counting pairs in a training corpus. So the vocabulary reflects that corpus's habits: ' the' is one token, an uncommon surname is five, and the same sentence in Hindi or Thai can cost three times what it costs in English. Your trie was a data structure. This one is a pricing model."
+  },
+  {
+    "to": "tokenization",
+    "from": "huffman-coding",
+    "sameness": "Identical greedy loop: count frequencies, repeatedly combine the pair that pays best, and end with common things encoded short and rare things encoded long. Both are frequency-driven compression built bottom-up.",
+    "delta": "Huffman merges the two least frequent symbols and runs to optimality. BPE merges the most frequent adjacent pair and stops at a fixed vocabulary size — usually 32k to 200k — because the output is not a bitstream but a symbol table an embedding matrix must have a row for. That cap is why rare words fragment: there was no budget left for them."
   },
   {
     "to": "vector-index",

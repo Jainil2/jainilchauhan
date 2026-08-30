@@ -444,4 +444,29 @@ export const labComponents: Record<string, LazyExoticComponent<ComponentType>> =
       default: m.SemanticCacheLab,
     })),
   ),
+  tokenization: lazy(() =>
+    import("@/components/system-design/AiPipelineLabs").then((m) => ({
+      default: m.TokenizationLab,
+    })),
+  ),
+  attention: lazy(() =>
+    import("@/components/system-design/AiPipelineLabs").then((m) => ({
+      default: m.AttentionLab,
+    })),
+  ),
+  "rag-pipeline": lazy(() =>
+    import("@/components/system-design/AiPipelineLabs").then((m) => ({
+      default: m.RagPipelineLab,
+    })),
+  ),
+  "agent-loop": lazy(() =>
+    import("@/components/system-design/AiPipelineLabs").then((m) => ({
+      default: m.AgentLoopLab,
+    })),
+  ),
+  "prompt-injection": lazy(() =>
+    import("@/components/system-design/AiPipelineLabs").then((m) => ({
+      default: m.PromptInjectionLab,
+    })),
+  ),
 };
