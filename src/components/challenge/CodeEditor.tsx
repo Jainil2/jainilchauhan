@@ -1,5 +1,7 @@
 import {
+  useEffect,
   useRef,
+  useState,
   type ChangeEvent,
   type CSSProperties,
   type KeyboardEvent,
@@ -34,10 +36,8 @@ const INDENT = "  ";
  * Ligatures are off because a ligature substitution can alter advance width,
  * and any width difference between the layers reintroduces the same bug.
  */
-const TYPE: CSSProperties = {
+const TYPE_BASE: CSSProperties = {
   fontFamily: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace',
-  fontSize: "13px",
-  lineHeight: "22px",
   letterSpacing: "normal",
   wordSpacing: "normal",
   fontWeight: 400,
@@ -52,8 +52,40 @@ const TYPE: CSSProperties = {
   textRendering: "auto",
 };
 
+/**
+ * Only the size varies, and it varies for every layer at once.
+ *
+ * A phone shows about half of a 70-character starter line at 13px. 12px is the
+ * design system's floor and buys back a few characters; the rest is horizontal
+ * scrolling, which `whiteSpace: "pre"` makes unavoidable and which the fade on
+ * the right edge exists to advertise.
+ */
+const TYPE_DEFAULT: CSSProperties = { ...TYPE_BASE, fontSize: "13px", lineHeight: "22px" };
+const TYPE_NARROW: CSSProperties = { ...TYPE_BASE, fontSize: "12px", lineHeight: "20px" };
+
+const NARROW = "(max-width: 480px)";
+
 /** Padding must match exactly too, or line one starts at a different x/y. */
 const PAD: CSSProperties = { paddingTop: 12, paddingBottom: 12, paddingLeft: 12, paddingRight: 12 };
+
+/**
+ * Narrow-viewport flag, defaulting to false so the server and the first client
+ * render agree — the same hydration shape every other reader of browser-only
+ * state in this repo uses.
+ */
+function useNarrowViewport() {
+  const [narrow, setNarrow] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia(NARROW);
+    const sync = () => setNarrow(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  return narrow;
+}
 
 /**
  * A transparent <textarea> laid over a syntax-highlighted <pre>.
@@ -70,6 +102,10 @@ export function CodeEditor({ value, onChange, disabled, ariaLabel }: CodeEditorP
   const preRef = useRef<HTMLPreElement>(null);
   const gutterRef = useRef<HTMLDivElement>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
+
+  // One object for all three layers, still — the size is chosen once here and
+  // spread everywhere, so the layers cannot end up at different metrics.
+  const TYPE = useNarrowViewport() ? TYPE_NARROW : TYPE_DEFAULT;
 
   const lines = value.split("\n");
 
@@ -116,6 +152,16 @@ export function CodeEditor({ value, onChange, disabled, ariaLabel }: CodeEditorP
       </div>
 
       <div className="relative flex-1">
+        {/*
+         * Lines are never wrapped -- whiteSpace: "pre" is what keeps the caret
+         * over its glyph -- so on a narrow screen a long line simply runs off
+         * the edge. This fade says "there is more to the right"; without it a
+         * cut line reads as a broken editor rather than a scrollable one.
+         */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-background to-transparent sm:hidden"
+        />
         <pre
           ref={preRef}
           aria-hidden
