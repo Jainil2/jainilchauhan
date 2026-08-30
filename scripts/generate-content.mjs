@@ -42,6 +42,19 @@ function loadLab(file) {
   }
 }
 
+/** Tracks are pure data with one type-only import, same as a lab file. */
+function loadTracks() {
+  const src = readFileSync(join(repoRoot, "src", "content", "tracks.ts"), "utf8");
+  const body = src
+    .replace(/^import type .*$/gm, "")
+    .replace(/export const tracks: Track\[\] =/, "return");
+  try {
+    return new Function(body)();
+  } catch (err) {
+    throw new Error(`tracks.ts: failed to evaluate — ${err.message}`);
+  }
+}
+
 function main() {
   const files = readdirSync(labsDir)
     .filter((f) => f.endsWith(".ts") && f !== "index.ts" && !f.endsWith(".test.ts"))
@@ -104,6 +117,47 @@ function main() {
     }
   }
 
+  // Tracks are an ordering over the same catalogue, so the only thing that can
+  // be wrong with one is a step naming a lab that does not exist.
+  const tracks = loadTracks();
+  const slugSet = new Set(labs.map((l) => l.slug));
+  for (const track of tracks) {
+    if (!track.slug || !track.title) errors.push(`track "${track.slug}": missing slug or title`);
+    if (!track.steps?.length) errors.push(`track "${track.slug}": has no steps`);
+    for (const step of track.steps ?? []) {
+      if (!slugSet.has(step)) errors.push(`track "${track.slug}": step "${step}" does not exist`);
+    }
+    if (new Set(track.steps).size !== track.steps?.length) {
+      errors.push(`track "${track.slug}": repeats a step`);
+    }
+  }
+
+  // "Every lab is connected" is a promise about the graph, so it is checked
+  // rather than asserted. A lab with no bridge in and no bridge out is a dead
+  // end: nothing leads to it and it leads nowhere, so no path can reach it and
+  // no reframe explains it. Roots are fine — they have edges out.
+  const connected = new Set();
+  for (const lab of labs) {
+    for (const b of lab.bridgesFrom ?? []) {
+      connected.add(lab.slug);
+      connected.add(b.slug);
+    }
+  }
+  // A lab an ordered track walks through is reachable by that route even with
+  // no bridge of its own, so a track step counts as connectivity too.
+  for (const track of tracks) for (const step of track.steps ?? []) connected.add(step);
+
+  // A warning while the bridges are still being authored; set STRICT_GRAPH=1 to
+  // make it fatal, which is how it should run once every lab has an edge.
+  const orphans = labs.map((l) => l.slug).filter((s) => !connected.has(s));
+  if (orphans.length) {
+    const line =
+      `${orphans.length} lab(s) are not connected to anything — no bridge in, ` +
+      `no bridge out, no track step:\n          ${orphans.join(", ")}`;
+    if (process.env.STRICT_GRAPH) errors.push(line);
+    else console.warn(`[content] ${line}`);
+  }
+
   if (errors.length) {
     console.error("[content] validation failed:");
     for (const e of errors) console.error("  - " + e);
@@ -141,7 +195,14 @@ function main() {
       ),
       null,
       2,
-    )};\n`;
+    )};\n\n` +
+    // Tracks are tiny (a title and a list of slugs), so they ship in the
+    // summary index rather than being lazily loaded like lab prose.
+    `/** Guided routes through the catalogue, ordered. */\n` +
+    `export interface TrackSummary {\n` +
+    `  slug: string;\n  title: string;\n  blurb: string;\n  outcome: string;\n` +
+    `  steps: string[];\n}\n\n` +
+    `export const trackSummaries: TrackSummary[] = ${JSON.stringify(tracks, null, 2)};\n`;
 
   writeFileSync(join(repoRoot, "src", "content", "labs.gen.ts"), gen, "utf8");
 

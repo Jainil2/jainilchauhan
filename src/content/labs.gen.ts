@@ -1065,3 +1065,34 @@ export const bridgeEdges: BridgeEdge[] = [
     "delta": "A Bloom filter's error is one-sided — a false positive, which a lookup in the real store immediately corrects. A vector index errs the other way: it returns false negatives, neighbours it never looked at. There is no cheap verification step, because verifying means the exact scan the index exists to avoid. So the error is invisible in production and must be measured offline."
   }
 ];
+
+/** Guided routes through the catalogue, ordered. */
+export interface TrackSummary {
+  slug: string;
+  title: string;
+  blurb: string;
+  outcome: string;
+  steps: string[];
+}
+
+export const trackSummaries: TrackSummary[] = [
+  {
+    "slug": "foundations",
+    "title": "Data structures, end to end",
+    "blurb": "The structures everything else is built out of, in the order that each one explains the next.",
+    "outcome": "You can pick the right structure for a problem and say what it costs, rather than reaching for a hash map every time.",
+    "steps": [
+      "array",
+      "dynamic-array",
+      "linked-list",
+      "stack",
+      "queue",
+      "hash-table",
+      "binary-tree",
+      "binary-search-tree",
+      "heap-priority-queue",
+      "trie",
+      "lru-cache"
+    ]
+  }
+];

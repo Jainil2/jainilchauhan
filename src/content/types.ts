@@ -1,5 +1,6 @@
 export type LabCategory =
   | "Distributed Systems"
+  | "System Design"
   | "Data Structures"
   | "Algorithms"
   | "Security"
@@ -9,11 +10,33 @@ export type Difficulty = "Beginner" | "Intermediate" | "Advanced";
 
 export const LAB_CATEGORIES: LabCategory[] = [
   "Distributed Systems",
+  "System Design",
   "Data Structures",
   "Algorithms",
   "Security",
   "AI Systems",
 ];
+
+/**
+ * An ordered route through the labs.
+ *
+ * Bridges answer "what is this a small change from"; a track answers "what do I
+ * do first, and then what". Both read the same catalogue — a track is only an
+ * ordering of slugs, so it can never disagree with the labs it points at.
+ *
+ * Product Rule 1 still binds: a track may be long, but nothing renders it as a
+ * count of what the visitor has not done.
+ */
+export interface Track {
+  slug: string;
+  title: string;
+  /** One line: who this is for and where it ends. */
+  blurb: string;
+  /** What you can do at the end, stated concretely. */
+  outcome: string;
+  /** Lab slugs, in the order they should be taken. Every one must resolve. */
+  steps: string[];
+}
 
 /**
  * One test case. `body` runs inside the challenge worker with `solution` bound
