@@ -1,67 +1,6 @@
 import { useMemo, useState } from "react";
 import { useSimulationStore } from "@/lib/useSimulationStore";
-
-/* ─── shared bits ──────────────────────────────────────────────────────────── */
-
-function Slider({
-  label,
-  value,
-  min,
-  max,
-  step = 1,
-  suffix = "",
-  onChange,
-}: {
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  step?: number;
-  suffix?: string;
-  onChange: (n: number) => void;
-}) {
-  return (
-    <label className="flex flex-col gap-1">
-      <span className="flex justify-between font-code text-xs uppercase tracking-wider text-muted-foreground">
-        {label}
-        <span className="tabular-nums text-foreground">
-          {value}
-          {suffix}
-        </span>
-      </span>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full accent-foreground"
-      />
-    </label>
-  );
-}
-
-function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="rounded-lg border border-border bg-card/60 p-3">
-      <p className="font-code text-xs uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p className="mt-1 font-code text-xl tabular-nums">{value}</p>
-      {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
-    </div>
-  );
-}
-
-function Bar({ fraction, muted }: { fraction: number; muted?: boolean }) {
-  return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
-      <div
-        className={`h-full rounded-full ${muted ? "bg-muted-foreground/50" : "bg-foreground"}`}
-        style={{ width: `${Math.max(0, Math.min(1, fraction)) * 100}%` }}
-      />
-    </div>
-  );
-}
+import { Bar, Slider, Stat } from "./ai-primitives";
 
 /* ─── KV cache ─────────────────────────────────────────────────────────────── */
 

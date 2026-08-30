@@ -22,6 +22,14 @@ export const labSummaries: LabSummary[] = [
     "blurb": "Greedily choose compatible activities with equal value."
   },
   {
+    "slug": "ann-search",
+    "title": "ANN Search & HNSW",
+    "category": "AI Systems",
+    "difficulty": "Advanced",
+    "readingTimeMin": 7,
+    "blurb": "A skip list whose ordering is distance — so greedy descent can get it wrong."
+  },
+  {
     "slug": "array",
     "title": "Array",
     "category": "Data Structures",
@@ -292,6 +300,14 @@ export const labSummaries: LabSummary[] = [
     "difficulty": "Advanced",
     "readingTimeMin": 5,
     "blurb": "Max flow using BFS shortest augmenting paths."
+  },
+  {
+    "slug": "embeddings",
+    "title": "Embeddings & Vector Space",
+    "category": "AI Systems",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "The sparse row you already know, squashed until direction means meaning."
   },
   {
     "slug": "external-merge-sort",
@@ -670,12 +686,28 @@ export const labSummaries: LabSummary[] = [
     "blurb": "Balanced BST using color rules and rotations."
   },
   {
+    "slug": "reranking",
+    "title": "Reranking",
+    "category": "AI Systems",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "Top-k twice: a cheap comparator to shortlist, an expensive one to decide."
+  },
+  {
     "slug": "segment-tree",
     "title": "Segment Tree",
     "category": "Data Structures",
     "difficulty": "Advanced",
     "readingTimeMin": 5,
     "blurb": "Range queries and point updates in logarithmic time."
+  },
+  {
+    "slug": "semantic-cache",
+    "title": "Semantic Cache",
+    "category": "AI Systems",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "A cache whose key is a vector — so a hit is a judgement call, and it can be wrong."
   },
   {
     "slug": "sharding-replication",
@@ -790,6 +822,14 @@ export const labSummaries: LabSummary[] = [
     "blurb": "Detecting causality and conflicts."
   },
   {
+    "slug": "vector-index",
+    "title": "Vector Index: Recall vs Latency",
+    "category": "AI Systems",
+    "difficulty": "Advanced",
+    "readingTimeMin": 6,
+    "blurb": "The index tradeoff you already know, except now the index can be wrong."
+  },
+  {
     "slug": "webauthn",
     "title": "WebAuthn / Passkeys",
     "category": "Security",
@@ -811,6 +851,18 @@ export interface BridgeEdge {
 
 export const bridgeEdges: BridgeEdge[] = [
   {
+    "to": "ann-search",
+    "from": "skip-list",
+    "sameness": "HNSW IS a skip list. A sparse top layer takes huge strides across the whole set, each layer below is denser, and you descend a layer the moment the current one stops improving — the same express-lane-then-local-lane trick you already implemented, with the same probabilistic layer assignment per node.",
+    "delta": "A skip list keys on a total order, so 'too far, drop a level' is always correct. Distance in 300 dimensions gives no total order, so the greedy walk is a heuristic: it can settle on a point that beats all its neighbours while a nearer one sits elsewhere in the graph. A skip list never returns the wrong node. This does, and cannot tell you when it has."
+  },
+  {
+    "to": "ann-search",
+    "from": "quadtree",
+    "sameness": "Same premise as the quadtree: partition space so a lookup touches a small region rather than every point, and let the structure of the data decide where the cuts go.",
+    "delta": "Recursive partitioning collapses past roughly ten dimensions — the cells needed to cover the space outgrow the points, and every query ends up touching most of them anyway. So high-dimensional search abandons partitioning for a navigable graph: nodes hold links to a few near neighbours plus a couple of deliberately long-range ones, and you walk edges instead of descending cells."
+  },
+  {
     "to": "continuous-batching",
     "from": "message-queue",
     "sameness": "It IS a work queue with a fixed pool of workers. Requests arrive, wait for a slot, occupy it for a while, and free it. The batch slots are the consumers and the scheduler decides who gets one next.",
@@ -821,6 +873,18 @@ export const bridgeEdges: BridgeEdge[] = [
     "from": "backpressure",
     "sameness": "The admission decision is the same one you implemented: a bounded pool, an arrival rate that may exceed it, and a policy for what happens to the excess.",
     "delta": "Rejecting is rarely acceptable here, so the excess queues and the pressure surfaces as time-to-first-token instead of dropped work. KV cache memory, not slot count, is usually the real bound."
+  },
+  {
+    "to": "embeddings",
+    "from": "sparse-matrix",
+    "sameness": "A bag-of-words document IS a row of a sparse matrix — one column per vocabulary term, almost every entry zero. You already stored it that way, and you already compared two documents by walking their non-zero entries.",
+    "delta": "An embedding is that row compressed to a few hundred dense dimensions, and the compression is learned rather than structural. The consequence is the whole point: sparse rows overlap only when they share literal tokens, so 'car' and 'automobile' score zero. Dense rows can be close without sharing a single term."
+  },
+  {
+    "to": "embeddings",
+    "from": "hash-table",
+    "sameness": "It is still key-to-value lookup, and the key is still derived from the content itself rather than assigned.",
+    "delta": "A hash deliberately destroys similarity — one changed character must scatter the key across the table, which is what keeps buckets even. An embedding deliberately preserves it. So there is no exact-match probe and no collision to resolve; 'lookup' becomes 'find the nearest points', and every query returns something, whether or not anything relevant exists."
   },
   {
     "to": "inference-cost",
@@ -853,9 +917,45 @@ export const bridgeEdges: BridgeEdge[] = [
     "delta": "Quantisation is lossy and fixed-width, so it is chosen for predictable memory and fast decode rather than for optimal compression."
   },
   {
+    "to": "reranking",
+    "from": "heap-priority-queue",
+    "sameness": "This is top-k, the operation you already implemented with a heap: keep the k best seen so far, evict the worst as better ones arrive, never sort the whole input.",
+    "delta": "The comparator changes between stages. Stage one ranks thousands of candidates by a cheap similarity you already have; stage two re-scores a shortlist with a cross-encoder that reads the query and the document together. Comparisons are no longer free — each one is a model call worth roughly ten milliseconds — so the shortlist size, not the heap, is what the design is about."
+  },
+  {
+    "to": "reranking",
+    "from": "quickselect",
+    "sameness": "Same insight as quickselect: you never needed the whole ordering, only the boundary between the top group and the rest, so most of the sorting work was waste.",
+    "delta": "Quickselect wins by doing less work on a fixed input. Here the two stages score different things — the cheap score is a proxy, the expensive one is closer to what you actually want — so cutting the shortlist does not merely save time, it discards documents the accurate scorer would have ranked first. A perfect stage-two model cannot recover a document stage one dropped."
+  },
+  {
+    "to": "semantic-cache",
+    "from": "lru-cache",
+    "sameness": "Same cache you already built. Keyed store in front of an expensive call, hit and miss counters, and least-recently-used eviction when it fills — nothing about that changes.",
+    "delta": "The key is an embedding and the comparison is a similarity threshold, so a hit is a decision rather than a fact. An LRU cache that misses costs you latency; a semantic cache that hits too loosely returns another question's answer, confidently, with no error anywhere. The failure mode moves from performance to correctness."
+  },
+  {
+    "to": "semantic-cache",
+    "from": "consistent-hashing",
+    "sameness": "Same machinery as the hash ring: hash the content, and let where it lands decide what happens to it. Both systems live or die on how the hash distributes.",
+    "delta": "The goal is inverted. Consistent hashing wants similar keys spread evenly across the ring — that uniformity is the whole point, and two nearly identical keys landing on the same node would be a flaw. Locality-sensitive hashing wants the opposite: near-identical inputs must collide on purpose, because a collision is the cache hit. Same tool, requirements reversed."
+  },
+  {
     "to": "speculative-decoding",
     "from": "branch-and-bound",
     "sameness": "It is the same speculate-then-prune shape you implemented: explore a candidate path cheaply, evaluate it against something authoritative, and discard everything after the point it stops holding up.",
     "delta": "The cheap explorer is a small language model rather than a bound function, and verification is exact rather than a heuristic — a rejected token costs wasted GPU time but never a wrong answer."
+  },
+  {
+    "to": "vector-index",
+    "from": "btree-index",
+    "sameness": "Same bargain as the B-tree index you built: pay memory and write amplification up front so a read touches a few pages instead of the whole table. Clusters are the pages, the centroid list is the root, and choosing how much of the index to open is still the query planner's job.",
+    "delta": "A B-tree read is exact — if the row is there, the index finds it, every time. A vector index answers 'probably'. Opening fewer clusters does not just cost you speed, it silently changes the answer, so the tuning knob is not latency versus throughput but latency versus correctness, measured as recall against a brute-force baseline."
+  },
+  {
+    "to": "vector-index",
+    "from": "bloom-filter",
+    "sameness": "You have already shipped a structure that trades exactness for size, with an error rate you dial deliberately. Same deal here: a fixed budget buys a fixed quality of answer, and you choose the point on the curve.",
+    "delta": "A Bloom filter's error is one-sided — a false positive, which a lookup in the real store immediately corrects. A vector index errs the other way: it returns false negatives, neighbours it never looked at. There is no cheap verification step, because verifying means the exact scan the index exists to avoid. So the error is invisible in production and must be measured offline."
   }
 ];

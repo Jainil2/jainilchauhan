@@ -419,4 +419,29 @@ export const labComponents: Record<string, LazyExoticComponent<ComponentType>> =
       default: m.QuantizationLab,
     })),
   ),
+  embeddings: lazy(() =>
+    import("@/components/system-design/AiRetrievalLabs").then((m) => ({
+      default: m.EmbeddingsLab,
+    })),
+  ),
+  "ann-search": lazy(() =>
+    import("@/components/system-design/AiRetrievalLabs").then((m) => ({
+      default: m.AnnSearchLab,
+    })),
+  ),
+  "vector-index": lazy(() =>
+    import("@/components/system-design/AiRetrievalLabs").then((m) => ({
+      default: m.VectorIndexLab,
+    })),
+  ),
+  reranking: lazy(() =>
+    import("@/components/system-design/AiRetrievalLabs").then((m) => ({
+      default: m.RerankingLab,
+    })),
+  ),
+  "semantic-cache": lazy(() =>
+    import("@/components/system-design/AiRetrievalLabs").then((m) => ({
+      default: m.SemanticCacheLab,
+    })),
+  ),
 };
