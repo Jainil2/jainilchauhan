@@ -1,14 +1,27 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, redirect, useLocation } from "@tanstack/react-router";
 import { ArrowLeft, Beaker, CheckCircle2, Clock, Gauge } from "lucide-react";
 import { LAB_CATEGORIES, labSummaries, type LabCategory } from "@/content/labs";
 import { NextThree } from "@/components/bridge/NextThree";
+import { SITE_NAME, absoluteUrl, migratedLabUrl } from "@/lib/site";
 import { useKnowledge } from "@/lib/useKnowledge";
 
 export const Route = createFileRoute("/lab")({
-  head: () => ({
+  // See lab.$slug.tsx — inert until the platform domain exists.
+  beforeLoad: () => {
+    const moved = migratedLabUrl("/lab");
+    if (moved) throw redirect({ href: moved, statusCode: 301 });
+  },
+  head: ({ match, matches }) => ({
+    // This route is both the /lab page and the layout wrapping /lab/$slug, so
+    // an unconditional canonical here gives every lab page two of them — and
+    // two canonicals is worse than none, the crawler just picks one.
+    links:
+      matches[matches.length - 1]?.id === match.id && absoluteUrl("/lab")
+        ? [{ rel: "canonical", href: absoluteUrl("/lab")! }]
+        : [],
     meta: [
-      { title: "Lab — Interactive System Design Demos · Jainil Chauhan" },
+      { title: `Lab — Interactive System Design Demos · ${SITE_NAME}` },
       {
         name: "description",
         content:

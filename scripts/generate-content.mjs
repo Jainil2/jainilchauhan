@@ -2,6 +2,7 @@
 // Reads src/content/labs/*.ts and emits:
 //   - src/content/labs.gen.ts  (small summary index for pages that only list labs)
 //   - public/sitemap.xml
+//   - public/robots.txt
 // Also validates content integrity and exits non-zero on failure, so a bad slug
 // or a dangling bridge fails the build instead of shipping.
 //
@@ -169,11 +170,22 @@ function main() {
 
   writeFileSync(join(repoRoot, "public", "sitemap.xml"), xml, "utf8");
 
+  // robots.txt follows the build for the same reason the sitemap does. It used
+  // to be a checked-in file naming jainilchauhan.com, which both Workers then
+  // shipped byte for byte — so the platform pointed crawlers at the portfolio's
+  // sitemap and none of its own pages.
+  writeFileSync(
+    join(repoRoot, "public", "robots.txt"),
+    `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`,
+    "utf8",
+  );
+
   const withChallenge = labs.filter((l) => l.challenge).length;
   const withBridge = labs.filter((l) => l.bridgesFrom?.length).length;
   console.log(
     `[content] ${labs.length} labs — ${withChallenge} with challenges, ` +
-      `${withBridge} with bridges. Wrote labs.gen.ts + sitemap.xml (${urls.length} urls).`,
+      `${withBridge} with bridges. Wrote labs.gen.ts + sitemap.xml + robots.txt ` +
+      `(${urls.length} urls, host ${SITE}).`,
   );
 }
 

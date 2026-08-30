@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { isPlatform } from "@/lib/site";
+import { absoluteUrl, isPlatform } from "@/lib/site";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 
 /* ─── Static project data ──────────────────────────────────────────────────── */
@@ -85,6 +85,7 @@ export const Route = createFileRoute("/projects/$slug")({
   },
   head: ({ params }) => {
     const p = projectData[params.slug];
+    const url = p ? absoluteUrl(`/projects/${params.slug}`) : undefined;
     return {
       meta: p
         ? [
@@ -92,8 +93,10 @@ export const Route = createFileRoute("/projects/$slug")({
             { name: "description", content: p.summary },
             { property: "og:title", content: p.title },
             { property: "og:description", content: p.summary },
+            ...(url ? [{ property: "og:url", content: url }] : []),
           ]
         : [{ title: "Project Not Found — Jainil Chauhan" }],
+      links: url ? [{ rel: "canonical", href: url }] : [],
     };
   },
   component: ProjectDetail,

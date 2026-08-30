@@ -8,7 +8,7 @@ import { useWebVitals } from "@/lib/useWebVitals";
 import { useBuildStatus } from "@/lib/useBuildStatus";
 import { useHydrateControlPlane } from "@/lib/useControlPlane";
 import { themeBootScript } from "@/lib/useTheme";
-import { isPortfolio } from "@/lib/site";
+import { BRAND, absoluteUrl, isPortfolio } from "@/lib/site";
 
 import appCss from "../styles.css?url";
 
@@ -54,12 +54,14 @@ const DEFAULT_META = isPortfolio
       image: "/og-image.png",
     }
   : {
-      title: "Delta — you already know most of this",
+      title: `${BRAND.name} — ${BRAND.tagline.toLowerCase()}`,
       description:
         "Learn AI systems from what you already understand. An LLM KV-cache is an LRU cache; continuous batching is a queue and a scheduler. Interactive labs with challenges you actually run.",
       social:
         "Learn AI systems from the CS you already know. Interactive labs, real challenges, and only ever three next steps.",
-      image: "/og-image.png",
+      // Its own card, not the portfolio's. Rebuild it by screenshotting
+      // scripts/og-delta-card.html at 1200x630 if the brand changes.
+      image: "/og-delta.png",
     };
 
 export const Route = createRootRoute({
@@ -73,11 +75,13 @@ export const Route = createRootRoute({
       { property: "og:title", content: DEFAULT_META.title },
       { property: "og:description", content: DEFAULT_META.social },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: DEFAULT_META.image },
+      // Absolute once a domain exists: several social crawlers refuse to
+      // resolve a relative og:image and just show no card.
+      { property: "og:image", content: absoluteUrl(DEFAULT_META.image) ?? DEFAULT_META.image },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: DEFAULT_META.title },
       { name: "twitter:description", content: DEFAULT_META.social },
-      { name: "twitter:image", content: DEFAULT_META.image },
+      { name: "twitter:image", content: absoluteUrl(DEFAULT_META.image) ?? DEFAULT_META.image },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },

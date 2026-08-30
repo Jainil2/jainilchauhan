@@ -15,20 +15,39 @@ import { CommandPalette } from "@/components/portfolio/CommandPalette";
 import { Now } from "@/components/portfolio/Now";
 import { InfrastructureMap } from "@/components/portfolio/InfrastructureMap";
 import { DeltaHome } from "@/components/delta/DeltaHome";
-import { isPlatform } from "@/lib/site";
+import { BRAND, absoluteUrl, isPlatform } from "@/lib/site";
 
 // `isPlatform` folds to a literal at build time (VITE_SITE is a define), so the
 // unused branch is dead-code-eliminated: a portfolio build ships no DeltaHome,
 // and a platform build ships none of the portfolio sections.
+const platformHome = absoluteUrl("/");
+
 const platformHead = {
   meta: [
-    { title: "Delta — learn AI systems from what you already know" },
+    { title: `${BRAND.name} — learn AI systems from what you already know` },
     {
       name: "description",
-      content:
-        "An LLM KV-cache is an LRU cache. Continuous batching is a queue and a scheduler. Delta teaches AI systems as small deltas from the CS you already understand, with challenges you actually run.",
+      content: `An LLM KV-cache is an LRU cache. Continuous batching is a queue and a scheduler. ${BRAND.name} teaches AI systems as small deltas from the CS you already understand, with challenges you actually run.`,
     },
+    ...(platformHome ? [{ property: "og:url", content: platformHome }] : []),
   ],
+  links: platformHome ? [{ rel: "canonical", href: platformHome }] : [],
+  scripts: platformHome
+    ? [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "@id": platformHome,
+            url: platformHome,
+            name: BRAND.name,
+            description: BRAND.tagline,
+            inLanguage: "en",
+          }),
+        },
+      ]
+    : [],
 };
 
 export const Route = createFileRoute("/")({
@@ -53,11 +72,13 @@ export const Route = createFileRoute("/")({
               content:
                 "Building low-latency, high-trust systems that scale quietly. Backend · auth · cloud.",
             },
-            { property: "og:image", content: "/og-image.png" },
+            // Absolute, like the root's — a relative og:image is silently
+            // dropped by several crawlers, and this route overrides the root.
+            { property: "og:image", content: absoluteUrl("/og-image.png") ?? "/og-image.png" },
             { property: "og:image:width", content: "1200" },
             { property: "og:image:height", content: "630" },
-            { property: "og:url", content: "https://jainilchauhan.com/" },
-            { name: "twitter:image", content: "/og-image.png" },
+            ...(absoluteUrl("/") ? [{ property: "og:url", content: absoluteUrl("/")! }] : []),
+            { name: "twitter:image", content: absoluteUrl("/og-image.png") ?? "/og-image.png" },
             { name: "twitter:title", content: "Jainil Chauhan — Software Engineer" },
             {
               name: "twitter:description",
@@ -65,6 +86,7 @@ export const Route = createFileRoute("/")({
                 "Building low-latency, high-trust systems that scale quietly. Backend · auth · cloud.",
             },
           ],
+          links: absoluteUrl("/") ? [{ rel: "canonical", href: absoluteUrl("/")! }] : [],
           scripts: [
             {
               type: "application/ld+json",

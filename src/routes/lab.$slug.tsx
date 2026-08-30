@@ -1,5 +1,5 @@
 import { Suspense, useEffect } from "react";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { ArrowLeft, Clock, Gauge } from "lucide-react";
 import { loadLab } from "@/content/labs";
 import { GameCard } from "@/components/system-design/GameCard";
@@ -10,27 +10,75 @@ import { UnlocksCard } from "@/components/bridge/UnlocksCard";
 import { ChallengePanel } from "@/components/challenge/ChallengePanel";
 import { KnowledgeControls } from "@/components/challenge/KnowledgeControls";
 import { useLabProgress } from "@/lib/useLabProgress";
+import { SITE_NAME, absoluteUrl, migratedLabUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/lab/$slug")({
+  // Inert until VITE_PLATFORM_URL is set on the portfolio build. The spec moves
+  // /lab/* to the platform domain with a 301 from here; wiring it now means
+  // launch day is an environment variable, not a code change.
+  beforeLoad: ({ params }) => {
+    const moved = migratedLabUrl(`/lab/${params.slug}`);
+    if (moved) throw redirect({ href: moved, statusCode: 301 });
+  },
   loader: async ({ params }) => {
     const lab = await loadLab(params.slug);
     if (!lab) throw notFound();
     return { lab };
   },
-  head: ({ loaderData }) => {
+  head: ({ params, loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Lab — Not found · Jainil Chauhan" }] };
+      return { meta: [{ title: `Lab — Not found · ${SITE_NAME}` }] };
     }
     const { lab } = loaderData;
-    const t = `${lab.title} — Lab · Jainil Chauhan`;
+    const t = `${lab.title} — Lab · ${SITE_NAME}`;
     const d = `${lab.blurb} Interactive ${lab.category.toLowerCase()} demo with concept, reference implementation, production usage at named companies, and pitfalls.`;
+    const url = absoluteUrl(`/lab/${params.slug}`);
+
     return {
       meta: [
         { title: t },
         { name: "description", content: d },
         { property: "og:title", content: t },
         { property: "og:description", content: d },
+        ...(url ? [{ property: "og:url", content: url }] : []),
       ],
+      // Omitted entirely before a domain exists — a canonical pointing at a
+      // placeholder host is worse than none, because a crawler believes it.
+      links: url ? [{ rel: "canonical", href: url }] : [],
+      // These are the pages meant to rank, and until now they carried no
+      // structured data at all.
+      scripts: url
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "LearningResource",
+                "@id": url,
+                url,
+                name: lab.title,
+                description: lab.blurb,
+                learningResourceType: "Interactive lab",
+                educationalLevel: lab.difficulty,
+                teaches: lab.skillTags,
+                timeRequired: `PT${lab.readingTimeMin}M`,
+                isAccessibleForFree: true,
+                inLanguage: "en",
+              }),
+            },
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                itemListElement: [
+                  { "@type": "ListItem", position: 1, name: "Lab", item: absoluteUrl("/lab") },
+                  { "@type": "ListItem", position: 2, name: lab.title, item: url },
+                ],
+              }),
+            },
+          ]
+        : [],
     };
   },
   notFoundComponent: NotFound,
