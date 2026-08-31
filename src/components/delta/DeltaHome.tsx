@@ -3,6 +3,8 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Play } from "lucide-react";
 import { labSummaries, LAB_CATEGORIES } from "@/content/labs";
 import { NextThree } from "@/components/bridge/NextThree";
+import { PlatformHeader } from "@/components/platform/PlatformHeader";
+import { categoryAnchor } from "@/components/platform/categories";
 import { bridgesInto } from "@/lib/bridges";
 import { BRAND } from "@/lib/site";
 import { useKnowledge } from "@/lib/useKnowledge";
@@ -137,14 +139,9 @@ export function DeltaHome() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
-          <span className="font-display text-lg font-semibold tracking-tight">{BRAND.name}</span>
-          <Link to="/lab" className="text-sm text-muted-foreground hover:text-foreground">
-            Labs
-          </Link>
-        </nav>
-      </header>
+      {/* The real shell: brand, nav, ⌘K search, mobile menu. This file only
+          ever renders on the platform build, so no gate is needed here. */}
+      <PlatformHeader />
 
       <main className="mx-auto max-w-5xl px-4 sm:px-6">
         <section className="pt-16 sm:pt-24">
@@ -217,6 +214,7 @@ export function DeltaHome() {
               <li key={category}>
                 <Link
                   to="/lab"
+                  hash={categoryAnchor(category)}
                   className="flex items-center justify-between rounded-lg border border-border bg-card px-5 py-4 transition-colors hover:border-foreground/25"
                 >
                   <span className="font-medium">{category}</span>

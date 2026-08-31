@@ -161,19 +161,28 @@ function LabDetail() {
 
         <BridgeCard slug={slug} />
 
-        <div id="lab-surface">
-          <GameCard title={lab.title} caption={lab.caption} whereUsed={lab.whereUsed}>
-            <Suspense
-              fallback={
-                <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">
-                  Loading demo…
-                </div>
-              }
-            >
-              <Game />
-            </Suspense>
-          </GameCard>
-        </div>
+        {/*
+         * A lab may ship without a bespoke visualisation. The registry is keyed
+         * by slug and a missing entry used to render `undefined` as a component,
+         * which throws — so a lab whose demo has not been built yet took the
+         * whole page down. It now simply has no demo surface, and the concept,
+         * production usage and challenge below carry the page.
+         */}
+        {Game && (
+          <div id="lab-surface">
+            <GameCard title={lab.title} caption={lab.caption} whereUsed={lab.whereUsed}>
+              <Suspense
+                fallback={
+                  <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">
+                    Loading demo…
+                  </div>
+                }
+              >
+                <Game />
+              </Suspense>
+            </GameCard>
+          </div>
+        )}
 
         {/*
          * Between the demo and the prose on purpose. Buried under six collapsed

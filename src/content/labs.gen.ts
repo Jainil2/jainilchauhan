@@ -38,6 +38,14 @@ export const labSummaries: LabSummary[] = [
     "blurb": "A skip list whose ordering is distance — so greedy descent can get it wrong."
   },
   {
+    "slug": "api-gateway",
+    "title": "API Gateway",
+    "category": "System Design",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "A load balancer that also holds every policy your services stopped implementing."
+  },
+  {
     "slug": "array",
     "title": "Array",
     "category": "Data Structures",
@@ -150,6 +158,14 @@ export const labSummaries: LabSummary[] = [
     "blurb": "Probabilistic set membership in O(k) bits."
   },
   {
+    "slug": "blue-green-canary",
+    "title": "Blue-Green & Canary",
+    "category": "System Design",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "A canary that sees too little traffic cannot fail. It can only fail to notice."
+  },
+  {
     "slug": "branch-and-bound",
     "title": "Branch and Bound",
     "category": "Algorithms",
@@ -174,12 +190,36 @@ export const labSummaries: LabSummary[] = [
     "blurb": "Distribute values into buckets, sort locally, then concatenate."
   },
   {
+    "slug": "caching-layers",
+    "title": "Caching Layers",
+    "category": "System Design",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "The same LRU, stacked four deep — and each layer has a different way of being wrong."
+  },
+  {
     "slug": "cap-theorem",
     "title": "CAP Theorem",
     "category": "Distributed Systems",
     "difficulty": "Advanced",
     "readingTimeMin": 5,
     "blurb": "Pick CP or AP — partition is non-negotiable."
+  },
+  {
+    "slug": "capacity-planning",
+    "title": "Capacity Planning",
+    "category": "System Design",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "Queueing theory says the last 20% of utilisation costs more than the first 80%."
+  },
+  {
+    "slug": "cdn-edge",
+    "title": "CDN & Edge Caching",
+    "category": "System Design",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "Two hundred copies of your LRU, one per city — and each one misses independently."
   },
   {
     "slug": "circuit-breaker",
@@ -206,12 +246,28 @@ export const labSummaries: LabSummary[] = [
     "blurb": "Compute minimum coins or number of ways for a target amount."
   },
   {
+    "slug": "config-and-secrets",
+    "title": "Config & Secrets",
+    "category": "System Design",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "Rotation without an overlap window is not rotation. It is a scheduled outage."
+  },
+  {
     "slug": "connected-components",
     "title": "Connected Components",
     "category": "Algorithms",
     "difficulty": "Beginner",
     "readingTimeMin": 4,
     "blurb": "Group reachable nodes in an undirected graph."
+  },
+  {
+    "slug": "connection-pooling",
+    "title": "Connection Pooling",
+    "category": "System Design",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "A bounded queue with N permits, where making N bigger usually makes things slower."
   },
   {
     "slug": "consistent-hashing",
@@ -260,6 +316,14 @@ export const labSummaries: LabSummary[] = [
     "difficulty": "Intermediate",
     "readingTimeMin": 5,
     "blurb": "Detect loops in directed and undirected graphs."
+  },
+  {
+    "slug": "database-scaling",
+    "title": "Database Scaling",
+    "category": "System Design",
+    "difficulty": "Advanced",
+    "readingTimeMin": 7,
+    "blurb": "Sharding buys you write throughput and charges you every query that lacks the key."
   },
   {
     "slug": "deadlock",
@@ -334,6 +398,14 @@ export const labSummaries: LabSummary[] = [
     "blurb": "Sort datasets larger than memory with run generation and k-way merge."
   },
   {
+    "slug": "feature-flags",
+    "title": "Feature Flags",
+    "category": "System Design",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "A percentage rollout is a hash ring with two nodes, and the salt decides who gets hurt."
+  },
+  {
     "slug": "fenwick-tree",
     "title": "Fenwick Tree",
     "category": "Data Structures",
@@ -364,6 +436,14 @@ export const labSummaries: LabSummary[] = [
     "difficulty": "Advanced",
     "readingTimeMin": 5,
     "blurb": "Epidemic state dissemination."
+  },
+  {
+    "slug": "graceful-shutdown",
+    "title": "Graceful Shutdown",
+    "category": "System Design",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "SIGTERM is not a stop signal. It is the start of a race you have to win."
   },
   {
     "slug": "graph-representations",
@@ -436,6 +516,14 @@ export const labSummaries: LabSummary[] = [
     "difficulty": "Advanced",
     "readingTimeMin": 5,
     "blurb": "Probabilistic cardinality estimation."
+  },
+  {
+    "slug": "idempotency",
+    "title": "Idempotency",
+    "category": "System Design",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "The network already delivered your payment twice. The only question is whether you noticed."
   },
   {
     "slug": "inference-cost",
@@ -590,12 +678,36 @@ export const labSummaries: LabSummary[] = [
     "blurb": "Find the smallest capacity separating source from sink."
   },
   {
+    "slug": "multi-region",
+    "title": "Multi-Region",
+    "category": "System Design",
+    "difficulty": "Advanced",
+    "readingTimeMin": 7,
+    "blurb": "Going multi-region does not buy availability. It buys a choice about which writes to lose."
+  },
+  {
+    "slug": "multi-tenancy",
+    "title": "Multi-Tenancy",
+    "category": "System Design",
+    "difficulty": "Advanced",
+    "readingTimeMin": 7,
+    "blurb": "Sharding by tenant works until one tenant is a thousand times bigger than the median."
+  },
+  {
     "slug": "n-queens",
     "title": "N-Queens",
     "category": "Algorithms",
     "difficulty": "Intermediate",
     "readingTimeMin": 4,
     "blurb": "Backtrack through board placements with constraint pruning."
+  },
+  {
+    "slug": "observability",
+    "title": "Observability",
+    "category": "System Design",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "Metrics tell you something is wrong; only a trace tells you which span ate the time."
   },
   {
     "slug": "oidc-flow",
@@ -662,6 +774,14 @@ export const labSummaries: LabSummary[] = [
     "blurb": "First-in, first-out ordering for fair processing."
   },
   {
+    "slug": "queues-vs-streams",
+    "title": "Queues vs Streams",
+    "category": "System Design",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "Delete on ack, or keep the log and move a cursor. Everything else follows from that."
+  },
+  {
     "slug": "quickselect",
     "title": "Quickselect",
     "category": "Algorithms",
@@ -710,6 +830,22 @@ export const labSummaries: LabSummary[] = [
     "blurb": "Token Bucket vs Leaky Bucket vs Fixed Window vs Sliding Log."
   },
   {
+    "slug": "rate-limiting-at-scale",
+    "title": "Rate Limiting at Scale",
+    "category": "System Design",
+    "difficulty": "Advanced",
+    "readingTimeMin": 6,
+    "blurb": "The token bucket is easy. Making one bucket out of forty machines is the hard part."
+  },
+  {
+    "slug": "read-replicas",
+    "title": "Read Replicas",
+    "category": "System Design",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "Cheap read capacity, paid for in a bug report that says 'I saved it and it disappeared'."
+  },
+  {
     "slug": "red-black-tree",
     "title": "Red-Black Tree",
     "category": "Data Structures",
@@ -724,6 +860,22 @@ export const labSummaries: LabSummary[] = [
     "difficulty": "Intermediate",
     "readingTimeMin": 6,
     "blurb": "Top-k twice: a cheap comparator to shortlist, an expensive one to decide."
+  },
+  {
+    "slug": "retries-and-timeouts",
+    "title": "Retries & Timeouts",
+    "category": "System Design",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "Retries add load exactly when the dependency has none to spare."
+  },
+  {
+    "slug": "schema-migration",
+    "title": "Schema Migration",
+    "category": "System Design",
+    "difficulty": "Advanced",
+    "readingTimeMin": 7,
+    "blurb": "Old code and new code run at the same time. Every migration has to be true for both."
   },
   {
     "slug": "segment-tree",
@@ -891,6 +1043,12 @@ export interface BridgeEdge {
 
 export const bridgeEdges: BridgeEdge[] = [
   {
+    "to": "activity-selection",
+    "from": "sorting-race",
+    "sameness": "The algorithm IS a sort. Order the activities by finish time and what remains is a single linear pass that takes anything starting after the last one you kept — the sort is doing all of the work.",
+    "delta": "Because the sort dominates, the whole thing is O(n log n) and the scan is free, which means correctness lives entirely in the comparator. Sort by start time, or by duration, or by earliest start instead, and the identical one-pass scan returns a confidently wrong answer with no error and no warning. Greedy algorithms are not fragile in their loop; they are fragile in their sort key."
+  },
+  {
     "to": "agent-loop",
     "from": "topological-sort",
     "sameness": "Tool calls form a dependency graph and run in dependency order: a step whose inputs are not ready cannot execute, and a step whose inputs failed never becomes ready. That is the ordering you already implemented.",
@@ -915,6 +1073,24 @@ export const bridgeEdges: BridgeEdge[] = [
     "delta": "Recursive partitioning collapses past roughly ten dimensions — the cells needed to cover the space outgrow the points, and every query ends up touching most of them anyway. So high-dimensional search abandons partitioning for a navigable graph: nodes hold links to a few near neighbours plus a couple of deliberately long-range ones, and you walk edges instead of descending cells."
   },
   {
+    "to": "api-gateway",
+    "from": "load-balancer",
+    "sameness": "A gateway IS the reverse proxy you already built. It terminates the client connection, picks a backend, forwards the request and streams the response back — health checks, connection reuse and all. Envoy is literally the same binary running as both a load balancer and a gateway.",
+    "delta": "It picks the backend by inspecting the request rather than by rotation, so it must parse and understand HTTP, and it is where auth, rate limits, quotas and request rewriting now live. That moves policy out of every service and into one process — which is the benefit and the risk in the same sentence, because that process is now a single failure domain for every API you own."
+  },
+  {
+    "to": "api-gateway",
+    "from": "circuit-breaker",
+    "sameness": "The outlier detection in a gateway is the breaker from that lab, one instance per upstream: count failures, trip, stop sending, probe, close. Envoy calls it outlier ejection and it is the same state machine.",
+    "delta": "The breaker now lives outside the calling service, so it protects every caller at once and it sees the aggregate failure rate rather than one client's view. The cost is that a single mis-tuned threshold can eject a healthy upstream for the whole fleet simultaneously."
+  },
+  {
+    "to": "astar-search",
+    "from": "dijkstra",
+    "sameness": "It IS Dijkstra. Same priority queue, same relaxation, same finalise-the-smallest loop — and with a heuristic that always returns zero, A star reduces to Dijkstra exactly, line for line.",
+    "delta": "The queue key becomes cost-so-far plus estimated-cost-remaining, which steers the expansion toward the goal instead of expanding uniformly in every direction. On a large grid that is the difference between exploring a disc and exploring a cone. The guarantee now depends on the heuristic: if it never overestimates, the path is still optimal; if it ever does, the algorithm still returns a path, still returns it fast, and gives no indication that it is not the shortest one."
+  },
+  {
     "to": "attention",
     "from": "hash-table",
     "sameness": "The vocabulary is not a metaphor. Attention has queries, keys and values, and it does the same thing your hash table did: present a query, find the keys it matches, return the associated values.",
@@ -925,6 +1101,180 @@ export const bridgeEdges: BridgeEdge[] = [
     "from": "sparse-matrix",
     "sameness": "The attention matrix is n×n and, in a decoder, structurally half empty — no position may attend to a future one, so everything above the diagonal is masked out. You already know how to represent and skip that triangle.",
     "delta": "Those zeros are a rule rather than absent data, so they cannot be dropped from the layout: the mask is applied before the softmax, as -∞, because a zero score is still a real weight after exponentiating. And the dense half is what hurts — it grows quadratically with context length, which is why FlashAttention tiles the computation instead of ever materialising the matrix."
+  },
+  {
+    "to": "avl-tree",
+    "from": "binary-search-tree",
+    "sameness": "It IS a binary search tree — same ordering invariant, same comparison-driven descent, same in-order walk for sorted output. Every search you wrote works here unmodified.",
+    "delta": "Each insert and delete also restores a height rule: the two subtrees of any node differ in height by at most one, enforced with rotations on the way back up. That converts the average case into a worst case guarantee, so the sorted-insertion order that turned a plain BST into a linked list is now harmless. You pay for it on writes, which now do O(log n) extra bookkeeping and can no longer be a simple leaf attachment."
+  },
+  {
+    "to": "b-plus-tree",
+    "from": "btree-index",
+    "sameness": "It IS a B-tree. Same high fan-out, same split-on-full growth, same all-leaves-at-equal-depth shape, same page-sized nodes chosen to match the disk.",
+    "delta": "Values are removed from the internal nodes and live only at the leaves, which are then chained together left to right. Internal nodes hold nothing but separator keys, so they pack more of them per page and the tree gets shallower — fewer disk reads per lookup. The chained leaves are the real prize: a range scan descends once and then walks the leaf list sequentially instead of re-traversing the tree per key, which is why every relational database index is a B+ tree rather than a B-tree."
+  },
+  {
+    "to": "backpressure",
+    "from": "circular-buffer",
+    "sameness": "It IS the bounded buffer you already built. A producer writes at one index, a consumer reads at another, the capacity is fixed, and the entire design question is what happens the moment the writer catches the reader — reject, block, or overwrite. Those are still the only three answers.",
+    "delta": "The producer is now on another machine and cannot see the indexes, so 'full' has to travel back to it as a signal: a slower acknowledgement, a paused TCP window, a 429. Nothing enforces the bound for you either, so an unbounded queue silently substitutes memory and latency for the rejection you did not write, and the collapse arrives as an out-of-memory kill rather than a full-buffer error."
+  },
+  {
+    "to": "bellman-ford",
+    "from": "dijkstra",
+    "sameness": "The inner step IS Dijkstra's relaxation, unchanged: if the distance to u plus the weight of edge u-v beats the distance to v, improve v. Same test, same update, same array of tentative distances.",
+    "delta": "What is dropped is the greedy order. Instead of trusting a priority queue to hand you vertices in a safe sequence, it relaxes every edge V-1 times, which costs O(VE) but never assumes a finalised distance can only stay put. That assumption was the thing negative edges broke, so the slower algorithm is the one that survives them — and a V-th pass that still improves something is a proof of a negative cycle, a condition Dijkstra cannot even detect, let alone report."
+  },
+  {
+    "to": "binary-search-tree",
+    "from": "binary-tree",
+    "sameness": "It IS a binary tree. Same nodes, same at-most-two-children shape, same traversals — pre-order, in-order and post-order all work here exactly as you wrote them.",
+    "delta": "One rule is added: everything in the left subtree is smaller than the node, everything in the right is larger. That single invariant turns a structure you could only traverse into one you can search, because a comparison at each node discards half the remaining tree, and it makes the in-order walk emit sorted output for free. The invariant is also the liability — nothing enforces balance, so inserting already-sorted keys builds a tree of height n and every O(log n) claim collapses to O(n)."
+  },
+  {
+    "to": "binary-search",
+    "from": "binary-search-tree",
+    "sameness": "It IS a walk down a binary search tree that was never built. The midpoint of the range plays the root, each comparison discards a subtree, and the sequence of midpoints you visit is exactly a root-to-leaf path.",
+    "delta": "Because the tree is implied by the array's indices rather than by pointers, it is perfectly balanced by construction — you get the O(log n) guarantee an AVL tree needs rotations to earn, with zero memory overhead. The cost is that the shape is fixed to the data: inserting one element means shifting an O(n) tail to keep the array sorted, which is precisely the write cost a real tree exists to buy back."
+  },
+  {
+    "to": "bipartite-check",
+    "from": "graph-traversal",
+    "sameness": "It IS BFS or DFS with one extra field per vertex. Traverse as usual, and colour each newly discovered vertex the opposite of the one you came from.",
+    "delta": "The test is a single check on every edge you touch: if a neighbour is already coloured the same as the current vertex, the graph is not bipartite. That turns an abstract property into a linear-time traversal, and it proves something concrete — a failure means an odd-length cycle exists, and the traversal tree tells you where. Disconnected graphs need the same outer loop as components, since each island is coloured independently."
+  },
+  {
+    "to": "bipartite-matching",
+    "from": "max-flow",
+    "sameness": "It IS a max-flow problem. Add a source pointing at every left vertex, a sink fed by every right vertex, give every edge capacity 1, and the maximum flow IS the maximum matching — an augmenting path in that network is exactly an alternating path here.",
+    "delta": "Unit capacities make the flow integral, so every unit that arrives at the sink corresponds to one real pair rather than to a fraction. That also lets you skip building the network: the direct implementation just runs the augmenting-path search over the original graph, and Hopcroft-Karp improves it further by finding a maximal set of shortest augmenting paths per phase instead of one at a time."
+  },
+  {
+    "to": "bitset",
+    "from": "array",
+    "sameness": "It IS an array of booleans. Same indexed access, same iteration, same semantics for get and set — index i still means element i.",
+    "delta": "The elements are packed 64 to a word instead of one per byte, so the index becomes a word plus a bit offset and every write turns into a read-modify-write with a mask. You buy an 8x memory drop and word-parallel union and intersection, and you pay with the loss of per-element addressing: you cannot hand out a reference to one bit, and two threads writing neighbouring bits are writing the same word."
+  },
+  {
+    "to": "bloom-filter",
+    "from": "hash-table",
+    "sameness": "It IS a hash table. Hash the key, go to that slot — the same addressing you already implemented, run k times with k different hash functions.",
+    "delta": "The slot holds one bit instead of the key, so nothing is ever stored and collisions are never resolved. That is the entire structure: constant memory per element regardless of key size, and an answer that is either definitely-not-present or probably-present. Being wrong stops being a bug and becomes a tuned parameter, and two operations disappear outright — you cannot enumerate the contents, and you cannot delete without breaking every other key that shares a bit."
+  },
+  {
+    "to": "bloom-filter",
+    "from": "bitset",
+    "sameness": "The storage IS a bitset. One flat array of bits, addressed by index, set with a mask — exactly the structure you already packed.",
+    "delta": "The indices come from hashes rather than from the caller, so the bits are no longer owned by any one element. Density becomes the thing to watch: as more keys are inserted the fraction of set bits rises, and the false positive rate rises with it, so a bloom filter has a capacity you must size up front even though it never physically runs out of room."
+  },
+  {
+    "to": "blue-green-canary",
+    "from": "circuit-breaker",
+    "sameness": "Canary analysis IS a circuit breaker, and the thing it is wrapped around is your own new version. Count outcomes over a window, compare the failure rate against a threshold, trip when it is exceeded. Same state machine: closed is baking, open is rolled back, and the small slice of traffic on the canary is the half-open probe.",
+    "delta": "The window is now a statistical sample rather than a stream of facts, and a small sample cannot tell a regression from noise. A breaker with five failures out of five is certain; a canary with five errors out of eleven requests is not evidence of anything. So the verdict has three values, not two — promote, roll back, and 'you did not collect enough data', and treating the third as the first is how bad releases get promoted automatically."
+  },
+  {
+    "to": "branch-and-bound",
+    "from": "n-queens",
+    "sameness": "It IS the same backtracking search. A DFS over partial solutions, extending one choice at a time and abandoning a branch the moment it is shown to be useless.",
+    "delta": "N-Queens prunes on feasibility — a branch dies because it cannot be completed at all. Here branches are all feasible, so pruning has to be on optimality: compute an optimistic bound on the best that branch could still achieve, and cut it when that cannot beat the best complete solution found so far. Two consequences follow. Finding a good solution early makes everything after it faster, so the exploration order becomes a performance decision, and a bound that is not genuinely optimistic prunes the optimum away and reports a wrong answer with total confidence."
+  },
+  {
+    "to": "btree-index",
+    "from": "binary-search-tree",
+    "sameness": "It IS a search tree with the same ordering invariant: keys in a node separate the ranges its children cover, and a lookup compares and descends exactly as it does in a BST.",
+    "delta": "A node holds hundreds of keys instead of one, and that single change is driven entirely by hardware. Reading one byte from disk costs the same as reading a whole page, so the tree is shaped to make each page read discard as much of the search space as possible — a few hundred keys per node means a billion rows sit three or four levels deep instead of thirty. Balance is maintained by splitting full nodes upward rather than by rotations, which is why the tree grows from the root and every leaf stays at the same depth."
+  },
+  {
+    "to": "bucket-sort",
+    "from": "counting-sort",
+    "sameness": "It IS counting sort with wider slots. Map each value to a slot by arithmetic, drop it in, then read the slots out in order — the same no-comparisons distribution step, with each slot covering a range of values rather than exactly one.",
+    "delta": "Because a slot now holds several distinct values, it needs sorting internally before concatenation, which is what makes this work on floats and on ranges too wide to count. The linear-time claim quietly acquires a condition: it holds only if the input is spread evenly across the buckets. Skewed data piles everything into one bucket and the runtime degrades to whatever sort runs inside it, so this is the rare algorithm whose complexity depends on the distribution rather than the size."
+  },
+  {
+    "to": "caching-layers",
+    "from": "lru-cache",
+    "sameness": "Every box in the diagram is the LRU cache you built. The process-local cache, the Redis cluster, the CDN edge — same hash map, same recency list, same eviction rule. A four-layer cache hierarchy is four instances of one data structure.",
+    "delta": "Layers have wildly different latencies (100ns, 1ms, 40ms) and different lifetimes, so the number that matters stops being hit rate and becomes the weighted average of the misses. And a second copy of a value means a second thing to invalidate: a write now has to be undone in every layer that holds it, and the layer you forget is the one serving stale data."
+  },
+  {
+    "to": "cap-theorem",
+    "from": "connected-components",
+    "sameness": "A network partition IS the component split you already computed. Drop edges from the cluster graph and the nodes fall into maximal groups that can still reach each other and cannot reach the rest — that is literally what the word partition means here.",
+    "delta": "No node can run the algorithm, because none of them can see the graph. A node knows only who answered it recently, and cannot distinguish a dead peer from an unreachable one, so each side decides alone from a partial view: count what I can still reach, compare against the membership I remember. CAP is the statement that with only that view you must choose — refuse writes and lose availability, or accept writes on both sides and reconcile divergence later."
+  },
+  {
+    "to": "capacity-planning",
+    "from": "backpressure",
+    "sameness": "This IS the queue from the backpressure lab, sized in advance instead of reacted to. Arrivals per second, a service rate, and a buffer between them — identical model. Backpressure is what you do when the queue is already growing; capacity planning is choosing numbers so it does not.",
+    "delta": "The queue is now implicit and invisible. It lives in kernel accept backlogs, connection pools and thread pools rather than in a data structure you can inspect, so nothing reports its depth until latency moves. And the arrival rate is not yours to shape — it is next quarter's traffic, which you must forecast rather than throttle."
+  },
+  {
+    "to": "capacity-planning",
+    "from": "rate-limiter",
+    "sameness": "Sizing a fleet IS sizing a token bucket. Refill rate is service capacity, bucket depth is the burst you can absorb without shedding, and the arithmetic that says whether a burst fits is the same arithmetic in both labs.",
+    "delta": "The limiter enforces a number someone chose; capacity planning is where that number comes from, and getting it wrong is expensive in both directions. Too low and you reject real customers; too high and you pay for idle machines every hour of every month. The rate limiter has one failure mode, and this has two that pull against each other."
+  },
+  {
+    "to": "cdn-edge",
+    "from": "lru-cache",
+    "sameness": "A CDN point of presence is an LRU cache with a URL for a key and a response body for a value. Cloudflare and Fastly nodes evict by recency under a disk budget exactly like the one you implemented — the interesting part of a CDN is not the cache, it is that there are three hundred of them.",
+    "delta": "Copies are independent, so a miss is not one miss — it is one per location, and origin load scales with your PoP count rather than your traffic. And entries now expire on time as well as on capacity, which introduces a failure your LRU never had: a value that is present, returnable, and wrong."
+  },
+  {
+    "to": "cdn-edge",
+    "from": "consistent-hashing",
+    "sameness": "Inside a single PoP the cache is sharded across machines with the same hash ring you built, and the tiered-cache 'shield' is the same idea applied one level up: hash the URL to pick which upper-tier data centre owns it, so one machine on earth is responsible for fetching that object from your origin.",
+    "delta": "The ring is now global and the cost of a remap is a transatlantic origin fetch rather than a local one. That is why CDNs pin the upper tier by object rather than by request — the whole benefit is that exactly one node ever talks to your origin for a given URL."
+  },
+  {
+    "to": "circuit-breaker",
+    "from": "rate-limiter",
+    "sameness": "It IS admission control in front of a call: count events in a recent window, compare against a threshold, and reject before doing any work. The failure counter is the same sliding window you implemented, and the open state is the same immediate rejection.",
+    "delta": "The threshold is derived from the callee's observed health rather than fixed by policy, so the limiter tightens itself — and it must then decide when to loosen again, which is what half-open is for. That adds a failure a rate limiter cannot have: a breaker that never probes starves a dependency that recovered, so the system stays down after the outage ended."
+  },
+  {
+    "to": "circular-buffer",
+    "from": "queue",
+    "sameness": "It IS a queue. Push at the tail, pop from the head, strict FIFO order — the interface and the guarantees are unchanged from the queue you already built.",
+    "delta": "The backing array is fixed and the indices wrap with a modulo instead of growing, so the structure can never allocate at runtime. That predictability is why audio, network and logging paths use it, and the cost is that full is now a real state: a producer that outruns the consumer must block, drop the newest, or overwrite the oldest. An unbounded queue turns overload into memory exhaustion; this turns it into a decision you have to make explicitly."
+  },
+  {
+    "to": "coin-change",
+    "from": "fibonacci-memoization",
+    "sameness": "It IS the same memoised recurrence. The answer for an amount is built from the answers for smaller amounts, every subproblem is computed once, and the table does the same job it did for Fibonacci.",
+    "delta": "Each state now branches once per coin instead of twice, so the transition is a minimum over choices rather than a sum, and the table is indexed by amount. The subtle part is that the two questions people ask of it differ only in loop order: iterating amounts outside coins counts ordered sequences, iterating coins outside amounts counts combinations. Same table, same recurrence, and the loop nesting silently decides which problem you actually solved."
+  },
+  {
+    "to": "config-and-secrets",
+    "from": "jwt-anatomy",
+    "sameness": "This IS the `kid` header you already used. A token names the key that signed it so the verifier can hold several keys at once, and that ability to hold several is the entire mechanism behind rotating any shared secret — database passwords, webhook signatures, API keys — not just JWTs.",
+    "delta": "The interesting part moves from the token to the calendar. A key needs three timestamps, not one: when it becomes usable for signing, when it stops being used for signing, and when it stops being accepted for verification. The verification window must outlive the signing window by at least the lifetime of the longest-lived artefact signed with it, and getting that ordering wrong produces an outage whose cause is a config file nobody changed today."
+  },
+  {
+    "to": "connected-components",
+    "from": "graph-traversal",
+    "sameness": "It IS the traversal you already wrote. Run BFS or DFS from a vertex and it marks exactly one component; the only addition is an outer loop that starts a fresh traversal from every vertex still unvisited.",
+    "delta": "The shared visited set is what keeps the total cost at O(V + E) rather than O(V) traversals: every vertex and edge is touched once across the whole run, no matter how many components there are. It also reframes the traversal's output — you stop caring about the order vertices were reached in and start caring only about which run reached them, which is the first time the traversal is used as a labelling rather than as a search."
+  },
+  {
+    "to": "connection-pooling",
+    "from": "backpressure",
+    "sameness": "A connection pool IS the bounded buffer with a rejection policy from that lab. N permits instead of N slots, a FIFO wait queue in front of them, and a checkout timeout as the drop rule. Producers block when it is full — which is backpressure, applied to a database instead of a stream.",
+    "delta": "The bound is not chosen for memory, it is chosen by what the database can actually do in parallel, and that number is far smaller than intuition suggests — often a few dozen for a machine serving thousands of requests per second. Raising the bound to relieve the queue is the move that makes throughput worse, because contention inside the database grows faster than the parallelism you bought."
+  },
+  {
+    "to": "connection-pooling",
+    "from": "rate-limiter",
+    "sameness": "It is the same admission decision as your limiter, taken on a different quantity. A rate limiter caps arrivals per second; a pool caps requests in flight. Both hand out a permit or refuse, both protect a resource that degrades badly past a threshold, and both must decide what happens to the caller who is refused.",
+    "delta": "The permit here is returned rather than refilled, so the effective rate is set by how long work takes rather than by a clock. That closes a feedback loop the rate limiter does not have: when the database slows down, permits come back more slowly, the pool tightens on its own, and queue time — not query time — becomes the latency your users experience."
+  },
+  {
+    "to": "consistent-hashing",
+    "from": "hash-table",
+    "sameness": "It IS a hash table. The hash of the key decides where the value lives, lookup is one computation rather than a search, and load depends entirely on how evenly the hash spreads keys — every property you already know still holds.",
+    "delta": "Buckets are now machines that die and get added, so the bucket count changes constantly and a plain modulo would remap nearly every key each time. Placing nodes on a ring makes that remapping proportional to the change instead of total. A resize stops being a pause and becomes a data migration, which is why virtual nodes exist: they smooth the slices so no single machine inherits a hot one."
   },
   {
     "to": "continuous-batching",
@@ -939,6 +1289,96 @@ export const bridgeEdges: BridgeEdge[] = [
     "delta": "Rejecting is rarely acceptable here, so the excess queues and the pressure surfaces as time-to-first-token instead of dropped work. KV cache memory, not slot count, is usually the real bound."
   },
   {
+    "to": "counting-sort",
+    "from": "array",
+    "sameness": "It IS an array used as a lookup table, with the value being sorted as the index. Count how many times each value appears, then walk the counters in order and write each value out that many times.",
+    "delta": "No two elements are ever compared, so the O(n log n) comparison lower bound simply does not apply — this is genuinely linear. The cost moves from time into space and becomes proportional to the range of the values rather than their count: sorting a hundred small integers is trivial, sorting a hundred 32-bit integers this way would ask for four billion counters. That constraint is the entire reason radix sort exists."
+  },
+  {
+    "to": "crdt-counter",
+    "from": "vector-clocks",
+    "sameness": "A G-Counter IS a vector clock. One slot per replica, a replica only ever increments its own slot, and merging two replicas takes the element-wise maximum — the same vector and the same merge you already implemented.",
+    "delta": "The vector is read as a value rather than as an ordering: sum the slots and you have the count. Because max is idempotent, commutative and associative, duplicated, reordered and delayed messages all land on the same answer, so concurrency stops being a conflict to resolve and becomes the normal case — there is no resolution rule because there is nothing to resolve. The price is that the structure only goes one way; decrementing needs a second vector, and deletion is harder still."
+  },
+  {
+    "to": "cycle-detection",
+    "from": "graph-traversal",
+    "sameness": "It IS depth-first search. Same recursion, same visited marks, same edge iteration — a cycle is detected purely by noticing where an edge points during the walk you already do.",
+    "delta": "One bit is added: whether a vertex is on the current recursion stack, not merely visited. An edge to a finished vertex is a shortcut, an edge to a vertex still on the stack is a cycle, and conflating the two is the bug that reports cycles in every diamond-shaped DAG. Undirected graphs need the opposite care — the edge back to your parent is not a cycle, so it must be excluded explicitly."
+  },
+  {
+    "to": "database-scaling",
+    "from": "sharding-replication",
+    "sameness": "It IS the shard router from that lab: hash the shard key, mod the shard count, send the query there. Vitess, Citus and every hand-rolled sharding layer are that function plus connection management.",
+    "delta": "Real queries do not all carry the shard key. The moment one does not, the router cannot pick a shard and must ask all of them, so a query that cost one shard's work now costs the whole cluster's — and adding shards makes that query slower, not faster. Sharding does not scale a workload; it scales the part of the workload that is keyed."
+  },
+  {
+    "to": "database-scaling",
+    "from": "consistent-hashing",
+    "sameness": "Resharding is the ring problem exactly as you built it. Modulo placement moves nearly every row when the shard count changes; hashing onto a ring with virtual nodes moves roughly K/N of them. Vitess's keyspace ranges are the same idea expressed as ranges instead of points.",
+    "delta": "Moving a cache key costs a miss. Moving a database row costs a copy, a consistency window and a cutover, all while writes keep arriving — which is why online resharding is a months-long project and cache rebalancing is a config change."
+  },
+  {
+    "to": "deadlock",
+    "from": "cycle-detection",
+    "sameness": "Deadlock IS a cycle in a directed graph. Threads are nodes, an edge means 'waits for a resource held by', and the circular wait in the Coffman conditions is exactly the back edge your detector found. Break the cycle and the deadlock cannot exist.",
+    "delta": "Nobody hands you the graph. It is scattered across lock tables in different processes and only exists at the instant you sample it, so detection means either building it continuously or waiting on a timeout and guessing. And because detection ends with aborting a victim, the fix moves upstream: a global lock ordering makes the cycle unconstructible, which is cheaper than finding one after it has already stopped the system."
+  },
+  {
+    "to": "deque",
+    "from": "queue",
+    "sameness": "It IS a queue. Push at one end, pop from the other, FIFO — use only pushBack and popFront and a deque is indistinguishable from the queue you already have.",
+    "delta": "Both ends now accept both operations, which costs nothing asymptotically but rules out the simplest implementations: a singly linked list cannot pop from the tail in O(1), so a deque needs a doubly linked list or a ring buffer underneath. In exchange you get sliding-window algorithms, where the ability to discard from the back is what keeps the window monotonic and the whole scan O(n)."
+  },
+  {
+    "to": "deque",
+    "from": "stack",
+    "sameness": "It IS also a stack. Restrict yourself to pushBack and popBack and you have LIFO with the same semantics as the stack you already built.",
+    "delta": "Being both at once is the point: one structure can back a stack, a queue, or a work-stealing scheduler where the owner pops one end and thieves steal from the other. That flexibility removes the type-level guarantee — a stack cannot be accidentally read FIFO, a deque can, so the discipline moves from the structure into your code."
+  },
+  {
+    "to": "dijkstra",
+    "from": "graph-traversal",
+    "sameness": "It IS breadth-first search. Same frontier, same visited set, same expand-the-nearest-first shape — and on a graph where every edge has weight 1, Dijkstra and BFS visit the vertices in exactly the same order.",
+    "delta": "The frontier is ordered by accumulated distance instead of by arrival, which is the only change. It buys correct shortest paths on weighted edges, and it costs the flat O(V + E): the frontier now needs a priority queue, making it O(E log V). It also introduces an assumption BFS never had — distances must never decrease, so a single negative edge makes the greedy finalisation wrong."
+  },
+  {
+    "to": "dijkstra",
+    "from": "heap-priority-queue",
+    "sameness": "The frontier IS the priority queue you built. Push each discovered vertex keyed by its tentative distance, pop the smallest, and the popped vertex's distance is final.",
+    "delta": "The complication is that distances improve after a vertex is already in the queue, and a binary heap cannot cheaply find and update an entry. Practical implementations therefore push a duplicate with the better key and ignore stale pops by checking against the recorded distance — the queue can hold more entries than the graph has vertices, and forgetting the staleness check is the classic bug that produces plausible but wrong paths."
+  },
+  {
+    "to": "disjoint-set-union",
+    "from": "array",
+    "sameness": "The whole structure IS an array. One slot per element, and the slot holds the index of that element's parent; the sets are simply the trees that array encodes, with a root being any element that points at itself.",
+    "delta": "Reads mutate. Path compression rewrites the entries it walks past, so find is not a lookup but an amortised repair, and the cost of an operation is only meaningful averaged over a sequence. The structure is also one-way: it merges sets and never splits them, so undoing a union means rebuilding from scratch."
+  },
+  {
+    "to": "distributed-tx",
+    "from": "n-queens",
+    "sameness": "A saga IS backtracking. Commit one step, move to the next, and when a step fails, walk back through the steps you already took applying their inverse until the state is clean — the same undo-on-failure unwind you wrote to take a queen back off the board.",
+    "delta": "The undo is neither free nor exact. Lifting a queen restores the board perfectly; refunding a charge is a new transaction the customer already saw, and the compensation can itself fail, so every one of them has to be retryable and idempotent. Backtracking explores states nobody observed; a saga commits states other users can read halfway through, which is the atomicity you are trading away for the locks you refuse to hold."
+  },
+  {
+    "to": "distributed-tx",
+    "from": "raft-election",
+    "sameness": "The prepare phase IS a vote round: a coordinator asks every participant, counts the replies, and only then announces the decision — the same collect-then-decide shape as an election.",
+    "delta": "The threshold is unanimity rather than a majority, so there is no quorum to route around a node that went quiet, and one slow participant blocks everyone. Worse, a coordinator that dies after collecting votes leaves participants holding locks with no way to learn the outcome and no timeout that can safely resolve it — where a Raft follower simply times out and starts a new term. That gap is why 2PC is called blocking and consensus is not."
+  },
+  {
+    "to": "dynamic-array",
+    "from": "array",
+    "sameness": "It IS an array. The storage underneath is the same fixed, contiguous block with the same O(1) indexing, and every read you already know behaves identically.",
+    "delta": "The only addition is a length kept separately from the capacity, plus a reallocation when they meet. That single move is what makes append amortised rather than constant: most appends are free, and one in every n copies the whole buffer, so a latency graph of appends is flat with periodic spikes rather than a straight line."
+  },
+  {
+    "to": "edmonds-karp",
+    "from": "max-flow",
+    "sameness": "It IS the max-flow loop you already ran: find an augmenting path in the residual graph, push the bottleneck along it, repeat until no path remains. Nothing about the flow, the residuals or the termination changes.",
+    "delta": "It fixes the choice of path, always taking a shortest one by BFS. That single rule replaces a bound that depends on the capacity values with O(V E squared), which depends only on the graph's size — the difference between an algorithm that can crawl on a graph with large capacities and one whose runtime you can predict from the vertex and edge counts alone."
+  },
+  {
     "to": "embeddings",
     "from": "sparse-matrix",
     "sameness": "A bag-of-words document IS a row of a sparse matrix — one column per vocabulary term, almost every entry zero. You already stored it that way, and you already compared two documents by walking their non-zero entries.",
@@ -949,6 +1389,150 @@ export const bridgeEdges: BridgeEdge[] = [
     "from": "hash-table",
     "sameness": "It is still key-to-value lookup, and the key is still derived from the content itself rather than assigned.",
     "delta": "A hash deliberately destroys similarity — one changed character must scatter the key across the table, which is what keeps buckets even. An embedding deliberately preserves it. So there is no exact-match probe and no collision to resolve; 'lookup' becomes 'find the nearest points', and every query returns something, whether or not anything relevant exists."
+  },
+  {
+    "to": "external-merge-sort",
+    "from": "merge-sort-recursion",
+    "sameness": "It IS merge sort. Sorted runs are combined by repeatedly taking the smallest head element — the identical merge you already wrote, just fed from files instead of subarrays.",
+    "delta": "The cost model changes from comparisons to I/O passes, and that reorders every decision. Splitting stops at whatever fits in RAM, so the runs are made by an in-memory sort rather than by recursing to single elements, and the merge becomes k-way in one pass because a second pass over a terabyte is far more expensive than a k-element heap. The merge's O(n) extra buffer, an annoyance in memory, becomes the entire design constraint on disk."
+  },
+  {
+    "to": "feature-flags",
+    "from": "consistent-hashing",
+    "sameness": "A percentage rollout IS the hash ring. You hash a key, look at where it lands in a fixed 0–99 space, and a range of that space owns it. Stickiness — the same user seeing the same variant on every request, from every server, with no shared state — is the identical property that lets any node in a cluster agree on placement without coordinating.",
+    "delta": "The ring's monotonicity now protects a person rather than a cache. Growing a rollout from 5% to 25% must only add users, never swap them, because a user who sees a feature and then loses it files a bug — so the mapping has to be a widening prefix of the space, not a re-partition. And the salt moves from a nicety to a requirement: hash the user id alone and every flag picks the same cohort, so your riskiest ten features all land on the same unlucky 5% of customers."
+  },
+  {
+    "to": "fenwick-tree",
+    "from": "segment-tree",
+    "sameness": "It IS the same idea as a segment tree: internal aggregates over ranges so a prefix sum costs O(log n) instead of a scan, and a point update repairs O(log n) of them. The nodes even correspond — a Fenwick tree keeps only the ones a prefix query can actually land on.",
+    "delta": "Dropping the rest means the tree needs no pointers and no 4n array, just n slots navigated by the lowest set bit of the index. Half the memory and much smaller constants, and one real restriction: prefix queries are combined by subtraction, so the operation has to be invertible. Sums and XOR work, range minimum does not, which is the case where the full segment tree is still the answer."
+  },
+  {
+    "to": "fibonacci-memoization",
+    "from": "hash-table",
+    "sameness": "The memo IS a hash table sitting in front of a pure function. Key is the argument, value is the result, and the lookup is the same average O(1) get you already implemented.",
+    "delta": "What changes is what the cache is worth. A cache normally saves latency; here it saves a complexity class, because the naive recursion recomputes the same subproblems exponentially many times and the table collapses that to one evaluation each — exponential to linear. That only works if the function is deterministic and side-effect free, which is why memoisation is a property of the function as much as of the table."
+  },
+  {
+    "to": "fibonacci-memoization",
+    "from": "lru-cache",
+    "sameness": "It IS a cache: same map from a computed key to a computed value, same hit-or-compute path on every call.",
+    "delta": "This one never evicts, and that is not laziness. Every entry may be needed again by a caller further up the recursion, so dropping a subproblem does not cost one recomputation — it costs the entire exponential subtree beneath it. A memo table with an LRU policy can be arbitrarily slower than one without, which is the inverse of the usual trade-off and the reason memo tables are bounded by the problem size rather than by a capacity you choose."
+  },
+  {
+    "to": "floyd-warshall",
+    "from": "bellman-ford",
+    "sameness": "The core step IS the same relaxation: if going through some intermediate point is cheaper than what you have, take it. Same comparison, same update, same tolerance for negative edges.",
+    "delta": "The relaxation is applied over pairs rather than over edges, and the outer loop is over which vertices are allowed to be intermediates. That gives every pair's shortest path in O(V cubed) with three lines and no data structures, which beats running Bellman-Ford from every source on dense graphs. The loop order is load-bearing in a way that is easy to get wrong: k has to be the outermost loop, because the invariant is that the table already accounts for all intermediates before k, and swapping the loops produces a table that looks reasonable and is silently incorrect."
+  },
+  {
+    "to": "gossip-protocol",
+    "from": "graph-traversal",
+    "sameness": "It IS a breadth-first traversal of the cluster graph. A node that learns something passes it to its neighbours, they pass it on, and the frontier widens until everything reachable has been reached. The version check that stops a node re-broadcasting stale news is the visited set doing its usual job.",
+    "delta": "There is no queue and no visited set anyone owns. Each node picks peers at random every round instead of walking an adjacency list, so nodes hear the same update many times and delivery is probabilistic rather than guaranteed. You give up the exact O(V+E) walk and get O(log N) rounds that still finish when nodes die mid-traversal — which is the property a single traversal, run from a single coordinator, can never have."
+  },
+  {
+    "to": "graceful-shutdown",
+    "from": "load-balancer",
+    "sameness": "A graceful shutdown IS a health check failing, on purpose. The balancer you built removes a backend when its health probe goes red; flipping your own readiness endpoint to red is you invoking that exact mechanism against yourself, so the pool drains you before you stop serving.",
+    "delta": "You control when the probe flips but not when the balancer believes it. Between the two there is a propagation window — probe interval times failure threshold, typically five to fifteen seconds — during which traffic still arrives at a process that has decided it is leaving. Every request in that window is a 502 unless you keep serving through it."
+  },
+  {
+    "to": "graceful-shutdown",
+    "from": "message-queue",
+    "sameness": "For a worker, shutdown IS the acknowledgement problem. A consumer that dies with a message in hand and no ack sends that message back to the queue after the visibility timeout, which is the same at-least-once redelivery you already reasoned about.",
+    "delta": "The redelivery is now caused by your own deploy, and it happens to every worker at once during a rolling restart. Duplicates arrive in a burst rather than a trickle, so handlers that are 'almost idempotent' fail visibly on exactly the day you ship."
+  },
+  {
+    "to": "graph-representations",
+    "from": "array",
+    "sameness": "The adjacency matrix IS a two-dimensional array. Row u, column v, and the cell says whether the edge exists — the same index arithmetic you already use.",
+    "delta": "Storage becomes V squared regardless of how many edges you actually have, which is the whole trade. Edge existence becomes an O(1) test and matrix algebra over the graph becomes available, but a social graph with a million users would need a trillion cells to store an average of a few hundred friends each. The representation is only honest when the graph is dense."
+  },
+  {
+    "to": "graph-representations",
+    "from": "linked-list",
+    "sameness": "The adjacency list IS a list per vertex. The graph is literally an array of linked lists, one holding each vertex's neighbours, and iterating a vertex's edges IS the list walk you already wrote.",
+    "delta": "Memory drops to O(V + E), which is why every real graph library uses this, and the cost lands on a different operation: asking whether a specific edge exists now means scanning one vertex's list instead of a single index. Every traversal you write from here on assumes this shape, because BFS and DFS only ever ask for a vertex's neighbours and never for a random edge."
+  },
+  {
+    "to": "graph-traversal",
+    "from": "queue",
+    "sameness": "BFS IS the queue. Put the start vertex in, pop one, push its unvisited neighbours, repeat — the algorithm is the queue's FIFO behaviour applied to a graph, nothing more.",
+    "delta": "FIFO is what makes the traversal expand in rings of equal distance, which is why BFS finds the fewest-edges path and why the first time you reach a vertex is the best time. The cost is memory: the queue holds an entire frontier, and on a wide graph that frontier can be most of the vertices at once."
+  },
+  {
+    "to": "graph-traversal",
+    "from": "stack",
+    "sameness": "DFS IS the stack. The same loop with a stack in place of the queue produces depth-first order, and the recursive version is that same stack, provided by the language instead of by you.",
+    "delta": "LIFO drives the walk as deep as possible before backing up, which finds a path fast but gives no guarantee it is short. Memory becomes proportional to depth rather than width, so it handles wide graphs the queue cannot — and it introduces a failure the queue version does not have, since the recursive form overflows the call stack on a long enough path."
+  },
+  {
+    "to": "graph-union-find",
+    "from": "disjoint-set-union",
+    "sameness": "It IS the disjoint set union you already built, with graph vertices as the elements. Each edge that arrives is a union, each connectivity question is two finds compared for equality.",
+    "delta": "Framing it as a graph makes the restriction visible: this answers whether two vertices are connected, and nothing else. It cannot produce the path between them, it cannot tell you the distance, and it cannot handle an edge being removed — deletion would require splitting a set, which the structure has no way to do."
+  },
+  {
+    "to": "graph-union-find",
+    "from": "connected-components",
+    "sameness": "It answers the same question as the component labelling you did with traversal: which vertices are in the same group.",
+    "delta": "The difference is when the edges arrive. Traversal needs the whole graph up front and costs O(V + E) every time it changes; union-find absorbs edges one at a time and answers queries in between at effectively constant cost. That makes it the right tool for a stream and the wrong tool for a snapshot you also want to explore, since it stores connectivity without storing the graph."
+  },
+  {
+    "to": "grid-dp",
+    "from": "fibonacci-memoization",
+    "sameness": "It IS memoised recursion. A cell's answer is built from the cells it depends on, each subproblem is solved once and stored, and the recurrence is the same shape as the one you already cached.",
+    "delta": "The key becomes a pair of coordinates, so the memo is a table rather than a line, and that makes the fill order explicit: iterate rows top to bottom and a cell's dependencies are always already computed, which removes the recursion entirely. It also exposes an optimisation that is invisible in the recursive form — if each row depends only on the row above, you can keep one row instead of the whole grid and the memory drops from O(rows times cols) to O(cols)."
+  },
+  {
+    "to": "heap-priority-queue",
+    "from": "binary-tree",
+    "sameness": "It IS a binary tree, and specifically a complete one — every level full except the last, which fills left to right. That completeness is why it needs no pointers at all: node i's children live at 2i+1 and 2i+2 of a flat array.",
+    "delta": "The ordering rule is weaker than a search tree's. A parent only beats its children; siblings are unordered, and there is no relationship between subtrees. That weakness is exactly what buys the guaranteed shape, so a heap can never degenerate the way an unbalanced BST does — but it also means you cannot search a heap. Finding an arbitrary element is O(n), and in-order traversal returns nothing meaningful."
+  },
+  {
+    "to": "heap-priority-queue",
+    "from": "queue",
+    "sameness": "The interface IS a queue. You push work in, you pop work out, and consumers cannot see anything but the next item.",
+    "delta": "The order changes from arrival to priority, and that changes the failure mode rather than the API. A FIFO queue guarantees every item is eventually served; a priority queue does not, so a steady stream of high-priority work starves the low-priority items indefinitely. Schedulers fix this by ageing entries, which is an admission that fairness was a property the plain queue gave you for free."
+  },
+  {
+    "to": "heap-sort",
+    "from": "heap-priority-queue",
+    "sameness": "It IS the priority queue you already built, drained. Heapify the array, then pop the max n times; each pop leaves a hole at the end of the array that is exactly where that element belongs.",
+    "delta": "Because the heap lives in the same array being sorted, nothing is allocated — an O(n log n) worst case with O(1) extra memory, which merge sort cannot offer and quicksort cannot guarantee. What it loses is locality: sift-down jumps to 2i+1, so it touches the array in a cache-hostile pattern and reliably finishes behind quicksort in wall-clock time despite the better bound. That is why it usually appears as introsort's fallback rather than as anyone's first choice."
+  },
+  {
+    "to": "huffman-coding",
+    "from": "heap-priority-queue",
+    "sameness": "The algorithm IS repeated extract-min. Take the two least frequent symbols out of the priority queue, merge them into a node whose frequency is their sum, put it back, and repeat until one node remains.",
+    "delta": "The queue is doing the optimisation, not a clever insight — greedily merging the two rarest symbols is provably optimal because the rarest symbols must end up deepest. The consequence is that the entire cost is n heap operations, O(n log n), and that the tree is built bottom-up: you do not know the code for any symbol until the last merge is done."
+  },
+  {
+    "to": "huffman-coding",
+    "from": "binary-tree",
+    "sameness": "The codebook IS a binary tree. Left is a 0, right is a 1, and a symbol's code is the path taken to reach its node.",
+    "delta": "Every symbol sits at a leaf, and that placement is what makes the code prefix-free: no codeword can be a prefix of another because no leaf is an ancestor of another. That is why the decoder needs no delimiters and no lengths — it walks the tree bit by bit and emits a symbol whenever it lands on a leaf, which also means a single flipped bit does not corrupt one character but desynchronises the rest of the stream."
+  },
+  {
+    "to": "hyperloglog",
+    "from": "bloom-filter",
+    "sameness": "It IS the same trick as a bloom filter: hash the element, use the hash bits to touch a tiny fixed-size sketch, never store the element itself, and accept a wrong answer in exchange for constant memory.",
+    "delta": "What the bits mean changes, and so does the shape of the error. A bloom filter records that a slot was hit; HyperLogLog records the longest run of leading zeros seen, because a rare hash pattern implies many distinct inputs. The result is an estimate of cardinality with a relative error rather than a one-sided guarantee, so unlike the bloom filter there is no answer it can give you with certainty — it can be high or low, and the only knob is how many registers you are willing to pay for."
+  },
+  {
+    "to": "idempotency",
+    "from": "hash-table",
+    "sameness": "An idempotency layer IS a hash table with one operation: insert-if-absent. Key in, existing value out if it is there, execute and store if it is not. Stripe's implementation, your framework's middleware and the four lines you would write yourself are all that map.",
+    "delta": "The map has to be shared across every process and survive a crash, so it is a unique index in a database rather than an object in memory — and the interesting part is the gap between claiming the key and finishing the work. A crash in that gap leaves a key that is taken but has no result, which is a state a hash table has never had and which decides whether the retry is safe or stuck."
+  },
+  {
+    "to": "idempotency",
+    "from": "distributed-tx",
+    "sameness": "This is the property the saga silently assumed. Every step in that lab is retried on failure and every compensation may run more than once, so the whole pattern is only correct if each step is idempotent. This lab is that assumption pulled out and implemented.",
+    "delta": "Here the requirement is on a single request rather than a workflow, and the enforcement is a key the caller supplies rather than a coordinator's log. That flips who is responsible: the client picks the identity of the operation, and the server's job is only to honour it — which is why 'generate the key once, before the first attempt' is the rule everything else depends on."
   },
   {
     "to": "inference-cost",
@@ -963,10 +1547,190 @@ export const bridgeEdges: BridgeEdge[] = [
     "delta": "Service time is not roughly constant. It scales with the number of output tokens, so two requests to the same endpoint can differ by a factor of fifty and capacity is a moving target."
   },
   {
+    "to": "interval-scheduling",
+    "from": "activity-selection",
+    "sameness": "It IS activity selection under different vocabulary. Same input of start and end times, same sort by earliest finish, same single pass taking anything compatible, same exchange argument for why that is optimal.",
+    "delta": "Seeing it as intervals is what exposes the assumption the greedy rests on: every interval counts the same, so more is always better. Attach a value to each one and the earliest finisher can be exactly the wrong choice — a single long lucrative booking can beat three short ones. That is the boundary where the greedy stops being correct and weighted interval scheduling has to sort by finish time and then run a DP with binary search, which is a good deal more work for a problem that looks identical."
+  },
+  {
+    "to": "jwt-anatomy",
+    "from": "merkle-tree",
+    "sameness": "Verifying a token IS the hash comparison you already trusted a Merkle root for: recompute a digest over the bytes you were handed and check it against one you consider authoritative. Change a single character of the payload and the digest no longer matches, exactly as a changed block cascades into a different root.",
+    "delta": "What makes the digest authoritative is a secret key rather than a chain up to a published root, so verification needs no server round trip and no stored session — which is the entire appeal and the entire risk. Integrity is all you get: the payload is base64, not encryption, so it is readable by anyone holding the token, and anyone holding the key can mint claims that verify perfectly. Revocation, which a session table gave you for free, now has to be built back."
+  },
+  {
+    "to": "knapsack",
+    "from": "coin-change",
+    "sameness": "It IS the same table. Capacity along one axis, one row per item, and the same take-it-or-leave-it recurrence comparing what you get by including an item against what you already had without it.",
+    "delta": "Each item may be used at most once, and remarkably that entire difference is encoded in the direction of one loop. Iterating capacity downward means an item's row reads values that do not yet include that item, so it is used once; iterate upward and you have unbounded coin change back. The other change is what the cell holds — a maximised value rather than a minimised count — which is also why the pseudo-polynomial O(n times W) hides a real cost: the table scales with the numeric capacity, so a knapsack with huge capacities is not tractable just because it has few items."
+  },
+  {
+    "to": "kruskal-mst",
+    "from": "disjoint-set-union",
+    "sameness": "It IS union-find with a sort in front. Walk the edges from cheapest to most expensive, and take an edge exactly when its endpoints have different roots — the find tells you whether the edge would close a cycle, and the union records that you took it.",
+    "delta": "That is the entire algorithm; the greedy correctness is doing no work that union-find is not already doing. Cost is O(E log E) dominated by the sort, since the union-find part is effectively linear, and it means Kruskal never needs the graph to be connected: run out of edges early and what you have is a minimum spanning forest, one tree per component, with no special handling."
+  },
+  {
     "to": "kv-cache",
     "from": "lru-cache",
     "sameness": "It IS an LRU cache. Keys are sequences, values are their attention tensors, and the eviction policy is the same recency ordering you implemented — the least recently touched conversation is the one that goes.",
     "delta": "The budget is GPU memory rather than entry count, so entries have wildly different sizes. And an eviction is not a miss you refetch — it is a recompute of every token in that sequence, which is why it shows up as a latency spike rather than an error."
+  },
+  {
+    "to": "levenshtein",
+    "from": "longest-common-subsequence",
+    "sameness": "It IS the same table. Rows are one string, columns are the other, cell (i, j) is the answer for the two prefixes, and each cell is computed from the three neighbours above, left, and diagonal.",
+    "delta": "Only the cell's meaning and the costs change: LCS maximises what the two strings share, edit distance minimises the operations to turn one into the other, and the three neighbours become deletion, insertion and substitution. That makes the costs a parameter rather than a constant — weight substitutions higher and you get a different metric out of identical code, which is how spell-checkers, diff tools and DNA alignment all end up running the same loop with different numbers in it."
+  },
+  {
+    "to": "load-balancer",
+    "from": "heap-priority-queue",
+    "sameness": "Least-connections IS extract-min. Backends are keyed by in-flight count, you pop the smallest, hand it the request, increment its key and put it back — the same heap operation you used for scheduling and Dijkstra.",
+    "delta": "The keys change without anyone telling you. A backend's count drops whenever a request finishes anywhere, and with several balancers there is no shared heap at all, so the minimum you popped was true a moment ago and is not now. Every balancer stampedes the same 'least busy' node and overwhelms it — which is why production picks two backends at random and takes the better of the pair rather than trusting a global minimum."
+  },
+  {
+    "to": "longest-common-subsequence",
+    "from": "grid-dp",
+    "sameness": "It IS grid DP. A two-dimensional table where every cell is built from its neighbours above and to the left, filled in a single row-by-row sweep, with the answer waiting in the far corner.",
+    "delta": "The axes are two strings rather than two spatial dimensions, so cell (i, j) means the best answer for the first i characters against the first j. The recurrence branches on a comparison — matching characters extend the diagonal, mismatching ones take the better of the two neighbours — and that branch is what makes the table reconstructable: walking backwards from the corner recovers the actual subsequence, not just its length, which the pure counting version of grid DP never needed to support."
+  },
+  {
+    "to": "longest-increasing-subsequence",
+    "from": "longest-common-subsequence",
+    "sameness": "It IS a longest common subsequence problem. Take the array, sort a copy of it, and the LIS of the array is the LCS of the array with its own sorted copy — the same table you already filled solves this with no new recurrence.",
+    "delta": "That reduction costs O(n squared), and it is worth knowing mainly because it explains why LIS feels like LCS. The extra structure here — one sequence, a total order — allows something LCS cannot do: keep an array of the smallest possible tail for each length and binary search it per element, which brings the whole thing to O(n log n). The tails array is not itself a valid subsequence, only its length is meaningful, which is the detail that makes reconstructing the actual sequence need a separate parent array."
+  },
+  {
+    "to": "longest-increasing-subsequence",
+    "from": "binary-search",
+    "sameness": "The fast solution IS binary search in a loop. Maintain a sorted array of the smallest tail value achievable for each subsequence length, and for each element binary search for the position it belongs in.",
+    "delta": "The array being searched changes as you go, which is the part that feels wrong at first — but it stays sorted by construction, so the invariant holds. Each element costs one O(log n) search and one write, giving O(n log n) instead of the quadratic scan over all previous elements. The trade is interpretability: the quadratic DP stores an answer per index and can be read directly, while the tails array stores something that is not a subsequence at all."
+  },
+  {
+    "to": "lru-cache",
+    "from": "hash-table",
+    "sameness": "The lookup half IS a hash table. Key to value, average O(1), same collision behaviour, same resize concerns — nothing about get changes.",
+    "delta": "A hash table has no opinion about which entry to drop when memory runs out, because it never runs out; it just grows. Adding a capacity forces a policy, and the policy needs an ordering the hash table does not have, which is why one structure is not enough here."
+  },
+  {
+    "to": "lru-cache",
+    "from": "linked-list",
+    "sameness": "The ordering half IS a doubly linked list. Most recently used at the head, least recently used at the tail, and the O(1) unlink-and-relink of a node given its pointer is exactly the operation the list already gave you.",
+    "delta": "The list alone cannot find the node for a key without walking it, so the two structures are stitched together: the map stores pointers into the list. That is what makes eviction O(1), and it is also what makes correctness fragile — every touch has to update both halves, and a get that forgets to move the node silently degrades the cache to FIFO."
+  },
+  {
+    "to": "lsm-tree",
+    "from": "external-merge-sort",
+    "sameness": "Compaction IS external merge sort. Sorted runs too large for memory, merged k at a time into bigger sorted runs by taking the smallest head element — the same algorithm, running forever instead of once.",
+    "delta": "The sort is never finished, which is the entire design. Writes land in a memory buffer that is flushed as a new small sorted run, so a write costs a sequential append rather than a random in-place update, and the merge runs in the background to keep the number of runs bounded. That moves the cost to reads, which may have to check several runs, and creates the trade every LSM engine tunes: compact aggressively for read speed and pay write amplification, or compact lazily and let reads fan out."
+  },
+  {
+    "to": "matrix-chain-multiplication",
+    "from": "grid-dp",
+    "sameness": "It IS a DP table indexed by two coordinates, filled from smaller answers to larger ones, exactly as you filled the grid.",
+    "delta": "A cell here means a subrange i to j, and it does not depend on its immediate neighbours but on every way of splitting that range in two. So the fill order becomes by increasing interval length rather than row by row, and each cell costs O(n) to evaluate instead of O(1) — the total goes to O(n cubed). This is the shape of every interval DP, and the thing it teaches is that the expensive part was never the multiplication itself but choosing the order, which changes the scalar operation count by orders of magnitude without changing the result at all."
+  },
+  {
+    "to": "max-flow",
+    "from": "graph-traversal",
+    "sameness": "Finding an augmenting path IS a graph traversal. Walk from source to sink over edges that still have capacity left, and every BFS or DFS you have written does this unchanged.",
+    "delta": "The graph is mutated by the walk. Pushing flow along a path subtracts capacity from its edges and adds a backward edge of the same amount, so the next traversal runs on a different graph — and those backward edges are what let a later path undo an earlier greedy mistake. Termination stops being about visiting everything and becomes about no path existing at all, so the algorithm is a loop over traversals rather than a single one."
+  },
+  {
+    "to": "merge-sort-recursion",
+    "from": "sorting-race",
+    "sameness": "It IS the merge sort you already watched run in the race — split in half, sort each half, merge the two sorted halves. This lab just opens the recursion up so you can see the calls.",
+    "delta": "Watching the recursion is what makes the O(n log n) stop being a fact you memorised: there are log n levels, each does O(n) work merging, and neither depends on the input's arrangement, which is why merge sort has no bad case. It also exposes the cost the race hides — merging needs somewhere to put the output, so this is the one contestant that is not in place, and that O(n) extra buffer is precisely what makes it the algorithm that survives when the data no longer fits in memory."
+  },
+  {
+    "to": "merkle-tree",
+    "from": "binary-tree",
+    "sameness": "It IS a binary tree. Leaves hold data, internal nodes hold a value derived from their two children, and you walk root-to-leaf exactly as before.",
+    "delta": "The derived value is a cryptographic hash of the children, which makes every node a fingerprint of its whole subtree. Comparing two large datasets collapses to comparing two roots, and when they differ you descend only into the mismatched side, so finding the changed block costs O(log n) hashes instead of a full scan. The property is one-directional: the tree proves a leaf belongs to a root, but it can never tell you what a leaf contains."
+  },
+  {
+    "to": "message-queue",
+    "from": "circular-buffer",
+    "sameness": "A partition IS a ring buffer. Producers append at a write index, consumers read at their own index, capacity is bounded by the retention window, and the gap between the two indexes — consumer lag — is the same fullness measure you were already tracking.",
+    "delta": "Reader and writer no longer share memory, and there are many readers each holding a private index, so a slow consumer cannot block the producer. It just drifts toward the wrap, and when the writer laps it the records are gone. Overflow stops being a full-buffer error and becomes silent data loss, visible only as lag climbing on a dashboard — which is why lag, not queue depth, is the metric people page on."
+  },
+  {
+    "to": "min-cut",
+    "from": "max-flow",
+    "sameness": "It IS max flow. Not analogous to it — equal to it: the maximum flow value and the minimum cut capacity are the same number, and after a max-flow run the cut is read straight off the residual graph as the set of vertices still reachable from the source.",
+    "delta": "So the work is already done, and what changes is what you ask for. Flow answers how much can get through; the cut answers which edges are the reason it cannot be more, which turns a throughput number into a list of things to fix. The same duality is why image segmentation and project selection reduce to a flow computation nobody would otherwise have guessed was involved."
+  },
+  {
+    "to": "multi-region",
+    "from": "cap-theorem",
+    "sameness": "This IS the CAP theorem, with the abstractions removed. The partition is not a thought experiment — it is 80 milliseconds of ocean between Virginia and Frankfurt, present on a good day and total on a bad one. Choosing active-passive is choosing C; choosing active-active with local writes is choosing A.",
+    "delta": "CAP asks what you give up during a partition. Operating across regions asks what you give up all the time, because the latency is permanent even when nothing is broken. A synchronous cross-region write costs a round trip on every request forever, so most systems pick asynchronous replication and accept a non-zero RPO — a quantity of acknowledged data they have decided in advance to lose."
+  },
+  {
+    "to": "multi-region",
+    "from": "vector-clocks",
+    "sameness": "Active-active writes ARE the concurrent-update problem vector clocks exist for. Two regions accept writes to the same key without having seen each other, which is the textbook definition of concurrent events, and the reconciliation you built is exactly what a global table has to run on conflict.",
+    "delta": "The clock is no longer the interesting part — the merge is, and it is a product decision rather than an algorithm. Last-writer-wins silently discards a real customer action; a CRDT keeps both but changes what the field means; a manual queue needs a human. Whichever you choose, someone in another timezone will read the result."
+  },
+  {
+    "to": "multi-tenancy",
+    "from": "sharding-replication",
+    "sameness": "Tenant isolation IS sharding, with tenant_id as the shard key. Every query carries the key, the router maps it to a shard, and each shard owns a disjoint slice of the data — mechanically identical to what you already built.",
+    "delta": "The keys are no longer interchangeable. Cache keys are roughly the same size, so a uniform hash balances them; tenants follow a power law, where the largest is routinely three orders of magnitude bigger than the median, so the same uniform hash produces a shard that is on fire and thirty that are idle. And a routing bug stops being a wrong-node lookup: reading the wrong tenant's rows is a data breach with a disclosure obligation."
+  },
+  {
+    "to": "multi-tenancy",
+    "from": "rate-limiter",
+    "sameness": "Noisy-neighbour control IS per-key rate limiting. One bucket per tenant, refilled at the rate that tenant paid for, and requests rejected when it empties — the same token bucket, keyed differently.",
+    "delta": "The resource being protected is shared and multi-dimensional. A tenant can be inside its request-per-second limit and still monopolise the database with one unindexed query, or fill the connection pool, or hold every worker thread. So the limits have to cover the scarce resource — connections, query time, storage — not just the request count, and a limiter on requests alone gives a false sense of isolation."
+  },
+  {
+    "to": "n-queens",
+    "from": "permutations-subsets",
+    "sameness": "It IS the permutation generator you already wrote. One queen per row and one per column means any solution IS a permutation of column indices, and the recursion that builds it is the same choose-undo-choose loop.",
+    "delta": "The only addition is a legality test before descending, and it changes everything about the cost: rejecting a partial placement prunes an entire subtree of permutations that would otherwise be generated and thrown away at the end. That is the difference between exploring n factorial complete boards and exploring a searchable fraction of them, and it makes the test itself performance-critical — checking diagonals by scanning the board reintroduces the work the pruning just saved, which is why the diagonals are tracked in sets."
+  },
+  {
+    "to": "observability",
+    "from": "topological-sort",
+    "sameness": "A trace IS a dependency graph. Each span carries a parent id, which is a directed edge, and rebuilding the waterfall is the same parent-pointer traversal you used to order a build graph. Attributing time correctly means walking children before parents — a post-order pass over exactly that DAG.",
+    "delta": "Edges arrive out of order, late, and sometimes not at all, because each span is shipped by a different process over an unreliable channel. So the graph you sort is a partial one: a missing parent leaves an orphan subtree, and the total you compute is quietly smaller than the request actually took."
+  },
+  {
+    "to": "observability",
+    "from": "hyperloglog",
+    "sameness": "Metric cardinality IS the distinct-count problem. The number of time series a system stores is the number of distinct label tuples it has ever emitted, which is precisely the set-cardinality question HyperLogLog answers, over the same kind of high-volume stream.",
+    "delta": "Here you are not estimating the count — you are paying for it. Every distinct tuple is an allocated series with its own index entry and retention, so adding one unbounded label like user_id multiplies your bill by the number of users. The counting problem becomes a capacity problem."
+  },
+  {
+    "to": "oidc-flow",
+    "from": "jwt-anatomy",
+    "sameness": "The id_token IS the JWT you already took apart — same three segments, same signature check — and 'who is this user' reduces to that verification plus reading the claims inside.",
+    "delta": "The key is not yours. You fetch the issuer's public key from its JWKS endpoint, so a valid signature no longer means a valid token: you must also pin the issuer, the audience and the nonce, or a perfectly signed token minted for another site logs its holder into yours. And the token now has to be obtained safely rather than merely read, which is what the code exchange and PKCE are for — the verifier proves that whoever redeems the authorization code is the client that started the flow."
+  },
+  {
+    "to": "pagerank",
+    "from": "graph-traversal",
+    "sameness": "It IS a walk over the graph. Start at a node, follow an outgoing edge, repeat — the same neighbour iteration as BFS, with the next step chosen at random rather than from a queue.",
+    "delta": "The walk never ends and never marks anything visited. Each node holds a probability instead of a boolean, and the answer is where that distribution settles after many steps, so there is no termination condition, only a convergence threshold. The walk's failure modes need patching too: a node with no outgoing links traps the surfer and a disconnected region is unreachable, which is exactly what the damping factor's random jump repairs."
+  },
+  {
+    "to": "pagerank",
+    "from": "sparse-matrix",
+    "sameness": "One iteration IS a sparse matrix-vector multiply. The link structure is a matrix with a non-zero wherever a link exists, the ranks are a vector, and the update multiplies one by the other.",
+    "delta": "The web's link matrix is almost entirely zeros, so the dense form would be billions squared and the sparse form is merely billions — the algorithm is only computable because the representation refuses to store what is not there. Cost per iteration is O(E), not O(V squared), and the whole computation becomes a handful of passes over an edge list, which is why it parallelises across machines so cleanly."
+  },
+  {
+    "to": "permutations-subsets",
+    "from": "stack",
+    "sameness": "The recursion IS a stack. Every recursive call pushes a frame holding the choice just made, and every return pops it — replace the call stack with an explicit stack of partial answers and the algorithm is unchanged.",
+    "delta": "What the stack holds is a partial solution being mutated in place, so the pop has to undo the choice as well as discard it. That undo is the whole discipline of backtracking and the source of its classic bug: append to a shared array, recurse, and forget to remove the element, and every branch inherits the previous branch's state. Storing the result also needs care for the same reason — pushing the working array rather than a copy leaves you with n references to one array that ends up empty."
+  },
+  {
+    "to": "prim-mst",
+    "from": "dijkstra",
+    "sameness": "It IS Dijkstra with one expression changed. Same frontier in a priority queue, same pop-the-cheapest-and-expand loop, same visited set — only the key differs: the weight of the single edge crossing the frontier, rather than the total distance from the source.",
+    "delta": "Because the key does not accumulate, the tree it grows minimises total edge weight instead of per-node distance. The consequence trips people up: the path between two vertices inside a minimum spanning tree can be far longer than their shortest path, so an MST is not a routing table. The starting vertex also stops mattering — every start yields a tree of the same total weight, where Dijkstra's answer is defined entirely by its source."
   },
   {
     "to": "prompt-injection",
@@ -981,6 +1745,12 @@ export const bridgeEdges: BridgeEdge[] = [
     "delta": "CORS is enforced by the browser, outside the page's control. Nothing enforces this. Once a retrieved document is in the context window it is the same colour as the system prompt as far as the model is concerned, so origin has to be tracked by your own code and carried forward — a call built on data from an untrusted document is itself untrusted, however trustworthy the caller looked."
   },
   {
+    "to": "quadtree",
+    "from": "binary-search-tree",
+    "sameness": "It IS a search tree in two dimensions. Same recursive partitioning, same descend-into-the-relevant-child search, same idea that structure lets you ignore most of the data — with four children instead of two because a point splits the plane both ways at once.",
+    "delta": "Two dimensions have no total order, so a query region can straddle a boundary and force you into several children at once. Search stops being a single path and becomes a bounded exploration, so the O(log n) is about depth rather than about work done. Balance also changes hands: a BST degenerates on bad insertion order, a quadtree degenerates on clustered points, and re-inserting in a different order does not fix it."
+  },
+  {
     "to": "quantization",
     "from": "bitset",
     "sameness": "It is the same packing you implemented: values that do not need a full machine word share one, and reading a value means an offset plus a mask. Memory falls geometrically with the bits per value.",
@@ -991,6 +1761,42 @@ export const bridgeEdges: BridgeEdge[] = [
     "from": "huffman-coding",
     "sameness": "Both spend bits in proportion to how much they matter. Huffman gives frequent symbols shorter codes; quantisation gives each weight group only as many levels as its range justifies.",
     "delta": "Quantisation is lossy and fixed-width, so it is chosen for predictable memory and fast decode rather than for optimal compression."
+  },
+  {
+    "to": "queues-vs-streams",
+    "from": "message-queue",
+    "sameness": "The stream side of this lab IS that lab: a partitioned append-only log, a key hashed to a partition, per-partition ordering, and consumers tracking offsets. Nothing about the mechanism changes here.",
+    "delta": "The comparison is against the other model — a queue that deletes a message once it is acknowledged. That single difference reverses every property. A queue can hand messages to a thousand workers because it does not have to preserve order; a log caps your parallelism at the partition count forever, because order is the thing it is protecting. And only one of the two can be replayed, which decides whether a bad deploy is a rewind or a data-loss incident."
+  },
+  {
+    "to": "queues-vs-streams",
+    "from": "backpressure",
+    "sameness": "Consumer lag is the buffer fill level from the backpressure lab. Producers write faster than consumers read, the gap grows, and you are watching exactly the queue-depth signal you already built a policy around.",
+    "delta": "The buffer is now on disk and measured in days of retention, so the system does not block or drop when it fills — it just gets further behind, quietly, for hours. That converts an immediate, obvious failure into a slow one you only notice from a lag chart, and the deadline is not memory exhaustion but the retention window, after which the unread data is deleted rather than delayed."
+  },
+  {
+    "to": "quickselect",
+    "from": "sorting-race",
+    "sameness": "It IS quicksort's partition step, unchanged. Pick a pivot, move smaller elements left and larger right, and the pivot lands in its final sorted position.",
+    "delta": "After partitioning you know which side k falls in, so you recurse into that side only and throw the other away. The work per level halves instead of staying at n, which sums to O(n) expected rather than O(n log n) — finding the median is genuinely cheaper than sorting. The worst case is inherited unchanged: bad pivots still give O(n squared), and only median-of-medians or a random pivot removes it."
+  },
+  {
+    "to": "rabin-karp",
+    "from": "hash-table",
+    "sameness": "It IS hashing, used for comparison instead of for storage. Hash the pattern once, hash each window of the text, and only compare strings when the hashes agree — the same reduce-a-key-to-a-number step you already rely on.",
+    "delta": "The hash has to be rolling: removing the leaving character and adding the entering one in O(1), so a window of length m does not cost m work to hash. And a collision means something different here. In a hash table a collision costs a probe; here it would mean reporting a match that is not there, so every hash hit must be verified character by character. That verification is what keeps the worst case at O(nm) even though the expected case is O(n + m)."
+  },
+  {
+    "to": "radix-sort",
+    "from": "counting-sort",
+    "sameness": "It IS counting sort, run once per digit. Each pass is the same count-then-place distribution you already wrote, applied to one digit position at a time, least significant first.",
+    "delta": "Counting on a digit rather than a whole value is what fixes counting sort's memory problem: the counter array is sized by the radix, 256 buckets, not by the value range, so 64-bit integers cost eight passes instead of an impossible amount of memory. Stability stops being a nicety and becomes correctness — each pass must preserve the order the previous pass established, and an unstable inner sort silently destroys the work of every earlier digit."
+  },
+  {
+    "to": "raft-election",
+    "from": "quickselect",
+    "sameness": "Deciding what is committed IS a selection problem. Take each follower's replicated index, and the commit point is the k-th largest where k is the majority size — the same order statistic you computed without sorting the whole array.",
+    "delta": "The array is a moving target: values only ever rise, arrive asynchronously, and some entries never arrive at all, so the answer is recomputed every round rather than once. A wrong k-th element is no longer a wrong percentile but a lost acknowledged write, which is why the raw order statistic is not enough — a leader may only commit entries from its own term, so entries from earlier terms must be excluded before selecting, even when a majority already holds them."
   },
   {
     "to": "rag-pipeline",
@@ -1011,6 +1817,42 @@ export const bridgeEdges: BridgeEdge[] = [
     "delta": "There is now a third cut after it that has nothing to do with relevance. The context window is finite, so the best passages are packed until the budget runs out and the rest are dropped — a document can be ranked first by every scorer in the pipeline and still not make it into the prompt."
   },
   {
+    "to": "rate-limiter",
+    "from": "queue",
+    "sameness": "The leaky bucket IS the FIFO queue you built: enqueue on arrival, dequeue from the front, reject when it is full. The token bucket is the same structure read from the other side — capacity that refills instead of drains.",
+    "delta": "The dequeue is driven by a clock rather than by a consumer asking for work, so queue depth is no longer bookkeeping — it is latency the caller is paying, and a full queue is a 429 someone receives rather than an exception you catch. Sizing the bucket is deciding how much burst you convert into delay before you convert it into refusal. Across a cluster the structure has to be shared, so the counter moves into Redis and every decision buys a network round trip."
+  },
+  {
+    "to": "rate-limiting-at-scale",
+    "from": "rate-limiter",
+    "sameness": "It IS the token bucket from the rate limiter lab, unchanged: capacity, refill rate, take one token or reject. The algorithm you wrote is the algorithm running in production at Stripe and Cloudflare — nobody replaces it at scale.",
+    "delta": "The bucket now lives on N machines instead of one, and a bucket is mutable shared state. Replicate it and you have multiplied the limit by N; centralise it and every request pays a network round trip to a store that is now on the critical path of your entire fleet. The algorithm was never the problem — where the counter lives is."
+  },
+  {
+    "to": "rate-limiting-at-scale",
+    "from": "consistent-hashing",
+    "sameness": "The fix for a shared counter is the ring you already built: hash the rate-limit key, and let the hash decide which node owns that key's bucket. One owner per key means one bucket per key, which is the property the whole scheme needs.",
+    "delta": "A rate-limit key is far hotter than a cache key — one abusive customer is one key, and that key's owner takes the entire flood alone. Cache hotspots cost you a slow node; rate-limit hotspots cost you the node that was supposed to stop the flood."
+  },
+  {
+    "to": "read-replicas",
+    "from": "sharding-replication",
+    "sameness": "This IS the asynchronous replication half of that lab, deployed. The primary appends to its write-ahead log, replicas stream and apply it, and the read you serve is whatever the replica has applied so far. Same mechanism, same lag, same acknowledgement choice between async and quorum.",
+    "delta": "The replicas now serve production reads, so lag stops being a recovery-time metric and becomes a user-visible correctness property. A 200 ms lag that was invisible when replicas were standbys is now the difference between a user seeing their own comment and filing a bug that it vanished."
+  },
+  {
+    "to": "read-replicas",
+    "from": "cap-theorem",
+    "sameness": "Routing a read to a replica is the AP choice from that lab, made per query rather than per system: you accept a possibly stale answer in exchange for availability and throughput. Routing it to the primary is the CP choice. It is the same dial, and you are now turning it request by request.",
+    "delta": "Because the choice is per read, the two settings coexist in one application, and the interesting engineering is the rule that picks between them — a sticky window after a write, a session token, or a per-endpoint annotation. Getting that rule wrong does not take the system down; it produces a rare, unreproducible staleness bug."
+  },
+  {
+    "to": "red-black-tree",
+    "from": "avl-tree",
+    "sameness": "It IS a self-balancing binary search tree of the same kind as the AVL tree. Same ordering invariant, same rotations, same idea that the tree repairs its own shape on the way back up from a write.",
+    "delta": "The invariant is looser — equal black-height rather than heights within one — so a red-black tree can be up to twice as tall as an AVL tree of the same size. It accepts slower lookups to make writes cheaper: rebalancing after an insert takes at most a couple of rotations and mostly recolouring, where AVL may rotate all the way to the root. That is why read-heavy in-memory indexes reach for AVL and general-purpose libraries like the standard library map and the Linux scheduler reach for red-black."
+  },
+  {
     "to": "reranking",
     "from": "heap-priority-queue",
     "sameness": "This is top-k, the operation you already implemented with a heap: keep the k best seen so far, evict the worst as better ones arrive, never sort the whole input.",
@@ -1021,6 +1863,36 @@ export const bridgeEdges: BridgeEdge[] = [
     "from": "quickselect",
     "sameness": "Same insight as quickselect: you never needed the whole ordering, only the boundary between the top group and the rest, so most of the sorting work was waste.",
     "delta": "Quickselect wins by doing less work on a fixed input. Here the two stages score different things — the cheap score is a proxy, the expensive one is closer to what you actually want — so cutting the shortlist does not merely save time, it discards documents the accurate scorer would have ranked first. A perfect stage-two model cannot recover a document stage one dropped."
+  },
+  {
+    "to": "retries-and-timeouts",
+    "from": "circuit-breaker",
+    "sameness": "This is the inner loop of the breaker you built. Both count failures against a dependency and both decide whether to send the next request; the breaker is that decision remembered across calls, and a retry is the same decision made inside one.",
+    "delta": "A retry acts on no memory, so it optimistically adds load precisely when the dependency is failing — three retries per client is a 4× traffic multiplier arriving at a service that is already down. That is why the two are always deployed together: the retry handles the unlucky request, and the breaker is the thing that notices the dependency is not unlucky, it is broken."
+  },
+  {
+    "to": "retries-and-timeouts",
+    "from": "rate-limiter",
+    "sameness": "A retry budget IS your token bucket, pointed at your own outbound traffic. Successful calls deposit tokens, every retry spends one, and when the bucket is empty the retry is refused. gRPC and Google's SRE guidance both specify it exactly that way: retries capped at roughly 10% of the request rate.",
+    "delta": "The thing being limited is your own client, and the trigger for spending is failure rather than arrival. That inverts the feedback: a normal limiter sees more traffic when things are healthy, while a retry budget drains fastest during an outage — which is why a fixed 'max 3 retries' per call is not a limit at all. It bounds one request while the fleet-wide retry rate is unbounded."
+  },
+  {
+    "to": "schema-migration",
+    "from": "btree-index",
+    "sameness": "An online migration IS the B-tree build you already did, running while the table is being written to. ADD INDEX and ADD COLUMN with a default both mean walking every row and constructing a new sorted structure beside the old one — same traversal, same page splits, same write amplification.",
+    "delta": "The table does not hold still while you build. Rows change under you, so the tool has to capture the changes it misses — a trigger, or the binlog — and replay them onto the copy until it catches up. That replay is why the operation is measured in hours on a large table, and why it can never quite finish on a table whose write rate exceeds the copy rate."
+  },
+  {
+    "to": "schema-migration",
+    "from": "distributed-tx",
+    "sameness": "The dual-write phase IS a distributed transaction, run without a coordinator. You write the old column and the new column and need both or neither, which is exactly the atomic-commit problem — and here nobody is holding the prepare phase for you.",
+    "delta": "There is no coordinator, so there is no abort. A crash between the two writes leaves a row that is permanently inconsistent, and nothing raises an error. The mitigation is not two-phase commit but reconciliation: a backfill that runs continuously and a comparison job that reports divergence, so 'both or neither' becomes 'eventually both, and we can prove it'."
+  },
+  {
+    "to": "segment-tree",
+    "from": "binary-tree",
+    "sameness": "It IS a binary tree over the array's index range. The root covers the whole array, each node splits its range in half for its two children, and the leaves are the individual elements.",
+    "delta": "Every internal node caches an aggregate — sum, min, max — over its range, which turns a range query into a walk that stops as soon as a node's range is fully contained. A point update invalidates exactly one root-to-leaf path, so writes stay O(log n) instead of the O(1) an array gives you, and that is the trade: you make every write slightly more expensive so that no read is ever a full scan."
   },
   {
     "to": "semantic-cache",
@@ -1035,10 +1907,52 @@ export const bridgeEdges: BridgeEdge[] = [
     "delta": "The goal is inverted. Consistent hashing wants similar keys spread evenly across the ring — that uniformity is the whole point, and two nearly identical keys landing on the same node would be a flaw. Locality-sensitive hashing wants the opposite: near-identical inputs must collide on purpose, because a collision is the cache hit. Same tool, requirements reversed."
   },
   {
+    "to": "sharding-replication",
+    "from": "consistent-hashing",
+    "sameness": "Routing a key to a shard IS the ring. Hash the key, find its owner, send the request there — placement, rebalancing cost and hot-key risk all behave exactly as they did.",
+    "delta": "Each shard now has N copies, so 'who owns this key' becomes 'how many copies must answer before the write is done'. That quorum choice, not the placement, is where latency and durability actually live: R + W > N buys you reads that see your own writes and pays for it on every request, while acknowledging on the primary and replicating asynchronously is fast and leaves a window in which a failover loses writes the client was already told succeeded."
+  },
+  {
+    "to": "skip-list",
+    "from": "linked-list",
+    "sameness": "It IS a sorted linked list. The bottom level is exactly the list you already built — same nodes, same next pointers, same linear walk — and every search still ends there.",
+    "delta": "Each node is randomly promoted to extra levels above, so a search starts on a sparse express lane and drops down only when the next node overshoots. That turns the O(n) walk into O(log n) expected, but expected is the operative word: the structure is randomised, so a pathological level assignment is possible and no rebalancing ever happens, unlike a tree that guarantees its height."
+  },
+  {
+    "to": "snowflake-id",
+    "from": "bitset",
+    "sameness": "It IS bit packing. Several independent fields share one 64-bit word and each is read back with a shift and a mask — the same arithmetic that let you store thousands of flags in a handful of integers.",
+    "delta": "The field widths are a capacity budget rather than a memory saving. 41 bits fixes how long your epoch lasts, 10 bits caps how many workers can ever exist, 12 bits caps IDs per millisecond per worker. Overflow does not corrupt a flag, it hands out a duplicate primary key — so the generator must stall until the next millisecond, and a clock that steps backwards can reissue IDs it already gave away."
+  },
+  {
+    "to": "sparse-matrix",
+    "from": "array",
+    "sameness": "A dense matrix IS an array. Two dimensions are a convenience over one contiguous block plus an index formula, row * cols + col, and the sparse formats keep arrays as the substrate — CSR is three plain arrays: values, column indices, and where each row starts.",
+    "delta": "What you give up is the index formula. Reading cell (i, j) stops being arithmetic and becomes a search inside row i's slice, so random access degrades from O(1) to O(log nnz) while memory drops from rows times cols to the number of non-zeros. That trade only pays while the matrix really is mostly empty — past roughly ten percent density the index bookkeeping costs more than the zeros did."
+  },
+  {
     "to": "speculative-decoding",
     "from": "branch-and-bound",
     "sameness": "It is the same speculate-then-prune shape you implemented: explore a candidate path cheaply, evaluate it against something authoritative, and discard everything after the point it stops holding up.",
     "delta": "The cheap explorer is a small language model rather than a bound function, and verification is exact rather than a heuristic — a rejected token costs wasted GPU time but never a wrong answer."
+  },
+  {
+    "to": "strongly-connected-components",
+    "from": "connected-components",
+    "sameness": "It IS the same question — group the vertices that can all reach each other — and Kosaraju's answer IS the same traversal, run twice.",
+    "delta": "Direction breaks the symmetry that made one pass enough. In an undirected graph reachability goes both ways, so a single traversal from any vertex captures the whole component; with directed edges u reaching v says nothing about v reaching u, so you need a pass to order the vertices by finish time and a second pass on the reversed graph to close the loop. The output also gains a structure the undirected version never had: contract each component and what remains is always a DAG, which is why this is the standard first step before running anything that requires acyclicity."
+  },
+  {
+    "to": "timsort",
+    "from": "merge-sort-recursion",
+    "sameness": "It IS merge sort. Same merge of two sorted sequences, same stability, same O(n log n) worst case — the runs being merged are simply found rather than created.",
+    "delta": "Instead of halving until size one, it scans for stretches that are already ordered and extends short ones with insertion sort. Real data is full of such stretches, so already-sorted input costs one pass, O(n), which no textbook merge sort achieves. The price is that the merging is now governed by stack invariants over run lengths rather than by the recursion shape, and those invariants are load-bearing: the published implementation shipped for years with a subtly wrong one that could overflow the run stack."
+  },
+  {
+    "to": "tls-handshake",
+    "from": "merkle-tree",
+    "sameness": "Certificate validation IS the proof walk you already did. You are handed a chain, you check each link by hashing the child and verifying it against its parent, and the leaf is trusted only because the chain terminates at a root you already hold. One bad link invalidates everything beneath it, exactly as one changed block changes the root.",
+    "delta": "The links are signatures rather than plain hashes, so an attacker cannot recompute them — but that also means trust is delegated: anyone your root store trusts can sign for any domain, which is a political property, not a cryptographic one. And validation is only half the handshake. The rest exists to derive a shared symmetric key, because the asymmetric operations you just paid for are far too slow to encrypt the actual traffic."
   },
   {
     "to": "tokenization",
@@ -1053,6 +1967,30 @@ export const bridgeEdges: BridgeEdge[] = [
     "delta": "Huffman merges the two least frequent symbols and runs to optimality. BPE merges the most frequent adjacent pair and stops at a fixed vocabulary size — usually 32k to 200k — because the output is not a bitstream but a symbol table an embedding matrix must have a row for. That cap is why rare words fragment: there was no budget left for them."
   },
   {
+    "to": "topological-sort",
+    "from": "graph-traversal",
+    "sameness": "Kahn's algorithm IS breadth-first search. Same queue, same pop-and-expand loop; the only difference is which vertices are allowed to enter it.",
+    "delta": "A vertex joins the frontier when its in-degree hits zero rather than when it is first discovered, so it waits for its last dependency instead of its first. That gating is also the cycle detector: if the queue empties while vertices remain, those vertices are waiting on each other, and the algorithm reports it by counting rather than by any extra pass. Unlike BFS the output order is not unique — any order the dependencies permit is a correct answer, which makes this the rare algorithm where two implementations can both be right and disagree."
+  },
+  {
+    "to": "tree-dp",
+    "from": "grid-dp",
+    "sameness": "It IS the same dynamic programming. Each subproblem solved once, each answer assembled from the answers of smaller subproblems, and a table keyed by whatever identifies a subproblem — here a node instead of a cell.",
+    "delta": "A grid hands you the fill order for free; a tree does not, so the traversal supplies it — a post-order DFS guarantees every child is solved before its parent. And each node returns several answers rather than one, typically the best with this node taken and the best without, because the parent's decision constrains what the child is allowed to do. That tuple is the whole technique: collapse it to a single number and there is no way for a parent to know which of its children's answers are still compatible with its own choice."
+  },
+  {
+    "to": "trie",
+    "from": "binary-tree",
+    "sameness": "It IS a tree. Nodes, children, a root, and a descent from the root to find something — every traversal instinct you built on binary trees transfers.",
+    "delta": "Two things change and both follow from the same decision. The branching factor becomes the alphabet rather than two, and the key stops being stored in the node: a node's key is the path taken to reach it. That is why a prefix query costs the length of the prefix rather than the log of the collection size, and why memory explodes on sparse alphabets — an unused child slot still occupies space in every node unless you switch to a map per node."
+  },
+  {
+    "to": "vector-clocks",
+    "from": "topological-sort",
+    "sameness": "Vector clocks compute the relation topological sort depends on. Comparing two vectors answers whether one event had to happen before the other, and when neither dominates, the events are concurrent — precisely the pairs a topological order was free to emit in either sequence.",
+    "delta": "You never see the DAG. Each node infers the ordering incrementally from counters riding along on messages, so the graph is discovered rather than given and no node ever holds all of it. Concurrency also stops being a harmless tie you can break arbitrarily: two concurrent writes to the same key are a real conflict, because picking either order silently discards the other update. That is why the resolution rule — last-write-wins, sibling versions, or a CRDT — is an application decision rather than a detail of the algorithm."
+  },
+  {
     "to": "vector-index",
     "from": "btree-index",
     "sameness": "Same bargain as the B-tree index you built: pay memory and write amplification up front so a read touches a few pages instead of the whole table. Clusters are the pages, the centroid list is the root, and choosing how much of the index to open is still the query planner's job.",
@@ -1063,6 +2001,12 @@ export const bridgeEdges: BridgeEdge[] = [
     "from": "bloom-filter",
     "sameness": "You have already shipped a structure that trades exactness for size, with an error rate you dial deliberately. Same deal here: a fixed budget buys a fixed quality of answer, and you choose the point on the curve.",
     "delta": "A Bloom filter's error is one-sided — a false positive, which a lookup in the real store immediately corrects. A vector index errs the other way: it returns false negatives, neighbours it never looked at. There is no cheap verification step, because verifying means the exact scan the index exists to avoid. So the error is invisible in production and must be measured offline."
+  },
+  {
+    "to": "webauthn",
+    "from": "jwt-anatomy",
+    "sameness": "It IS asymmetric signature verification, the RS256 half of the token lab, run in the other direction: the server stores only a public key and checks something signed by a private key it has never seen and cannot reproduce.",
+    "delta": "What gets signed is a fresh challenge the server just issued, not a self-contained set of claims, so a captured signature is worthless a second later — replay stops being something you mitigate with short expiry. The signature also covers the origin, so a lookalike domain cannot collect anything usable, which is what makes it unphishable. And the credential table stops being a target: dumping it yields public keys, because the private key never leaves the authenticator, which is also why account recovery, not theft, becomes the hard problem."
   }
 ];
 
@@ -1093,6 +2037,91 @@ export const trackSummaries: TrackSummary[] = [
       "heap-priority-queue",
       "trie",
       "lru-cache"
+    ]
+  },
+  {
+    "slug": "algorithms",
+    "title": "The algorithms that keep showing up",
+    "blurb": "For anyone who can code but freezes at 'what algorithm is this' — search and sort first, then graphs, then the two ways of not recomputing.",
+    "outcome": "You can recognise a problem as a search, a sort, a graph walk or an overlapping-subproblem recurrence, and reach for the right one without looking it up.",
+    "steps": [
+      "binary-search",
+      "sorting-race",
+      "merge-sort-recursion",
+      "quickselect",
+      "heap-sort",
+      "graph-representations",
+      "graph-traversal",
+      "topological-sort",
+      "dijkstra",
+      "fibonacci-memoization",
+      "knapsack",
+      "huffman-coding"
+    ]
+  },
+  {
+    "slug": "distributed",
+    "title": "One machine to many",
+    "blurb": "For someone who has shipped a service and is now being asked to run several — starts at a single node under load and ends at agreement between nodes that cannot trust each other.",
+    "outcome": "You can say where a design loses consistency, what it does when a dependency is slow rather than down, and why a system needs consensus at all.",
+    "steps": [
+      "load-balancer",
+      "rate-limiter",
+      "backpressure",
+      "circuit-breaker",
+      "message-queue",
+      "consistent-hashing",
+      "sharding-replication",
+      "snowflake-id",
+      "cap-theorem",
+      "vector-clocks",
+      "crdt-counter",
+      "raft-election",
+      "distributed-tx"
+    ]
+  },
+  {
+    "slug": "ai-systems",
+    "title": "Inside an LLM system",
+    "blurb": "For an engineer who uses model APIs and wants to know what is happening behind them — from the tokenizer through retrieval and serving to the failure modes nobody logs.",
+    "outcome": "You can reason about an LLM feature the way you reason about any other system: where the latency is, where the memory goes, what the bill scales with, and which layer is lying to you when the answer is wrong.",
+    "steps": [
+      "tokenization",
+      "embeddings",
+      "attention",
+      "kv-cache",
+      "vector-index",
+      "ann-search",
+      "reranking",
+      "rag-pipeline",
+      "semantic-cache",
+      "continuous-batching",
+      "quantization",
+      "inference-cost",
+      "agent-loop",
+      "prompt-injection"
+    ]
+  },
+  {
+    "slug": "the-spine",
+    "title": "The spine",
+    "blurb": "The argument of this whole site in one ordering: seven things you probably already know, then the seven AI systems that turn out to be those same things wearing different words.",
+    "outcome": "You can open any paper or vendor page about LLM infrastructure and name the data structure underneath it — and say precisely where the analogy stops holding, which is the part that actually costs you.",
+    "steps": [
+      "hash-table",
+      "lru-cache",
+      "trie",
+      "sparse-matrix",
+      "btree-index",
+      "consistent-hashing",
+      "rate-limiter",
+      "tokenization",
+      "embeddings",
+      "attention",
+      "vector-index",
+      "kv-cache",
+      "semantic-cache",
+      "inference-cost"
     ]
   }
 ];
