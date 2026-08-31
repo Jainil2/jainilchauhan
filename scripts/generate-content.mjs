@@ -18,13 +18,20 @@ const labsDir = join(repoRoot, "src", "content", "labs");
 // URL must follow the build. Shipping a delta sitemap full of jainilchauhan.com
 // URLs would be a silent, launch-day SEO bug, so warn loudly instead.
 const isDeltaBuild = process.env.VITE_SITE === "delta";
-const SITE =
-  process.env.SITE_URL || (isDeltaBuild ? "https://delta.invalid" : "https://jainilchauhan.com");
 
-if (isDeltaBuild && !process.env.SITE_URL) {
+// Neither product has a domain yet, so neither gets a real default. This used
+// to fall back to https://jainilchauhan.com for the portfolio build, which is
+// owned by a different person of the same name -- so every canonical tag, the
+// sitemap and robots.txt named a site this project does not control. A
+// placeholder that cannot resolve is the honest default: it is obvious in a
+// diff, and it cannot hand a crawler someone else's domain.
+const SITE =
+  process.env.SITE_URL || (isDeltaBuild ? "https://delta.invalid" : "https://portfolio.invalid");
+
+if (!process.env.SITE_URL) {
   console.warn(
-    "[content] WARNING: delta build with no SITE_URL — sitemap.xml uses a placeholder host.\n" +
-      "          Set SITE_URL=https://<domain> before deploying the delta Worker.",
+    `[content] WARNING: no SITE_URL — sitemap.xml and robots.txt use the placeholder ${SITE}.\n` +
+      "          Set SITE_URL=https://<domain> before deploying either Worker.",
   );
 }
 

@@ -238,14 +238,14 @@ export function DeltaHome() {
 
       <footer className="mt-20 border-t border-border py-10">
         <div className="mx-auto max-w-5xl px-4 text-sm text-muted-foreground sm:px-6">
-          Built by{" "}
-          <a
-            href="https://jainilchauhan.com"
-            className="text-foreground underline underline-offset-4 hover:opacity-80"
-          >
-            Jainil Chauhan
-          </a>
-          .
+          {/*
+           * Credit with no outbound link. This used to point at
+           * jainilchauhan.com, which is owned by a different person of the same
+           * name — so the platform's footer was sending its visitors to a
+           * stranger's site. Restore a link only when there is a domain this
+           * project actually controls.
+           */}
+          Built by <span className="text-foreground">Jainil Chauhan</span>.
         </div>
       </footer>
     </div>

@@ -308,7 +308,9 @@ export function TerminalShell() {
       }
 
       case "curl": {
-        const url = rest[0] ?? "https://api.jainilchauhan.com/metrics";
+        // example.com is reserved for documentation (RFC 2606). The default used to
+        // be api.jainilchauhan.com, a domain this project does not own.
+        const url = rest[0] ?? "https://api.example.com/metrics";
         const rps = (1200 + Math.random() * 500).toFixed(0);
         const mem = (240 + Math.random() * 20).toFixed(1);
         out([
@@ -325,7 +327,7 @@ export function TerminalShell() {
       }
 
       case "dig": {
-        const domain = rest[0] ?? "jainilchauhan.com";
+        const domain = rest[0] ?? "example.com";
         out([
           { kind: "out", text: `; <<>> DiG 9.10.6 <<>> ${domain}` },
           { kind: "out", text: `;; global options: +cmd` },

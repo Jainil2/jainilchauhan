@@ -94,8 +94,15 @@ export const Route = createFileRoute("/")({
                 "@context": "https://schema.org",
                 "@type": "Person",
                 name: "Jainil Chauhan",
-                url: "https://jainilchauhan.com/",
-                image: "https://jainilchauhan.com/og-image.png",
+                // Derived from this build's own origin, never hardcoded. These
+                // two fields named jainilchauhan.com, a domain owned by a
+                // different person of the same name, so the structured data was
+                // telling search engines that someone else's site is this
+                // person's homepage. Omitted entirely until SITE_URL is set —
+                // schema.org Person is valid without them, and no claim beats a
+                // false one.
+                ...(absoluteUrl("/") ? { url: absoluteUrl("/") } : {}),
+                ...(absoluteUrl("/og-image.png") ? { image: absoluteUrl("/og-image.png") } : {}),
                 jobTitle: "Software Engineer",
                 description:
                   "Backend & distributed systems engineer building low-latency, high-trust systems.",
