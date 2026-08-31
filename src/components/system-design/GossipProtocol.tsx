@@ -18,7 +18,7 @@ export function GossipProtocol() {
   });
   const [tick, setTick] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  
+
   const animate = simulationsEnabled && !reduce;
 
   function reset() {
@@ -42,7 +42,7 @@ export function GossipProtocol() {
       for (let i = 0; i < prev.length; i++) {
         if (prev[i]) infectedIndices.push(i);
       }
-      
+
       if (infectedIndices.length === prev.length) {
         setIsPlaying(false);
         return prev; // All infected
@@ -73,68 +73,76 @@ export function GossipProtocol() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-           <button
-             onClick={() => setIsPlaying(!isPlaying)}
-             disabled={infectedCount === size}
-             className="flex items-center gap-1.5 rounded-md border border-terminal/40 bg-terminal/10 px-3 py-1.5 font-mono text-xs text-terminal hover:bg-terminal/20 disabled:opacity-50"
-           >
-             {isPlaying ? <Pause className="size-3" /> : <Play className="size-3" />}
-             {isPlaying ? "pause" : "play"}
-           </button>
-           <button
-             onClick={step}
-             disabled={isPlaying || infectedCount === size}
-             className="flex items-center gap-1.5 rounded-md border border-border bg-secondary/50 px-3 py-1.5 font-mono text-xs text-foreground hover:bg-secondary disabled:opacity-50"
-           >
-             <StepForward className="size-3" /> step
-           </button>
-           <button
-             onClick={reset}
-             className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 font-mono text-xs text-muted-foreground hover:text-foreground"
-           >
-             <RotateCcw className="size-3" /> reset
-           </button>
+          <button
+            onClick={() => setIsPlaying(!isPlaying)}
+            disabled={infectedCount === size}
+            className="flex items-center gap-1.5 rounded-md border border-terminal/40 bg-terminal/10 px-3 py-1.5 font-mono text-xs text-terminal hover:bg-terminal/20 disabled:opacity-50"
+          >
+            {isPlaying ? <Pause className="size-3" /> : <Play className="size-3" />}
+            {isPlaying ? "pause" : "play"}
+          </button>
+          <button
+            onClick={step}
+            disabled={isPlaying || infectedCount === size}
+            className="flex items-center gap-1.5 rounded-md border border-border bg-secondary/50 px-3 py-1.5 font-mono text-xs text-foreground hover:bg-secondary disabled:opacity-50"
+          >
+            <StepForward className="size-3" /> step
+          </button>
+          <button
+            onClick={reset}
+            className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 font-mono text-xs text-muted-foreground hover:text-foreground"
+          >
+            <RotateCcw className="size-3" /> reset
+          </button>
         </div>
-        
+
         <div className="flex items-center gap-4 font-mono text-xs text-muted-foreground">
-           <label className="flex items-center gap-2">
-             size:
-             <select 
-               value={size} 
-               onChange={(e) => setSize(Number(e.target.value))}
-               className="rounded border border-border bg-background px-2 py-1 outline-none focus:border-terminal/50"
-             >
-               {SIZES.map(s => <option key={s} value={s}>{s}</option>)}
-             </select>
-           </label>
-           <label className="flex items-center gap-2">
-             fanout:
-             <select 
-               value={fanout} 
-               onChange={(e) => setFanout(Number(e.target.value))}
-               className="rounded border border-border bg-background px-2 py-1 outline-none focus:border-terminal/50"
-             >
-               {FANOUTS.map(f => <option key={f} value={f}>{f}</option>)}
-             </select>
-           </label>
+          <label className="flex items-center gap-2">
+            size:
+            <select
+              value={size}
+              onChange={(e) => setSize(Number(e.target.value))}
+              className="rounded border border-border bg-background px-2 py-1 outline-none focus:border-terminal/50"
+            >
+              {SIZES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex items-center gap-2">
+            fanout:
+            <select
+              value={fanout}
+              onChange={(e) => setFanout(Number(e.target.value))}
+              className="rounded border border-border bg-background px-2 py-1 outline-none focus:border-terminal/50"
+            >
+              {FANOUTS.map((f) => (
+                <option key={f} value={f}>
+                  {f}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </div>
 
       <div className="rounded-lg border border-border bg-card/40 p-6">
-         <div className="flex flex-wrap justify-center gap-2">
-            {nodes.map((infected, i) => (
-              <motion.div
-                key={i}
-                initial={false}
-                animate={animate ? { scale: infected ? [1.3, 1] : 1 } : false}
-                className={`size-6 rounded-full border transition-colors duration-300 ${
-                  infected 
-                    ? "border-terminal bg-terminal/20 shadow-[0_0_8px_rgba(20,184,166,0.5)]" 
-                    : "border-border bg-secondary/30"
-                }`}
-              />
-            ))}
-         </div>
+        <div className="flex flex-wrap justify-center gap-2">
+          {nodes.map((infected, i) => (
+            <motion.div
+              key={i}
+              initial={false}
+              animate={animate ? { scale: infected ? [1.3, 1] : 1 } : false}
+              className={`size-6 rounded-full border transition-colors duration-300 ${
+                infected
+                  ? "border-terminal bg-terminal/20 shadow-[0_0_8px_rgba(20,184,166,0.5)]"
+                  : "border-border bg-secondary/30"
+              }`}
+            />
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-4">
@@ -142,12 +150,14 @@ export function GossipProtocol() {
         <Stat label="infected" value={`${infectedCount} / ${size}`} />
         <Stat label="coverage" value={`${coverage.toFixed(1)}%`} />
       </div>
-      
+
       <div className="rounded-md border border-cyan-accent/20 bg-cyan-accent/5 p-4 font-mono text-xs text-cyan-accent/80">
         <p>
-          At each tick, every infected node picks <span className="font-bold text-cyan-accent">{fanout}</span> random node(s) 
-          and shares the state. Notice how growth is exponential — it starts slow, but once ~10% are infected, 
-          it rapidly spreads to the entire cluster in <span className="font-bold text-cyan-accent">O(log N)</span> rounds.
+          At each tick, every infected node picks{" "}
+          <span className="font-bold text-cyan-accent">{fanout}</span> random node(s) and shares the
+          state. Notice how growth is exponential — it starts slow, but once ~10% are infected, it
+          rapidly spreads to the entire cluster in{" "}
+          <span className="font-bold text-cyan-accent">O(log N)</span> rounds.
         </p>
       </div>
     </div>
@@ -157,9 +167,7 @@ export function GossipProtocol() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border border-border bg-background/40 px-3 py-2">
-      <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
-        {label}
-      </p>
+      <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{label}</p>
       <p className="font-mono text-lg text-terminal">{value}</p>
     </div>
   );

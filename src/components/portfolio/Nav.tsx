@@ -6,9 +6,7 @@ import { ThemeToggle } from "./ThemeToggle";
 
 function openShell() {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(
-    new KeyboardEvent("keydown", { key: "j", metaKey: true }),
-  );
+  window.dispatchEvent(new KeyboardEvent("keydown", { key: "j", metaKey: true }));
 }
 
 const links = [
@@ -38,16 +36,11 @@ export function Nav() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all ${
-        scrolled
-          ? "border-b border-border bg-background/85 backdrop-blur-md"
-          : "bg-transparent"
+        scrolled ? "border-b border-border bg-background/85 backdrop-blur-md" : "bg-transparent"
       }`}
     >
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <a
-          href="#top"
-          className="text-lg font-semibold tracking-tight text-foreground"
-        >
+        <a href="#top" className="text-lg font-semibold tracking-tight text-foreground">
           Jainil Chauhan
         </a>
 
@@ -58,17 +51,12 @@ export function Nav() {
                 href={l.href}
                 aria-current={active === l.href.slice(1) ? "true" : undefined}
                 className={`relative rounded-md px-3 py-2 text-sm transition-colors hover:bg-secondary hover:text-foreground ${
-                  active === l.href.slice(1)
-                    ? "text-foreground"
-                    : "text-muted-foreground"
+                  active === l.href.slice(1) ? "text-foreground" : "text-muted-foreground"
                 }`}
               >
                 {l.label}
                 {active === l.href.slice(1) && (
-                  <span
-                    aria-hidden
-                    className="absolute inset-x-3 -bottom-px h-px bg-foreground"
-                  />
+                  <span aria-hidden className="absolute inset-x-3 -bottom-px h-px bg-foreground" />
                 )}
               </a>
             </li>

@@ -11,7 +11,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { CodeBlock } from "./CodeBlock";
-import type { LabEntry } from "@/lib/labRegistry";
+import type { LabMeta } from "@/content/types";
 
 interface SectionProps {
   icon: React.ReactNode;
@@ -47,9 +47,82 @@ function Section({ icon, title, defaultOpen = false, children }: SectionProps) {
   );
 }
 
-export function LabContent({ lab }: { lab: LabEntry }) {
+/**
+ * Named systems that run on the concept — never behind a click.
+ *
+ * This is the page's trust signal: every lab ships real companies, real
+ * products, and links to the engineering write-ups they came from. It spent its
+ * life as the fifth collapsed accordion on the page, which is the same as not
+ * having it. It sits outside `Section` on purpose — nothing here should be
+ * collapsible.
+ */
+function UsedInProduction({ items }: { items: NonNullable<LabMeta["usedBy"]> }) {
+  return (
+    <section
+      aria-labelledby="used-by-heading"
+      className="rounded-lg border border-border bg-card p-5"
+    >
+      <h2
+        id="used-by-heading"
+        className="flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground"
+      >
+        <Building2 className="size-4 text-muted-foreground" aria-hidden />
+        Used in production
+      </h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Systems that run on this, and where each one is written up.
+      </p>
+
+      <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+        {items.map((item) => {
+          const body = (
+            <>
+              <span className="flex flex-wrap items-center gap-x-2 gap-y-1 font-code text-xs">
+                <span className="font-semibold text-foreground">{item.company}</span>
+                <span className="text-muted-foreground">/</span>
+                <span className="text-muted-foreground">{item.product}</span>
+                {item.href ? (
+                  <ExternalLink className="size-3 text-muted-foreground" aria-hidden />
+                ) : (
+                  <span className="uppercase tracking-wider text-muted-foreground">
+                    commonly used in
+                  </span>
+                )}
+              </span>
+              <span className="mt-1.5 block text-sm leading-relaxed text-muted-foreground">
+                {item.usage}
+              </span>
+            </>
+          );
+          const className =
+            "block h-full rounded-md border border-border bg-background/40 px-3 py-3";
+          return (
+            <li key={`${item.company}-${item.product}`}>
+              {item.href ? (
+                <a
+                  href={item.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`${className} transition-colors hover:border-foreground/30`}
+                >
+                  {body}
+                </a>
+              ) : (
+                <div className={className}>{body}</div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+export function LabContent({ lab }: { lab: LabMeta }) {
   return (
     <div className="mt-6 space-y-3">
+      {lab.usedBy && lab.usedBy.length > 0 && <UsedInProduction items={lab.usedBy} />}
+
       <Section icon={<BookOpen className="size-4" />} title="Concept" defaultOpen>
         <div className="space-y-3 whitespace-pre-line">{lab.concept}</div>
       </Section>
@@ -85,50 +158,6 @@ export function LabContent({ lab }: { lab: LabEntry }) {
         </Section>
       )}
 
-      {lab.usedBy && lab.usedBy.length > 0 && (
-        <Section icon={<Building2 className="size-4" />} title="Used in production" defaultOpen>
-          <ul className="grid gap-2 sm:grid-cols-2">
-            {lab.usedBy.map((item) => {
-              const body = (
-                <>
-                  <span className="flex items-center gap-2 font-mono text-xs">
-                    <span className="font-semibold text-terminal">{item.company}</span>
-                    <span className="text-muted-foreground">/</span>
-                    <span className="text-cyan-accent">{item.product}</span>
-                    {item.href ? (
-                      <ExternalLink className="size-3 text-muted-foreground" />
-                    ) : (
-                      <span className="text-xs uppercase tracking-wider text-muted-foreground">
-                        commonly used in
-                      </span>
-                    )}
-                  </span>
-                  <span className="mt-1 block text-xs text-foreground">{item.usage}</span>
-                </>
-              );
-              const className =
-                "block h-full rounded-md border border-border bg-background/40 px-3 py-2";
-              return (
-                <li key={`${item.company}-${item.product}`}>
-                  {item.href ? (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={`${className} transition-colors hover:border-terminal/50`}
-                    >
-                      {body}
-                    </a>
-                  ) : (
-                    <div className={className}>{body}</div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </Section>
-      )}
-
       {lab.realWorld && lab.realWorld.length > 0 && (
         <Section icon={<Globe className="size-4" />} title="In the wild">
           <ul className="ml-4 list-disc space-y-1.5 marker:text-terminal">
@@ -141,7 +170,9 @@ export function LabContent({ lab }: { lab: LabEntry }) {
 
       {lab.pitfalls && lab.pitfalls.length > 0 && (
         <Section icon={<AlertTriangle className="size-4" />} title="Pitfalls & gotchas">
-          <ul className="ml-4 list-disc space-y-1.5 marker:text-amber-400">
+          {/* Monochrome: the amber marker that used to be here was the only
+              colour on the page outside a brand logo. */}
+          <ul className="ml-4 list-disc space-y-1.5 marker:text-muted-foreground">
             {lab.pitfalls.map((item, i) => (
               <li key={i}>{item}</li>
             ))}

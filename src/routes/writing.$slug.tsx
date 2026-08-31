@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { absoluteUrl, isPlatform } from "@/lib/site";
 import { ArrowLeft, Clock, ExternalLink } from "lucide-react";
 
 /* ─── Static writing data ──────────────────────────────────────────────────── */
@@ -63,8 +64,13 @@ const writingData: Record<
 /* ─── Route ─────────────────────────────────────────────────────────────────── */
 
 export const Route = createFileRoute("/writing/$slug")({
+  // Portfolio-only — see the note in projects.$slug.tsx.
+  beforeLoad: () => {
+    if (isPlatform) throw notFound();
+  },
   head: ({ params }) => {
     const post = writingData[params.slug];
+    const url = post ? absoluteUrl(`/writing/${params.slug}`) : undefined;
     return {
       meta: post
         ? [
@@ -73,8 +79,10 @@ export const Route = createFileRoute("/writing/$slug")({
             { property: "og:title", content: post.title },
             { property: "og:description", content: post.summary },
             { property: "article:published_time", content: post.date },
+            ...(url ? [{ property: "og:url", content: url }] : []),
           ]
         : [{ title: "Post Not Found — Jainil Chauhan" }],
+      links: url ? [{ rel: "canonical", href: url }] : [],
     };
   },
   component: WritingDetail,

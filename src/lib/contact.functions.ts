@@ -8,7 +8,11 @@ const contactSchema = z.object({
   // Honeypot: real users leave this empty. Bots tend to fill every field.
   website: z.string().max(0).optional().default(""),
   // Time-trap: ms elapsed between form mount and submit. Bots submit instantly.
-  elapsedMs: z.number().int().min(1500).max(1000 * 60 * 60),
+  elapsedMs: z
+    .number()
+    .int()
+    .min(1500)
+    .max(1000 * 60 * 60),
 });
 
 export const sendContactMessage = createServerFn({ method: "POST" })

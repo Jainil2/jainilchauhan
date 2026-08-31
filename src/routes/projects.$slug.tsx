@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { absoluteUrl, isPlatform } from "@/lib/site";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 
 /* ─── Static project data ──────────────────────────────────────────────────── */
@@ -76,8 +77,15 @@ const projectData: Record<
 /* ─── Route ─────────────────────────────────────────────────────────────────── */
 
 export const Route = createFileRoute("/projects/$slug")({
+  // Portfolio-only. The route tree is shared by both Workers, so without this
+  // the platform domain would serve Jainil's project pages — duplicate content
+  // Google would have to pick a winner for, on the wrong product.
+  beforeLoad: () => {
+    if (isPlatform) throw notFound();
+  },
   head: ({ params }) => {
     const p = projectData[params.slug];
+    const url = p ? absoluteUrl(`/projects/${params.slug}`) : undefined;
     return {
       meta: p
         ? [
@@ -85,8 +93,10 @@ export const Route = createFileRoute("/projects/$slug")({
             { name: "description", content: p.summary },
             { property: "og:title", content: p.title },
             { property: "og:description", content: p.summary },
+            ...(url ? [{ property: "og:url", content: url }] : []),
           ]
         : [{ title: "Project Not Found — Jainil Chauhan" }],
+      links: url ? [{ rel: "canonical", href: url }] : [],
     };
   },
   component: ProjectDetail,
@@ -100,7 +110,9 @@ function ProjectDetail() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background font-mono text-foreground">
         <p className="text-terminal text-4xl font-bold">404</p>
-        <p className="text-muted-foreground">project not found: <span className="text-terminal">/{slug}</span></p>
+        <p className="text-muted-foreground">
+          project not found: <span className="text-terminal">/{slug}</span>
+        </p>
         <Link
           to="/"
           className="mt-4 flex items-center gap-2 rounded border border-terminal/40 bg-terminal/10 px-4 py-2 text-terminal transition-all hover:glow-terminal"
@@ -132,9 +144,7 @@ function ProjectDetail() {
         <p className="font-mono text-xs uppercase tracking-widest text-cyan-accent">
           // case-study
         </p>
-        <h1 className="mt-2 font-mono text-3xl font-bold text-foreground sm:text-4xl">
-          {p.title}
-        </h1>
+        <h1 className="mt-2 font-mono text-3xl font-bold text-foreground sm:text-4xl">{p.title}</h1>
         <p className="mt-3 text-lg text-muted-foreground">{p.summary}</p>
 
         {/* Stack */}

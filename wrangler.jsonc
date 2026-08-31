@@ -4,4 +4,24 @@
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
+
+  // Two Workers, one codebase. The default deploy is the portfolio; `delta` is
+  // the learning platform, built with VITE_SITE=delta so the root route mounts
+  // platform chrome instead of portfolio chrome (see src/lib/site.ts).
+  //
+  // Build and deploy them separately -- the output differs, so `npm run
+  // build:delta` must run immediately before deploying this environment:
+  //   npm run build        && npx wrangler deploy
+  //   npm run build:delta  && npx wrangler deploy --env delta
+  //
+  // "delta" is a placeholder name, replaced before launch. No custom domain is
+  // attached yet; add `routes` here once the domain exists.
+  "env": {
+    "delta": {
+      "name": "delta-platform",
+      "compatibility_date": "2025-09-24",
+      "compatibility_flags": ["nodejs_compat"],
+      "main": "@tanstack/react-start/server-entry",
+    },
+  },
 }

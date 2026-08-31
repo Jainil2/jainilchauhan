@@ -53,10 +53,17 @@ function insertNonFull(node: BNode, key: number) {
   }
 }
 
-function search(node: BNode, key: number, depth = 0): { found: boolean; comparisons: number; path: number[] } {
+function search(
+  node: BNode,
+  key: number,
+  depth = 0,
+): { found: boolean; comparisons: number; path: number[] } {
   let cmp = 0;
   let i = 0;
-  while (i < node.keys.length && key > node.keys[i]) { i++; cmp++; }
+  while (i < node.keys.length && key > node.keys[i]) {
+    i++;
+    cmp++;
+  }
   if (i < node.keys.length && key === node.keys[i]) {
     cmp++;
     return { found: true, comparisons: cmp, path: [depth] };
@@ -71,13 +78,23 @@ function clone(n: BNode): BNode {
 }
 
 function NodeView({ node, depth }: { node: BNode; depth: number }) {
-  const colors = ["oklch(0.85 0.21 150)", "oklch(0.78 0.16 200)", "oklch(0.75 0.18 310)", "oklch(0.80 0.18 60)"];
+  const colors = [
+    "oklch(0.85 0.21 150)",
+    "oklch(0.78 0.16 200)",
+    "oklch(0.75 0.18 310)",
+    "oklch(0.80 0.18 60)",
+  ];
   const c = colors[depth % colors.length];
   return (
     <div className="flex flex-col items-center">
-      <div className="flex gap-0.5 rounded border bg-card/60 px-1.5 py-1 font-mono text-xs" style={{ borderColor: c }}>
+      <div
+        className="flex gap-0.5 rounded border bg-card/60 px-1.5 py-1 font-mono text-xs"
+        style={{ borderColor: c }}
+      >
         {node.keys.map((k) => (
-          <span key={k} className="px-1 text-foreground">{k}</span>
+          <span key={k} className="px-1 text-foreground">
+            {k}
+          </span>
         ))}
       </div>
       {!node.leaf && (
@@ -101,11 +118,18 @@ export function BTreeIndexLab() {
     return r;
   });
   const [input, setInput] = useState("");
-  const [lookup, setLookup] = useState<{ key: number; result: ReturnType<typeof search>; tableScan: number } | null>(null);
+  const [lookup, setLookup] = useState<{
+    key: number;
+    result: ReturnType<typeof search>;
+    tableScan: number;
+  } | null>(null);
 
   const totalKeys = useMemo(() => {
     let n = 0;
-    function walk(x: BNode) { n += x.keys.length; x.children.forEach(walk); }
+    function walk(x: BNode) {
+      n += x.keys.length;
+      x.children.forEach(walk);
+    }
     walk(root);
     return n;
   }, [root]);
@@ -139,10 +163,27 @@ export function BTreeIndexLab() {
           placeholder="key (0-999)"
           className="w-24 rounded border border-border bg-background/60 px-2 py-1 text-foreground placeholder:text-muted-foreground"
         />
-        <button onClick={add} className="rounded border border-border px-2 py-1 hover:border-terminal/50 hover:text-terminal">insert</button>
-        <button onClick={find} className="rounded border border-border px-2 py-1 hover:border-terminal/50 hover:text-terminal">lookup</button>
-        <button onClick={rand} className="rounded border border-border px-2 py-1 text-muted-foreground hover:text-foreground">+ random</button>
-        <span className="ml-auto text-muted-foreground">order={ORDER} · {totalKeys} keys</span>
+        <button
+          onClick={add}
+          className="rounded border border-border px-2 py-1 hover:border-terminal/50 hover:text-terminal"
+        >
+          insert
+        </button>
+        <button
+          onClick={find}
+          className="rounded border border-border px-2 py-1 hover:border-terminal/50 hover:text-terminal"
+        >
+          lookup
+        </button>
+        <button
+          onClick={rand}
+          className="rounded border border-border px-2 py-1 text-muted-foreground hover:text-foreground"
+        >
+          + random
+        </button>
+        <span className="ml-auto text-muted-foreground">
+          order={ORDER} · {totalKeys} keys
+        </span>
       </div>
 
       <div className="overflow-x-auto rounded border border-border bg-background/40 p-4">
@@ -154,15 +195,22 @@ export function BTreeIndexLab() {
       {lookup && (
         <div className="rounded border border-border bg-background/40 p-3 font-mono text-xs">
           <p>
-            lookup({lookup.key}) → <span className={lookup.result.found ? "text-terminal" : "text-destructive"}>{lookup.result.found ? "found" : "miss"}</span>
+            lookup({lookup.key}) →{" "}
+            <span className={lookup.result.found ? "text-terminal" : "text-destructive"}>
+              {lookup.result.found ? "found" : "miss"}
+            </span>
           </p>
           <p className="mt-1 text-muted-foreground">
-            B-tree comparisons: <span className="text-terminal">{lookup.result.comparisons}</span> across depth <span className="text-terminal">{lookup.result.path.length}</span>
+            B-tree comparisons: <span className="text-terminal">{lookup.result.comparisons}</span>{" "}
+            across depth <span className="text-terminal">{lookup.result.path.length}</span>
           </p>
           <p className="text-muted-foreground">
-            Naive table scan (~n/2): <span className="text-destructive">{lookup.tableScan}</span> comparisons
+            Naive table scan (~n/2): <span className="text-destructive">{lookup.tableScan}</span>{" "}
+            comparisons
           </p>
-          <p className="mt-1 text-cyan-accent">// O(log n) vs O(n) — and disk pages mean each node hit is one I/O.</p>
+          <p className="mt-1 text-cyan-accent">
+            // O(log n) vs O(n) — and disk pages mean each node hit is one I/O.
+          </p>
         </div>
       )}
     </div>

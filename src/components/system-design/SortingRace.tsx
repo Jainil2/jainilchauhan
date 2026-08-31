@@ -161,10 +161,7 @@ export function SortingRace() {
           const cur = trace[Math.min(frame, trace.length - 1)];
           const done = frame >= trace.length - 1;
           return (
-            <div
-              key={algo.id}
-              className="rounded-md border border-border bg-background/40 p-2"
-            >
+            <div key={algo.id} className="rounded-md border border-border bg-background/40 p-2">
               <div className="mb-2 flex items-center justify-between font-mono text-xs">
                 <span style={{ color: algo.color }}>{algo.name}</span>
                 <span className={done ? "text-terminal" : "text-muted-foreground"}>

@@ -13,9 +13,7 @@ function key(r: number, c: number) {
   return `${r},${c}`;
 }
 
-function dijkstra(
-  walls: Set<string>,
-): { visitedOrder: string[]; path: string[] } {
+function dijkstra(walls: Set<string>): { visitedOrder: string[]; path: string[] } {
   const dist: Record<string, number> = {};
   const prev: Record<string, string | null> = {};
   const visitedOrder: string[] = [];

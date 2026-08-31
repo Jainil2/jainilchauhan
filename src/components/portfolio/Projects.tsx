@@ -29,11 +29,7 @@ const projects: Project[] = [
     title: "Distributed NGO Volunteer Management Platform",
     summary:
       "Real-time coordination platform that scales to thousands of concurrent volunteers without breaking a sweat.",
-    metrics: [
-      "10K+ concurrent users",
-      "Sub-200ms response times",
-      "85% test coverage",
-    ],
+    metrics: ["10K+ concurrent users", "Sub-200ms response times", "85% test coverage"],
     stack: ["React", "Node.js", "MongoDB", "Redis", "S3", "Docker"],
     problem:
       "NGOs were coordinating thousands of volunteers across spreadsheets and group chats — assignments got lost, real-time status was impossible, and the platform had to stay up during high-stakes events.",
@@ -164,9 +160,7 @@ export function Projects() {
               <p className="mb-3 font-mono text-xs uppercase tracking-widest text-cyan-accent">
                 // load balancer · consistent hashing
               </p>
-              <ConsistentHashRing
-                projects={projects.map((p) => ({ id: p.id, title: p.title }))}
-              />
+              <ConsistentHashRing projects={projects.map((p) => ({ id: p.id, title: p.title }))} />
             </aside>
           </Reveal>
         )}
@@ -239,9 +233,7 @@ export function Projects() {
 function Block({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="mb-2 font-mono text-xs uppercase tracking-wider text-terminal">
-        // {label}
-      </p>
+      <p className="mb-2 font-mono text-xs uppercase tracking-wider text-terminal">// {label}</p>
       {children}
     </div>
   );

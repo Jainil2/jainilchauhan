@@ -13,6 +13,7 @@ import { Route as LabRouteImport } from './routes/lab'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WritingSlugRouteImport } from './routes/writing.$slug'
 import { Route as ProjectsSlugRouteImport } from './routes/projects.$slug'
+import { Route as PathSlugRouteImport } from './routes/path.$slug'
 import { Route as LabSlugRouteImport } from './routes/lab.$slug'
 
 const LabRoute = LabRouteImport.update({
@@ -35,6 +36,11 @@ const ProjectsSlugRoute = ProjectsSlugRouteImport.update({
   path: '/projects/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PathSlugRoute = PathSlugRouteImport.update({
+  id: '/path/$slug',
+  path: '/path/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LabSlugRoute = LabSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/lab': typeof LabRouteWithChildren
   '/lab/$slug': typeof LabSlugRoute
+  '/path/$slug': typeof PathSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/writing/$slug': typeof WritingSlugRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/lab': typeof LabRouteWithChildren
   '/lab/$slug': typeof LabSlugRoute
+  '/path/$slug': typeof PathSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/writing/$slug': typeof WritingSlugRoute
 }
@@ -60,19 +68,33 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/lab': typeof LabRouteWithChildren
   '/lab/$slug': typeof LabSlugRoute
+  '/path/$slug': typeof PathSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/writing/$slug': typeof WritingSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/lab' | '/lab/$slug' | '/projects/$slug' | '/writing/$slug'
+  fullPaths:
+    | '/'
+    | '/lab'
+    | '/lab/$slug'
+    | '/path/$slug'
+    | '/projects/$slug'
+    | '/writing/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/lab' | '/lab/$slug' | '/projects/$slug' | '/writing/$slug'
+  to:
+    | '/'
+    | '/lab'
+    | '/lab/$slug'
+    | '/path/$slug'
+    | '/projects/$slug'
+    | '/writing/$slug'
   id:
     | '__root__'
     | '/'
     | '/lab'
     | '/lab/$slug'
+    | '/path/$slug'
     | '/projects/$slug'
     | '/writing/$slug'
   fileRoutesById: FileRoutesById
@@ -80,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LabRoute: typeof LabRouteWithChildren
+  PathSlugRoute: typeof PathSlugRoute
   ProjectsSlugRoute: typeof ProjectsSlugRoute
   WritingSlugRoute: typeof WritingSlugRoute
 }
@@ -114,6 +137,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/path/$slug': {
+      id: '/path/$slug'
+      path: '/path/$slug'
+      fullPath: '/path/$slug'
+      preLoaderRoute: typeof PathSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lab/$slug': {
       id: '/lab/$slug'
       path: '/$slug'
@@ -137,6 +167,7 @@ const LabRouteWithChildren = LabRoute._addFileChildren(LabRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LabRoute: LabRouteWithChildren,
+  PathSlugRoute: PathSlugRoute,
   ProjectsSlugRoute: ProjectsSlugRoute,
   WritingSlugRoute: WritingSlugRoute,
 }

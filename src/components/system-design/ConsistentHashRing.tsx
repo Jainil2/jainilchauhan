@@ -97,9 +97,7 @@ export function ConsistentHashRing({ projects, onProjectHover }: Props) {
 
     // After 400ms switch to "node" phase
     setTimeout(() => {
-      setPackets((prev) =>
-        prev.map((p) => (p.id === pid ? { ...p, phase: "node" } : p)),
-      );
+      setPackets((prev) => prev.map((p) => (p.id === pid ? { ...p, phase: "node" } : p)));
     }, 400);
 
     // Remove after full animation
@@ -215,9 +213,7 @@ export function ConsistentHashRing({ projects, onProjectHover }: Props) {
         {ALL_NODES.map((node) => {
           const pos = nodePos(node.id);
           const alive = activeNodes.includes(node.id);
-          const isTarget =
-            activeProject !== null &&
-            assignedNode[activeProject] === node.id;
+          const isTarget = activeProject !== null && assignedNode[activeProject] === node.id;
 
           return (
             <g key={node.id}>

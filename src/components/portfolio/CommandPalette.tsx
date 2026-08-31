@@ -32,7 +32,7 @@ import {
   Monitor,
 } from "lucide-react";
 import { useSimulationStore } from "@/lib/useSimulationStore";
-import { labRegistry } from "@/lib/labRegistry";
+import { labSummaries } from "@/content/labs";
 import { useControlPlane, type EnvMode } from "@/lib/useControlPlane";
 import { useTheme, type ThemeChoice } from "@/lib/useTheme";
 
@@ -135,7 +135,7 @@ export function CommandPalette() {
             <CommandItem onSelect={() => run(() => navigate({ to: "/lab" }))}>
               <Beaker className="size-4" /> Open Lab index
             </CommandItem>
-            {labRegistry.map((lab) => (
+            {labSummaries.map((lab) => (
               <CommandItem
                 key={lab.slug}
                 onSelect={() =>

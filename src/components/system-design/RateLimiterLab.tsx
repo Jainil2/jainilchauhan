@@ -23,10 +23,26 @@ const REFILL_PER_SEC = 2.5;
 const LEAK_PER_SEC = 2.5;
 
 const STRATEGY_META: Record<Strategy, { label: string; color: string; blurb: string }> = {
-  token: { label: "Token Bucket", color: "oklch(0.85 0.21 150)", blurb: "Burst-friendly. Bucket holds tokens; refills steadily." },
-  leaky: { label: "Leaky Bucket", color: "oklch(0.78 0.16 200)", blurb: "Smooth output. FIFO queue drains at fixed rate." },
-  fixed: { label: "Fixed Window", color: "oklch(0.80 0.18 60)", blurb: "Simple counter, resets every N seconds. Edge bursts possible." },
-  sliding: { label: "Sliding Log", color: "oklch(0.75 0.18 310)", blurb: "Rolling N-second window. Most accurate, costs memory." },
+  token: {
+    label: "Token Bucket",
+    color: "oklch(0.85 0.21 150)",
+    blurb: "Burst-friendly. Bucket holds tokens; refills steadily.",
+  },
+  leaky: {
+    label: "Leaky Bucket",
+    color: "oklch(0.78 0.16 200)",
+    blurb: "Smooth output. FIFO queue drains at fixed rate.",
+  },
+  fixed: {
+    label: "Fixed Window",
+    color: "oklch(0.80 0.18 60)",
+    blurb: "Simple counter, resets every N seconds. Edge bursts possible.",
+  },
+  sliding: {
+    label: "Sliding Log",
+    color: "oklch(0.75 0.18 310)",
+    blurb: "Rolling N-second window. Most accurate, costs memory.",
+  },
 };
 
 export function RateLimiterLab() {
@@ -40,7 +56,10 @@ export function RateLimiterLab() {
     denied: { token: 0, leaky: 0, fixed: 0, sliding: 0 },
   });
   const [lastResult, setLastResult] = useState<Record<Strategy, "allow" | "deny" | null>>({
-    token: null, leaky: null, fixed: null, sliding: null,
+    token: null,
+    leaky: null,
+    fixed: null,
+    sliding: null,
   });
   const lastTickRef = useRef(Date.now());
 
@@ -64,22 +83,50 @@ export function RateLimiterLab() {
     const now = Date.now();
     setState((prev) => {
       const next = { ...prev, allowed: { ...prev.allowed }, denied: { ...prev.denied } };
-      const result: Record<Strategy, "allow" | "deny"> = { token: "deny", leaky: "deny", fixed: "deny", sliding: "deny" };
+      const result: Record<Strategy, "allow" | "deny"> = {
+        token: "deny",
+        leaky: "deny",
+        fixed: "deny",
+        sliding: "deny",
+      };
       for (let i = 0; i < count; i++) {
         // Token bucket
-        if (next.tokens >= 1) { next.tokens -= 1; next.allowed.token++; result.token = "allow"; }
-        else { next.denied.token++; }
+        if (next.tokens >= 1) {
+          next.tokens -= 1;
+          next.allowed.token++;
+          result.token = "allow";
+        } else {
+          next.denied.token++;
+        }
         // Leaky bucket — accept if queue has slot
-        if (next.leakyQueue.length < CAPACITY) { next.leakyQueue = [...next.leakyQueue, now]; next.allowed.leaky++; result.leaky = "allow"; }
-        else { next.denied.leaky++; }
+        if (next.leakyQueue.length < CAPACITY) {
+          next.leakyQueue = [...next.leakyQueue, now];
+          next.allowed.leaky++;
+          result.leaky = "allow";
+        } else {
+          next.denied.leaky++;
+        }
         // Fixed window
-        if (now - next.fixedWindowStart >= WINDOW_MS) { next.fixedWindowStart = now; next.fixedCount = 0; }
-        if (next.fixedCount < CAPACITY) { next.fixedCount++; next.allowed.fixed++; result.fixed = "allow"; }
-        else { next.denied.fixed++; }
+        if (now - next.fixedWindowStart >= WINDOW_MS) {
+          next.fixedWindowStart = now;
+          next.fixedCount = 0;
+        }
+        if (next.fixedCount < CAPACITY) {
+          next.fixedCount++;
+          next.allowed.fixed++;
+          result.fixed = "allow";
+        } else {
+          next.denied.fixed++;
+        }
         // Sliding log
         next.slidingLog = next.slidingLog.filter((t) => now - t < WINDOW_MS);
-        if (next.slidingLog.length < CAPACITY) { next.slidingLog = [...next.slidingLog, now]; next.allowed.sliding++; result.sliding = "allow"; }
-        else { next.denied.sliding++; }
+        if (next.slidingLog.length < CAPACITY) {
+          next.slidingLog = [...next.slidingLog, now];
+          next.allowed.sliding++;
+          result.sliding = "allow";
+        } else {
+          next.denied.sliding++;
+        }
       }
       setLastResult(result);
       return next;
@@ -101,11 +148,33 @@ export function RateLimiterLab() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
-        <span className="text-muted-foreground">capacity {CAPACITY}/{WINDOW_MS / 1000}s</span>
-        <button onClick={() => fire(1)} className="rounded border border-border px-2 py-1 hover:border-terminal/50 hover:text-terminal">+1 req</button>
-        <button onClick={() => fire(10)} className="rounded border border-amber-500/40 px-2 py-1 text-amber-300 hover:border-amber-400">burst 10</button>
-        <button onClick={() => fire(20)} className="rounded border border-destructive/40 px-2 py-1 text-destructive hover:border-destructive">burst 20</button>
-        <button onClick={reset} className="ml-auto rounded border border-border px-2 py-1 text-muted-foreground hover:text-foreground">reset</button>
+        <span className="text-muted-foreground">
+          capacity {CAPACITY}/{WINDOW_MS / 1000}s
+        </span>
+        <button
+          onClick={() => fire(1)}
+          className="rounded border border-border px-2 py-1 hover:border-terminal/50 hover:text-terminal"
+        >
+          +1 req
+        </button>
+        <button
+          onClick={() => fire(10)}
+          className="rounded border border-amber-500/40 px-2 py-1 text-amber-300 hover:border-amber-400"
+        >
+          burst 10
+        </button>
+        <button
+          onClick={() => fire(20)}
+          className="rounded border border-destructive/40 px-2 py-1 text-destructive hover:border-destructive"
+        >
+          burst 20
+        </button>
+        <button
+          onClick={reset}
+          className="ml-auto rounded border border-border px-2 py-1 text-muted-foreground hover:text-foreground"
+        >
+          reset
+        </button>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -115,28 +184,48 @@ export function RateLimiterLab() {
           const allowRate = total ? (state.allowed[s] / total) * 100 : 0;
           let levelLabel = "";
           let levelPct = 0;
-          if (s === "token") { levelLabel = `${state.tokens.toFixed(1)} / ${CAPACITY} tokens`; levelPct = (state.tokens / CAPACITY) * 100; }
-          else if (s === "leaky") { levelLabel = `${state.leakyQueue.length} / ${CAPACITY} in queue`; levelPct = (state.leakyQueue.length / CAPACITY) * 100; }
-          else if (s === "fixed") { levelLabel = `${state.fixedCount} / ${CAPACITY} this window`; levelPct = (state.fixedCount / CAPACITY) * 100; }
-          else { levelLabel = `${state.slidingLog.length} / ${CAPACITY} in last ${WINDOW_MS / 1000}s`; levelPct = (state.slidingLog.length / CAPACITY) * 100; }
+          if (s === "token") {
+            levelLabel = `${state.tokens.toFixed(1)} / ${CAPACITY} tokens`;
+            levelPct = (state.tokens / CAPACITY) * 100;
+          } else if (s === "leaky") {
+            levelLabel = `${state.leakyQueue.length} / ${CAPACITY} in queue`;
+            levelPct = (state.leakyQueue.length / CAPACITY) * 100;
+          } else if (s === "fixed") {
+            levelLabel = `${state.fixedCount} / ${CAPACITY} this window`;
+            levelPct = (state.fixedCount / CAPACITY) * 100;
+          } else {
+            levelLabel = `${state.slidingLog.length} / ${CAPACITY} in last ${WINDOW_MS / 1000}s`;
+            levelPct = (state.slidingLog.length / CAPACITY) * 100;
+          }
 
           return (
             <div key={s} className="rounded-lg border border-border bg-background/40 p-3">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-semibold" style={{ color: meta.color }}>{meta.label}</span>
+                <span className="font-mono text-xs font-semibold" style={{ color: meta.color }}>
+                  {meta.label}
+                </span>
                 {lastResult[s] && (
-                  <span className={`rounded border px-1.5 py-0.5 font-mono text-xs ${lastResult[s] === "allow" ? "border-terminal/50 text-terminal" : "border-destructive/50 text-destructive"}`}>
+                  <span
+                    className={`rounded border px-1.5 py-0.5 font-mono text-xs ${lastResult[s] === "allow" ? "border-terminal/50 text-terminal" : "border-destructive/50 text-destructive"}`}
+                  >
                     {lastResult[s] === "allow" ? "200 OK" : "429"}
                   </span>
                 )}
               </div>
               <p className="mt-1 font-mono text-xs text-muted-foreground">{meta.blurb}</p>
               <div className="mt-2 h-1.5 overflow-hidden rounded bg-card">
-                <div className="h-full transition-all duration-200" style={{ width: `${levelPct}%`, background: meta.color }} />
+                <div
+                  className="h-full transition-all duration-200"
+                  style={{ width: `${levelPct}%`, background: meta.color }}
+                />
               </div>
               <div className="mt-1 flex justify-between font-mono text-xs text-muted-foreground">
                 <span>{levelLabel}</span>
-                <span><span className="text-terminal">{state.allowed[s]}</span> / <span className="text-destructive">{state.denied[s]}</span> ({allowRate.toFixed(0)}%)</span>
+                <span>
+                  <span className="text-terminal">{state.allowed[s]}</span> /{" "}
+                  <span className="text-destructive">{state.denied[s]}</span> (
+                  {allowRate.toFixed(0)}%)
+                </span>
               </div>
             </div>
           );

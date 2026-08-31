@@ -6,20 +6,17 @@ const items = [
   {
     icon: Wrench,
     label: "building",
-    body:
-      "Auth + tenancy primitives at Tech Holding — short-lived tokens, scoped sessions, and audit-grade logging.",
+    body: "Auth + tenancy primitives at Tech Holding — short-lived tokens, scoped sessions, and audit-grade logging.",
   },
   {
     icon: BookOpen,
     label: "reading",
-    body:
-      "Designing Data-Intensive Applications (re-read) and Tigerbeetle's docs on deterministic state machines.",
+    body: "Designing Data-Intensive Applications (re-read) and Tigerbeetle's docs on deterministic state machines.",
   },
   {
     icon: Sparkles,
     label: "learning",
-    body:
-      "Rust for systems work, and going deeper on OpenTelemetry tracing across distributed services.",
+    body: "Rust for systems work, and going deeper on OpenTelemetry tracing across distributed services.",
   },
 ];
 
@@ -28,8 +25,8 @@ export function Now() {
     <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
       <SectionHeading id="now" prompt="Current focus" title="Now" />
       <p className="mb-8 max-w-2xl text-muted-foreground">
-        A snapshot of what I&apos;m focused on this season — updated when life
-        changes, in the spirit of{" "}
+        A snapshot of what I&apos;m focused on this season — updated when life changes, in the
+        spirit of{" "}
         <a
           href="https://nownownow.com/about"
           target="_blank"
@@ -51,9 +48,7 @@ export function Now() {
                   <Icon className="size-4 text-terminal" />
                   {item.label}
                 </div>
-                <p className="mt-3 leading-relaxed text-foreground">
-                  {item.body}
-                </p>
+                <p className="mt-3 leading-relaxed text-foreground">{item.body}</p>
               </article>
             </Reveal>
           );

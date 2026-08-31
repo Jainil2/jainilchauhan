@@ -12,11 +12,7 @@ import { TokenBucket } from "@/components/system-design/TokenBucket";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name is too long"),
-  email: z
-    .string()
-    .trim()
-    .email("Enter a valid email")
-    .max(255, "Email is too long"),
+  email: z.string().trim().email("Enter a valid email").max(255, "Email is too long"),
   message: z
     .string()
     .trim()
@@ -33,8 +29,7 @@ export function Contact() {
   const mountedAt = useRef<number>(Date.now());
   const prevLengthRef = useRef(0);
 
-  const { tokens, maxTokens, onType, canSubmit, isRateLimited } =
-    useTokenBucket(REQUIRED_TOKENS);
+  const { tokens, maxTokens, onType, canSubmit, isRateLimited } = useTokenBucket(REQUIRED_TOKENS);
 
   useEffect(() => {
     mountedAt.current = Date.now();
@@ -101,26 +96,19 @@ export function Contact() {
       <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr]">
         <div>
           <h3 className="text-pretty font-mono text-2xl font-semibold text-foreground sm:text-3xl">
-            Have a problem worth solving?{" "}
-            <span className="text-terminal">Let&apos;s talk.</span>
+            Have a problem worth solving? <span className="text-terminal">Let&apos;s talk.</span>
           </h3>
           <p className="mt-3 max-w-xl text-muted-foreground">
-            I&apos;m open to backend, platform, and distributed-systems roles —
-            full-time, contract, or interesting one-off engagements. Drop a note
-            and I&apos;ll reply within a couple of days.
+            I&apos;m open to backend, platform, and distributed-systems roles — full-time, contract,
+            or interesting one-off engagements. Drop a note and I&apos;ll reply within a couple of
+            days.
           </p>
 
           <form onSubmit={onSubmit} noValidate className="mt-8 space-y-4">
             {/* Honeypot field — hidden from users, visible to most bots. */}
             <div className="absolute left-[-9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
               <label htmlFor="website">Website</label>
-              <input
-                id="website"
-                name="website"
-                type="text"
-                tabIndex={-1}
-                autoComplete="off"
-              />
+              <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
             </div>
             <div>
               <label htmlFor="name" className="font-mono text-xs text-muted-foreground">
@@ -205,19 +193,13 @@ export function Contact() {
               </button>
 
               {/* Token bucket visualizer */}
-              <TokenBucket
-                tokens={tokens}
-                maxTokens={maxTokens}
-                isRateLimited={isRateLimited}
-              />
+              <TokenBucket tokens={tokens} maxTokens={maxTokens} isRateLimited={isRateLimited} />
             </div>
           </form>
         </div>
 
         <aside className="space-y-3 rounded-lg border border-border bg-card/60 p-6 font-mono text-sm">
-          <p className="text-xs uppercase tracking-wider text-cyan-accent">
-            // direct lines
-          </p>
+          <p className="text-xs uppercase tracking-wider text-cyan-accent">// direct lines</p>
 
           <a
             href="mailto:jainil.chauhan@example.com"

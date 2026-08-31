@@ -36,14 +36,19 @@ export function CapTheoremLab() {
       }
       // AP, or majority side in CP
       setNodes((ns) => ns.map((n) => (n.side === side && n.online ? { ...n, value } : n)));
-      append(`✓ write(${value}) on ${side} → accepted${mode === "AP" && !isMajority ? " (will diverge)" : ""}`);
+      append(
+        `✓ write(${value}) on ${side} → accepted${mode === "AP" && !isMajority ? " (will diverge)" : ""}`,
+      );
     } else {
       setNodes((ns) => ns.map((n) => (n.online ? { ...n, value } : n)));
       append(`✓ write(${value}) → replicated to all`);
     }
   }
 
-  function partition() { setPartitioned(true); append("⚡ network partition between left/right"); }
+  function partition() {
+    setPartitioned(true);
+    append("⚡ network partition between left/right");
+  }
 
   function heal() {
     if (!partitioned) return;
@@ -81,9 +86,26 @@ export function CapTheoremLab() {
             {m === "CP" ? "CP — Consistency" : "AP — Availability"}
           </button>
         ))}
-        <button onClick={partition} disabled={partitioned} className="ml-auto rounded border border-amber-500/40 px-2 py-1 text-amber-300 disabled:opacity-40">⚡ partition</button>
-        <button onClick={heal} disabled={!partitioned} className="rounded border border-terminal/40 px-2 py-1 text-terminal disabled:opacity-40">heal</button>
-        <button onClick={reset} className="rounded border border-border px-2 py-1 text-muted-foreground">reset</button>
+        <button
+          onClick={partition}
+          disabled={partitioned}
+          className="ml-auto rounded border border-amber-500/40 px-2 py-1 text-amber-300 disabled:opacity-40"
+        >
+          ⚡ partition
+        </button>
+        <button
+          onClick={heal}
+          disabled={!partitioned}
+          className="rounded border border-terminal/40 px-2 py-1 text-terminal disabled:opacity-40"
+        >
+          heal
+        </button>
+        <button
+          onClick={reset}
+          className="rounded border border-border px-2 py-1 text-muted-foreground"
+        >
+          reset
+        </button>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
@@ -95,25 +117,35 @@ export function CapTheoremLab() {
           return (
             <div key={side} className="rounded-lg border border-border bg-background/40 p-3">
               <div className="mb-2 flex items-center justify-between font-mono text-xs">
-                <span className="uppercase tracking-widest text-muted-foreground">{side} partition</span>
+                <span className="uppercase tracking-widest text-muted-foreground">
+                  {side} partition
+                </span>
                 <span className={isMajority || !partitioned ? "text-terminal" : "text-destructive"}>
                   {!partitioned ? "online" : isMajority ? "majority" : "minority"}
                 </span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {sideNodes.map((n) => (
-                  <div key={n.id} className="rounded border border-border bg-card/60 px-3 py-2 font-mono text-xs">
+                  <div
+                    key={n.id}
+                    className="rounded border border-border bg-card/60 px-3 py-2 font-mono text-xs"
+                  >
                     <div className="text-muted-foreground">{n.id}</div>
                     <div className="text-terminal text-base">{n.value}</div>
                   </div>
                 ))}
               </div>
               <div className="mt-3 flex gap-2">
-                <button onClick={() => write(side, `v${Math.floor(Math.random() * 99) + 1}`)} disabled={!writable}
-                  className="flex-1 rounded border border-border px-2 py-1 font-mono text-xs hover:border-terminal/50 hover:text-terminal disabled:opacity-30 disabled:hover:text-foreground">
+                <button
+                  onClick={() => write(side, `v${Math.floor(Math.random() * 99) + 1}`)}
+                  disabled={!writable}
+                  className="flex-1 rounded border border-border px-2 py-1 font-mono text-xs hover:border-terminal/50 hover:text-terminal disabled:opacity-30 disabled:hover:text-foreground"
+                >
                   {writable ? "write" : "✗ refused"}
                 </button>
-                <button className="flex-1 rounded border border-border px-2 py-1 font-mono text-xs text-cyan-accent">read → {sideNodes[0]?.value}</button>
+                <button className="flex-1 rounded border border-border px-2 py-1 font-mono text-xs text-cyan-accent">
+                  read → {sideNodes[0]?.value}
+                </button>
               </div>
             </div>
           );
@@ -123,9 +155,15 @@ export function CapTheoremLab() {
       <div className="rounded border border-border bg-background/40 p-3 font-mono text-xs">
         <p className="mb-1 text-xs uppercase tracking-widest text-muted-foreground">cluster log</p>
         {log.length === 0 ? (
-          <p className="text-muted-foreground">No events yet — try writing on each side, then partition.</p>
+          <p className="text-muted-foreground">
+            No events yet — try writing on each side, then partition.
+          </p>
         ) : (
-          log.map((l, i) => <div key={i} className="text-foreground">{l}</div>)
+          log.map((l, i) => (
+            <div key={i} className="text-foreground">
+              {l}
+            </div>
+          ))
         )}
       </div>
     </div>
