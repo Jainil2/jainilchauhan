@@ -294,6 +294,14 @@ export const labSummaries: LabSummary[] = [
     "blurb": "Origins and Preflights."
   },
   {
+    "slug": "cost-modeling",
+    "title": "Cost Modeling",
+    "category": "System Design",
+    "difficulty": "Intermediate",
+    "readingTimeMin": 6,
+    "blurb": "Find the dominant term first. Optimising anything else is a rounding error with a sprint attached."
+  },
+  {
     "slug": "counting-sort",
     "title": "Counting Sort",
     "category": "Algorithms",
@@ -1287,6 +1295,18 @@ export const bridgeEdges: BridgeEdge[] = [
     "from": "backpressure",
     "sameness": "The admission decision is the same one you implemented: a bounded pool, an arrival rate that may exceed it, and a policy for what happens to the excess.",
     "delta": "Rejecting is rarely acceptable here, so the excess queues and the pressure surfaces as time-to-first-token instead of dropped work. KV cache memory, not slot count, is usually the real bound."
+  },
+  {
+    "to": "cost-modeling",
+    "from": "inference-cost",
+    "sameness": "It IS the inference cost model, with the request in place of the token. Same three moves: find the unit that scales, price it, then multiply by volume to get a number per unit and a number per month. The insight that one term dominates and the rest are noise is identical.",
+    "delta": "The units multiply. A token has one price; a request pulls compute, storage, egress, log ingest and metric series behind it, each metered differently and some of them priced per gigabyte of data you never chose to produce. So the dominant term is rarely the one you provisioned, and it moves as the system grows — which is why the model has to be recomputed rather than remembered."
+  },
+  {
+    "to": "cost-modeling",
+    "from": "capacity-planning",
+    "sameness": "This IS the capacity plan with a price tag on each row. The fleet size that came out of Little's Law and the N−1 rule is the same integer that goes into the compute line here — one artefact, read twice.",
+    "delta": "Reading it as money reverses some of the conclusions. Headroom you justified as reliability now has an invoice attached, and the honest question becomes what an hour of degraded service is worth against the cost of the idle capacity that prevents it. That is a business decision the queueing arithmetic cannot make for you."
   },
   {
     "to": "counting-sort",

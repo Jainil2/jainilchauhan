@@ -173,43 +173,52 @@ function LabIndex() {
         </div>
 
         {/*
-         * Tracks first. "What next" answers three labs at a time; a track
+         * Tracks and "what next", in that order on a wide screen: a track
          * answers the whole route, which is what turns a visit into a habit.
-         * TrackCard renders no link of its own so it can be wrapped here.
+         *
+         * On a phone the order flips. Five stacked track cards run about
+         * 1400px, which pushed the answer to "what should I do right now" a
+         * full screen and a half below the fold — so on small viewports the
+         * three next steps come first and the routes sit under them. Wide
+         * screens show tracks in one row, where no such burial happens.
          */}
-        <section className="mt-10" aria-labelledby="tracks-heading">
-          <h2
-            id="tracks-heading"
-            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
-          >
-            Guided tracks
-          </h2>
-          <p className="mt-1.5 text-sm text-muted-foreground">
-            Ordered routes, each one built so no step is a cold start. Start anywhere.
-          </p>
-          <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {trackSummaries.map((track) => (
-              <li key={track.slug}>
-                <Link
-                  to="/path/$slug"
-                  params={{ slug: track.slug }}
-                  className="block h-full rounded-lg transition-colors hover:border-foreground/25"
-                >
-                  <TrackCard track={track} className="h-full" />
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <div className="flex flex-col">
+          <section className="order-2 mt-10 sm:order-1" aria-labelledby="tracks-heading">
+            <h2
+              id="tracks-heading"
+              className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+            >
+              Guided tracks
+            </h2>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Ordered routes, each one built so no step is a cold start. Start anywhere.
+            </p>
+            <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {trackSummaries.map((track) => (
+                <li key={track.slug}>
+                  <Link
+                    to="/path/$slug"
+                    params={{ slug: track.slug }}
+                    className="block h-full rounded-lg transition-colors hover:border-foreground/25"
+                  >
+                    <TrackCard track={track} className="h-full" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <div className="order-1 sm:order-2">
+            <NextThree />
+          </div>
+        </div>
 
         {/*
-         * The order below is the argument: what to do next, then what you have
-         * already done, then — and only then — the catalogue. The grid used to
-         * be the first thing on the page, which made 108 cards of things you
-         * have not done the answer to "where do I start".
+         * Then what you have already done, then — and only then — the
+         * catalogue. The grid used to be the first thing on the page, which
+         * made 108 cards of things you have not done the answer to "where do
+         * I start".
          */}
-        <NextThree />
-
         <WhatYouHaveDone />
 
         <section className="mt-16 border-t border-border pt-10" aria-labelledby="browse-heading">

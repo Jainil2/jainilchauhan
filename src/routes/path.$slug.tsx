@@ -88,18 +88,10 @@ function TrackPage() {
           navigate from, not a dead end. */}
       <PlatformHeader />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
-        <Link
-          to="/lab"
-          className="inline-flex items-center gap-2 font-code text-xs text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="size-3" />
-          All labs
-        </Link>
-
-        <div className="mt-8">
-          <TrackDetail track={track} />
-        </div>
+      {/* No back-link here: the header already carries "All labs", and two of
+          them a few pixels apart reads as a mistake. */}
+      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+        <TrackDetail track={track} />
       </div>
     </div>
   );

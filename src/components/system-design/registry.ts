@@ -469,4 +469,104 @@ export const labComponents: Record<string, LazyExoticComponent<ComponentType>> =
       default: m.PromptInjectionLab,
     })),
   ),
+  "rate-limiting-at-scale": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsA").then((m) => ({
+      default: m.RateLimitingAtScaleLab,
+    })),
+  ),
+  "caching-layers": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsA").then((m) => ({
+      default: m.CachingLayersLab,
+    })),
+  ),
+  "cdn-edge": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsA").then((m) => ({
+      default: m.CdnEdgeLab,
+    })),
+  ),
+  "api-gateway": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsA").then((m) => ({
+      default: m.ApiGatewayLab,
+    })),
+  ),
+  "database-scaling": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsA").then((m) => ({
+      default: m.DatabaseScalingLab,
+    })),
+  ),
+  "read-replicas": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsA").then((m) => ({
+      default: m.ReadReplicasLab,
+    })),
+  ),
+  "connection-pooling": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsA").then((m) => ({
+      default: m.ConnectionPoolingLab,
+    })),
+  ),
+  "queues-vs-streams": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsA").then((m) => ({
+      default: m.QueuesVsStreamsLab,
+    })),
+  ),
+  idempotency: lazy(() =>
+    import("@/components/system-design/SystemDesignLabsA").then((m) => ({
+      default: m.IdempotencyLab,
+    })),
+  ),
+  "retries-and-timeouts": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsA").then((m) => ({
+      default: m.RetriesAndTimeoutsLab,
+    })),
+  ),
+  observability: lazy(() =>
+    import("@/components/system-design/SystemDesignLabsB").then((m) => ({
+      default: m.ObservabilityLab,
+    })),
+  ),
+  "graceful-shutdown": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsB").then((m) => ({
+      default: m.GracefulShutdownLab,
+    })),
+  ),
+  "multi-region": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsB").then((m) => ({
+      default: m.MultiRegionLab,
+    })),
+  ),
+  "feature-flags": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsB").then((m) => ({
+      default: m.FeatureFlagsLab,
+    })),
+  ),
+  "schema-migration": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsB").then((m) => ({
+      default: m.SchemaMigrationLab,
+    })),
+  ),
+  "capacity-planning": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsB").then((m) => ({
+      default: m.CapacityPlanningLab,
+    })),
+  ),
+  "blue-green-canary": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsB").then((m) => ({
+      default: m.BlueGreenCanaryLab,
+    })),
+  ),
+  "config-and-secrets": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsB").then((m) => ({
+      default: m.ConfigAndSecretsLab,
+    })),
+  ),
+  "multi-tenancy": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsB").then((m) => ({
+      default: m.MultiTenancyLab,
+    })),
+  ),
+  "cost-modeling": lazy(() =>
+    import("@/components/system-design/SystemDesignLabsB").then((m) => ({
+      default: m.CostModelingLab,
+    })),
+  ),
 };
